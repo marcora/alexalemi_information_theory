@@ -1,0 +1,47 @@
+---
+title: "Information theory"
+author: "Alex Alemi"
+bibliography: references.bib
+---
+
+Notes from lectures of intro course on information theory for machine learning by [Alex Alemi](https://www.alexalemi.com):
+
+- Lectures: [\[part I\]](https://youtu.be/WsLsEc-p3ww) [\[part II\]](https://youtu.be/hwZU-O0_12g) [\[part III\]](https://youtu.be/NYcJwXhVhuI)
+
+- [\[slides\]](https://docs.google.com/presentation/d/1oSgexQc4hckbb4eWuMQCTplhR-OPRpK-bquW9_G3pbI/present?usp=sharing)
+
+- [\[problem set\]](https://drive.google.com/file/d/1VdFc41xtayn6YY-ZsHlbOBSCEabmNRXs/view?usp=sharing)
+
+- [\[solutions\]](https://drive.google.com/file/d/1jPUhUS5T2rgyx5Dlt74g4_MwX8vrBi2I/view?usp=sharing)
+
+## Introduction
+
+[Information theory](https://en.wikipedia.org/wiki/Information_theory) is a [recent invention](https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication) by [Claude Shannon](https://en.wikipedia.org/wiki/Claude_Shannon), who was primarily concerned with communication [@shannon1948]. We have to thank him for basically all things digital!
+
+Here, we develop information theory from probability theory rather than in the original context of communication (see [curated list of books](https://franknielsen.github.io/Books/CuratedBookLists.html) by [Frank Nielsen](https://franknielsen.github.io/more.html)).
+
+Fundamentally, information theory is about [measures](https://en.wikipedia.org/wiki/Information_theory_and_measure_theory):
+
+- [weight of evidence](https://en.wikipedia.org/wiki/Bayes%27_theorem): measures the "importance" of data for distinguishing between two hypotheses
+
+- [relative entropy](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) (a.k.a. Kullback–Leibler (KL) divergence): measures a "distance" between two distributions
+
+- [entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)): measures the "complexity" of a distribution
+
+- [mutual information](https://en.wikipedia.org/wiki/Mutual_information): measures the "complexity" of the association between two variables
+
+## Weight of evidence
+
+xxx
+
+## Relative entropy
+
+xxx
+
+## Entropy
+
+xxx
+
+## Mutual information
+
+xxx
