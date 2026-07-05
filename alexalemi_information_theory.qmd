@@ -24,15 +24,74 @@ Fundamentally, information theory is about [measures](https://en.wikipedia.org/w
 
 - [weight of evidence](https://en.wikipedia.org/wiki/Bayes%27_theorem): measures the "importance" of data for distinguishing between two hypotheses
 
+$$w[x;p,q] \equiv \log \frac{p(x)}{q(x)}$$
+
 - [relative entropy](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) (a.k.a. Kullback–Leibler (KL) divergence): measures a "distance" between two distributions
+
+$$\mathcal{S}[p;q] \equiv \sum p(x) \log \frac{p(x)}{q(x)}$$
 
 - [entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)): measures the "complexity" of a distribution
 
+$$\mathcal{S}[p] \equiv - \sum p(x) \log p(x)$$
+
 - [mutual information](https://en.wikipedia.org/wiki/Mutual_information): measures the "complexity" of the association between two variables
+
+$$\mathcal{I}(X;Y) \equiv \sum p(x,y) \log \frac{p(x,y)}{p(x)p(y)}$$
 
 ## Weight of evidence
 
-xxx
+In the beginning, there was Bayes' rule (joint probability/product rule factored/sliced two ways + algebra):
+
+$$P(A,B) = P(A)P(B \mid A) = P(B)P(A \mid B) = P(B, A)$$
+
+$$P(B \mid A) = \frac{P(B) P(A \mid B)}{P(A)}$$
+
+All "frequentist vs. Bayesian, etc." controversies are rooted in the philosophical interpretation of this uncontroversial rule of probability theory when applied to statistical inference:
+
+$$P(H \mid D) = \frac{P(H) P(D \mid H)}{P(D)}$$
+where:
+
+$P(H \mid D) = \text{the (posterior) probability of the hypothesis after observing the data}$
+
+$P(H) = \text{the (prior) probability of the hypothesis before observing the data}$
+
+$P(D \mid H) = \text{the probability of the observed data given the hypothesis (a.k.a. the likelihood of the hypothesis given the observed data)}$
+
+$P(D) = \text{the (marginal) probability (a.k.a. evidence or marginal likelihood) of the observed data, computed by averaging over all hypotheses}$
+
+For example, $P(H \mid D) = \frac{P(H) P(D \mid H)}{P(H) P(D \mid H)+ P(\lnot H) P(D \mid \lnot H)}$
+
+The evidence/marginal likelihood is the tricky bit... so, let's get rid of it!
+
+We begin by considering just two hypotheses $H_1$ and $H_2$:
+
+$$
+\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \frac{P(H_1)}{P(H_2)} \frac{P(D \mid H_1)}{P(D \mid H_2)}
+$$
+
+where:
+
+$\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \text{the posterior odds}$
+
+$\frac{P(H_1)}{P(H_2)} = \text{the prior odds}$
+
+$\frac{P(D \mid H_1)}{P(D \mid H_2)} = \text{the Bayes' factor/likelihood ratio}$
+
+Then, we log both sides:
+
+$$
+\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \log \Big(\frac{P(H_1)}{P(H_2)} \frac{P(D \mid H_1)}{P(D \mid H_2)} \Big) =  \log \frac{P(H_1)}{P(H_2)} + \log \frac{P(D \mid H_1)}{P(D \mid H_2)}
+$$
+
+where:
+
+$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \text{the posterior log odds}$
+
+$\log \frac{P(H_1)}{P(H_2)} = \text{the prior log odds}$
+
+$\log \frac{P(D \mid H_1)}{P(D \mid H_2)} = \text{the weight of evidence}$
+
+The posterior log odds are prior log odds + the **weight of evidence**.
 
 ## Relative entropy
 
