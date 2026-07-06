@@ -48,8 +48,7 @@ $$P(B \mid A) = \frac{P(B) P(A \mid B)}{P(A)}$$
 
 All "frequentist vs. Bayesian, etc." controversies are rooted in the philosophical interpretation of this uncontroversial rule of probability theory when applied to statistical inference:
 
-$$P(H \mid D) = \frac{P(H) P(D \mid H)}{P(D)}$$
-where:
+$$P(H \mid D) = \frac{P(H) P(D \mid H)}{P(D)}$$ where:
 
 $P(H \mid D) = \text{the (posterior) probability of the hypothesis after observing the data}$
 
@@ -65,9 +64,7 @@ The evidence/marginal likelihood is the tricky bit... so, let's get rid of it!
 
 We begin by considering just two hypotheses $H_1$ and $H_2$:
 
-$$
-\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \frac{P(H_1)}{P(H_2)} \frac{P(D \mid H_1)}{P(D \mid H_2)}
-$$
+$$\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \frac{P(H_1)}{P(H_2)} \frac{P(D \mid H_1)}{P(D \mid H_2)}$$
 
 where:
 
@@ -79,9 +76,7 @@ $\frac{P(D \mid H_1)}{P(D \mid H_2)} = \text{the Bayes' factor/likelihood ratio}
 
 Then, we log both sides:
 
-$$
-\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \log \Big(\frac{P(H_1)}{P(H_2)} \frac{P(D \mid H_1)}{P(D \mid H_2)} \Big) =  \log \frac{P(H_1)}{P(H_2)} + \log \frac{P(D \mid H_1)}{P(D \mid H_2)}
-$$
+$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \log \Big(\frac{P(H_1)}{P(H_2)} \frac{P(D \mid H_1)}{P(D \mid H_2)} \Big) =  \log \frac{P(H_1)}{P(H_2)} + \log \frac{P(D \mid H_1)}{P(D \mid H_2)}$$
 
 where:
 
@@ -92,6 +87,31 @@ $\log \frac{P(H_1)}{P(H_2)} = \text{the prior log odds}$
 $\log \frac{P(D \mid H_1)}{P(D \mid H_2)} = \text{the weight of evidence}$
 
 The posterior log odds are prior log odds + the **weight of evidence**.
+
+If you don't know what [odds](https://en.wikipedia.org/wiki/Odds) are (in the case of a single event):
+
+$$\text{Odds}(A) = \frac{P(A)}{P(\lnot A)} = \frac{P(A)}{1 - P(A)}$$
+
+For example:
+
+$$P(A) = 0.5 = \frac{1}{2} \rightarrow \text{Odds}(A) = \frac{\frac{1}{2}}{\frac{1}{2}} = 1 = 1 : 1$$
+
+$$P(A) = 0.75 = \frac{3}{4} \rightarrow \text{Odds}(A) = \frac{\frac{3}{4}}{\frac{1}{4}} = 3 = 3 : 1$$
+
+More generally, odds are the ratio of any two probabilities, not necessarily $P(A)$ and $P(\lnot A)$, e.g., $\frac{P(H_1)}{P(H_2)}$.
+
+>We define the logarithm of the likelihood ration as the **information** in data $X = x$ for discrimination in favor of $H_1$ against $H_2$, i.e., the **weight of evidence** for $H_1$ (against $H_2$) given data $X = x$.
+
+Change of notation:
+
+$$
+\begin{align}
+P(X = x \mid P) & \rightarrow p(x) \\
+P(X = x \mid Q) & \rightarrow q(x) \\
+\end{align}
+$$
+
+
 
 ## Relative entropy
 
