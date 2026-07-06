@@ -4,7 +4,7 @@ author: "Alex Alemi"
 bibliography: references.bib
 ---
 
-Notes from lectures of intro course on information theory for machine learning by [Alex Alemi](https://www.alexalemi.com):
+Notes from lectures of intro course on information theory for machine learning by [Alex Alemi](https://www.alexalemi.com), later summarized in a [blog post](https://blog.alexalemi.com/kl-is-all-you-need.html):
 
 - Lectures: [\[part I\]](https://youtu.be/WsLsEc-p3ww) [\[part II\]](https://youtu.be/hwZU-O0_12g) [\[part III\]](https://youtu.be/NYcJwXhVhuI)
 
@@ -126,7 +126,7 @@ $\log_{10} : \text{dit, ban, hartley}$
 $10\log_{10} : \text{deciban}$
 
 |          |      |      |      |      |      |      |      |      |      |      |      |      |      |      |
-|:---------|:-----|:-----|:-----|:-----|:-----|:-----|:-----|:-----|:-----|:-----|:-----|:-----|:-----|:-----|
+|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|
 | **db**   | 0    | 1    | 2    | 3    | 4    | 5    | 6    | 7    | 8    | 9    | 10   | 11   | 12   | 13   |
 | **bit**  | 0    | ⅓    | ⅔    | 1    | 1⅓   | 1⅔   | 2    | 2⅓   | 2⅔   | 3    | 3⅓   | 3⅔   | 4    | 4⅓   |
 | **nat**  | 0.00 | 0.23 | 0.46 | 0.69 | 0.92 | 1.15 | 1.38 | 1.61 | 1.84 | 2.07 | 2.30 | 2.53 | 2.76 | 2.99 |
@@ -135,7 +135,7 @@ $10\log_{10} : \text{deciban}$
 
 ### Belief-O-Meter
 
-xxx
+![](images/clipboard-1482521587.png)
 
 ## Relative entropy
 
