@@ -185,13 +185,133 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p>We define the logarithm of the likelihood ration as the <strong>information</strong> in data <span class="math inline">\(X = x\)</span> for discrimination in favor of <span class="math inline">\(H_1\)</span> against <span class="math inline">\(H_2\)</span>, i.e., the <strong>weight of evidence</strong> for <span class="math inline">\(H_1\)</span> (against <span class="math inline">\(H_2\)</span>) given data <span class="math inline">\(X = x\)</span>.</p>
 </blockquote>
-<p>Change of notation:</p>
-<p><span class="math display">\[
-\begin{align}
+<section id="change-of-notation" class="level3">
+<h3 class="anchored" data-anchor-id="change-of-notation">Change of notation</h3>
+<p><span class="math display">\[\begin{align}
 P(X = x \mid P) &amp; \rightarrow p(x) \\
 P(X = x \mid Q) &amp; \rightarrow q(x) \\
-\end{align}
-\]</span></p>
+\end{align}\]</span></p>
+<p>The probability that some variable <span class="math inline">\(X\)</span> takes on a value <span class="math inline">\(x\)</span> given that some model/hypothesis is true.</p>
+<p>The weight of evidence is:</p>
+<p><span class="math display">\[\log \frac{p(x)}{q(x)}\]</span></p>
+</section>
+<section id="units-of-weight-of-evidence" class="level3">
+<h3 class="anchored" data-anchor-id="units-of-weight-of-evidence">Units of weight of evidence</h3>
+<p><span class="math inline">\(\log_2 : \text{bit, shannon}\)</span></p>
+<p><span class="math inline">\(\log_e : \text{nat}\)</span></p>
+<p><span class="math inline">\(\log_{10} : \text{dit, ban, hartley}\)</span></p>
+<p><span class="math inline">\(10\log_{10} : \text{deciban}\)</span></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>db</strong></td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">13</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>bit</strong></td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">⅓</td>
+<td style="text-align: left;">⅔</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1⅓</td>
+<td style="text-align: left;">1⅔</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">2⅓</td>
+<td style="text-align: left;">2⅔</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">3⅓</td>
+<td style="text-align: left;">3⅔</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">4⅓</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>nat</strong></td>
+<td style="text-align: left;">0.00</td>
+<td style="text-align: left;">0.23</td>
+<td style="text-align: left;">0.46</td>
+<td style="text-align: left;">0.69</td>
+<td style="text-align: left;">0.92</td>
+<td style="text-align: left;">1.15</td>
+<td style="text-align: left;">1.38</td>
+<td style="text-align: left;">1.61</td>
+<td style="text-align: left;">1.84</td>
+<td style="text-align: left;">2.07</td>
+<td style="text-align: left;">2.30</td>
+<td style="text-align: left;">2.53</td>
+<td style="text-align: left;">2.76</td>
+<td style="text-align: left;">2.99</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>odds</strong></td>
+<td style="text-align: left;">1:1</td>
+<td style="text-align: left;">5:4</td>
+<td style="text-align: left;">π:2</td>
+<td style="text-align: left;">2:1</td>
+<td style="text-align: left;">5:2</td>
+<td style="text-align: left;">π:1</td>
+<td style="text-align: left;">4:1</td>
+<td style="text-align: left;">5:1</td>
+<td style="text-align: left;">2π:1</td>
+<td style="text-align: left;">8:1</td>
+<td style="text-align: left;">10:1</td>
+<td style="text-align: left;">4π:1</td>
+<td style="text-align: left;">16:1</td>
+<td style="text-align: left;">20:1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>p</strong></td>
+<td style="text-align: left;">50%</td>
+<td style="text-align: left;">56%</td>
+<td style="text-align: left;">61%</td>
+<td style="text-align: left;">67%</td>
+<td style="text-align: left;">72%</td>
+<td style="text-align: left;">76%</td>
+<td style="text-align: left;">80%</td>
+<td style="text-align: left;">83%</td>
+<td style="text-align: left;">86%</td>
+<td style="text-align: left;">89%</td>
+<td style="text-align: left;">91%</td>
+<td style="text-align: left;">93%</td>
+<td style="text-align: left;">94%</td>
+<td style="text-align: left;">95%</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="belief-o-meter" class="level3">
+<h3 class="anchored" data-anchor-id="belief-o-meter">Belief-O-Meter</h3>
+<p>xxx</p>
+</section>
 </section>
 <section id="relative-entropy" class="level2">
 <h2 class="anchored" data-anchor-id="relative-entropy">Relative entropy</h2>

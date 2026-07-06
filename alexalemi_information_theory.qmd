@@ -100,18 +100,42 @@ $$P(A) = 0.75 = \frac{3}{4} \rightarrow \text{Odds}(A) = \frac{\frac{3}{4}}{\fra
 
 More generally, odds are the ratio of any two probabilities, not necessarily $P(A)$ and $P(\lnot A)$, e.g., $\frac{P(H_1)}{P(H_2)}$.
 
->We define the logarithm of the likelihood ration as the **information** in data $X = x$ for discrimination in favor of $H_1$ against $H_2$, i.e., the **weight of evidence** for $H_1$ (against $H_2$) given data $X = x$.
+> We define the logarithm of the likelihood ration as the **information** in data $X = x$ for discrimination in favor of $H_1$ against $H_2$, i.e., the **weight of evidence** for $H_1$ (against $H_2$) given data $X = x$.
 
-Change of notation:
+### Change of notation
 
-$$
-\begin{align}
+$$\begin{align}
 P(X = x \mid P) & \rightarrow p(x) \\
 P(X = x \mid Q) & \rightarrow q(x) \\
-\end{align}
-$$
+\end{align}$$
 
+The probability that some variable $X$ takes on a value $x$ given that some model/hypothesis is true.
 
+The weight of evidence is:
+
+$$\log \frac{p(x)}{q(x)}$$
+
+### Units of weight of evidence
+
+$\log_2 : \text{bit, shannon}$
+
+$\log_e : \text{nat}$
+
+$\log_{10} : \text{dit, ban, hartley}$
+
+$10\log_{10} : \text{deciban}$
+
+|          |      |      |      |      |      |      |      |      |      |      |      |      |      |      |
+|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|
+| **db**   | 0    | 1    | 2    | 3    | 4    | 5    | 6    | 7    | 8    | 9    | 10   | 11   | 12   | 13   |
+| **bit**  | 0    | ⅓    | ⅔    | 1    | 1⅓   | 1⅔   | 2    | 2⅓   | 2⅔   | 3    | 3⅓   | 3⅔   | 4    | 4⅓   |
+| **nat**  | 0.00 | 0.23 | 0.46 | 0.69 | 0.92 | 1.15 | 1.38 | 1.61 | 1.84 | 2.07 | 2.30 | 2.53 | 2.76 | 2.99 |
+| **odds** | 1:1  | 5:4  | π:2  | 2:1  | 5:2  | π:1  | 4:1  | 5:1  | 2π:1 | 8:1  | 10:1 | 4π:1 | 16:1 | 20:1 |
+| **p**    | 50%  | 56%  | 61%  | 67%  | 72%  | 76%  | 80%  | 83%  | 86%  | 89%  | 91%  | 93%  | 94%  | 95%  |
+
+### Belief-O-Meter
+
+xxx
 
 ## Relative entropy
 
