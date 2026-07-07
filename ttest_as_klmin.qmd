@@ -1,5 +1,0 @@
----
-title: "From t-test to KL minimization"
-format: html
----
-
