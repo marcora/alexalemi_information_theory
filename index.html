@@ -197,6 +197,7 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 </section>
 <section id="units-of-weight-of-evidence" class="level3">
 <h3 class="anchored" data-anchor-id="units-of-weight-of-evidence">Units of weight of evidence</h3>
+<p>Probability vs (logarithmic) evidence space to measure strength of belief.</p>
 <p><span class="math inline">\(\log_2 : \text{bit, shannon}\)</span></p>
 <p><span class="math inline">\(\log_e : \text{nat}\)</span></p>
 <p><span class="math inline">\(\log_{10} : \text{dit, ban, hartley}\)</span></p>
@@ -313,18 +314,51 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 </tr>
 </tbody>
 </table>
+<p>Independent observations decompose additively in (logarithmic) evidence space, as opposed to multiplicatively in probability space.</p>
+<p><span class="math display">\[\log \frac{p(x_1, x_2, \ldots)}{q(x_1, x_2, \ldots)} = \log \frac{p(x_1)\ p(x_2)\ \ldots}{q(x_1)\ q(x_2)\ \ldots} = \log \frac{p(x_1)}{q(x_1)} + \log \frac{p(x_2)}{q(x_2)} + \ldots \]</span></p>
 </section>
 <section id="belief-o-meter" class="level3">
 <h3 class="anchored" data-anchor-id="belief-o-meter">Belief-O-Meter</h3>
 <p><img src="images/clipboard-1482521587.png" class="img-fluid"></p>
+<section id="loaded-die" class="level4">
+<h4 class="anchored" data-anchor-id="loaded-die">Loaded die</h4>
+<p><span class="math inline">\(H_1 : \text{die is loaded, shows 6 1/3 of the times (and 1, 2, 3, 4, or 5 2/3 of the times)}\)</span></p>
+<p><span class="math inline">\(H_2 : \text{die is not loaded, shows 6 1/6 of the times (and 1, 2, 3, 4, or 5 5/6 of the times})\)</span></p>
+<p><span class="math inline">\(D : \text{die shows 6} \implies 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{1}{3}}{\frac{1}{6}} = 10\log_{10}(2) \approx 3\ \text{dB}\)</span></p>
+<p><span class="math inline">\(D : \text{die shows 1, 2, 3, 4, or 5} \implies 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{2}{3}}{\frac{5}{6}} = 10\log_{10}(0.8) \approx -1\ \text{dB}\)</span></p>
+<p>If we observe <span class="math inline">\(\{1, 4, 6, 6\}\)</span> then (assuming i.i.d.) the weight of the evidence is <span class="math inline">\(-1 + (-1) + 3 + 3 = 4\ \text{dB}\)</span>. Thus, if our prior log odds were <span class="math inline">\(0\ \text{dB}\)</span> (i.e., <span class="math inline">\(H_1\)</span> and <span class="math inline">\(H_2\)</span> are equally likely, max entropy), then our posterior log odds are <span class="math inline">\(4\ \text{dB}\)</span> , corresponding to <span class="math inline">\(16:1\ \text{odds}\)</span> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>.</p>
 </section>
-<section id="loaded-die" class="level3">
-<h3 class="anchored" data-anchor-id="loaded-die">Loaded die</h3>
-<p><span class="math inline">\(H_1 = \text{die is loaded, shows 6 1/3 of the times}\)</span></p>
-<p><span class="math inline">\(H_2 = \text{die is not loaded}\)</span></p>
-<p><span class="math inline">\(D : \text{die shows 6} \rightarrow 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{1}{3}}{\frac{1}{6}} = 10\log_{10}(2) \approx 3\ \text{dB}\)</span></p>
-<p><span class="math inline">\(D : \text{die shows 1, 2, 3, 4, or 5} \rightarrow 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{2}{3}}{\frac{5}{6}} = 10\log_{10}(0.8) \approx -1\ \text{dB}\)</span></p>
-<p><span class="math inline">\(\text{If we observe 1, 4, 6, 6} \rightarrow \text{weight of evidence} = -1 + (-1) + 3 + 3 = 4\ \text{dB}\)</span></p>
+<section id="human-births" class="level4">
+<h4 class="anchored" data-anchor-id="human-births">Human births</h4>
+<p><span class="math inline">\(H_1 : \text{human births are 50% ♂ and 50% ♀}\)</span></p>
+<p><span class="math inline">\(H_2 : \text{human births are 51% ♂ and 49% ♀}\)</span></p>
+<p>Laplace looked at Parisian birth records and found that between 1745 and 1770, 251,527 ♂ and 241,945 ♀ were born.</p>
+<p>Thus, the weight of the evidence in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span> is:</p>
+<p><span class="math display">\[251,527 \cdot 10\log_{10} \frac{0.51}{0.50} + 241,945 \cdot 10\log_{10} \frac{0.49}{0.50} = 21,632 + (-21,228) = 404\ \text{dB}\]</span></p>
+<p>corresponding to <span class="math inline">\(2.51\times 10^{40}:1\ \text{odds}\)</span> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span> (25.1 duodecillions to one).</p>
+</section>
+<section id="covid-test" class="level4">
+<h4 class="anchored" data-anchor-id="covid-test">COVID test</h4>
+<p><span class="math inline">\(H_1 : \text{you have COVID}\)</span></p>
+<p><span class="math inline">\(H_2 : \text{you don't have COVID}\)</span></p>
+<p>Typical sensitivity of a COVID test:</p>
+<p><span class="math display">\[P(+ \mid \text{COVID}) = 0.94\]</span></p>
+<p>Typical specificity of a COVID test:</p>
+<p><span class="math display">\[P(- \mid \lnot\text{COVID}) = 0.96\]</span></p>
+<p>Typical prevalence of COVID is between 0.5-1.5%. Thus, assuming 1% prevalence of COVID, i.e., <span class="math inline">\(P{(\text{COVID})} = 0.01\)</span>:</p>
+<p><span class="math display">\[10\log_{10}\frac{0.01}{0.99} \approx 10\log_{10}(0.0101) = -19.96\]</span></p>
+<p><span class="math inline">\(D : + \implies 10\log_{10}\frac{P(+ \mid \text{COVID})}{P(+ \mid \lnot \text{COVID})} = 10\log_{10}\frac{0.94}{0.04} = 10\log_{10}(23.5) = 13.71\ \text{dB}\)</span></p>
+<p><span class="math inline">\(D : - \implies 10\log_{10}\frac{P(- \mid \text{COVID})}{P(- \mid \lnot \text{COVID})} = 10\log_{10}\frac{0.06}{0.96} = 10\log_{10}(0.0625) = -12.04\ \text{dB}\)</span></p>
+<p>So, if a person drawn at random from the population tests positive for COVID, they are only approx. 19% likely to have COVID:</p>
+<p><span class="math display">\[-19.96 + 13.71 = -6.25\ \text{dB}\]</span></p>
+<p><span class="math display">\[P = \frac{1}{1 + 10^{-\text{dB}/10}}\]</span></p>
+<p><span class="math display">\[P(\text{COVID} \mid +) = \frac{1}{1 + 10^{0.625}} = \frac{1}{5.217} = 0.192\]</span></p>
+<p>This conversion from odds (or dB) to probability is valid only when the odds are between two complementary hypotheses, i.e., <span class="math inline">\(H_2 = \lnot H_1\)</span>, so that <span class="math inline">\(\frac{P(H_1)}{P(H_2)}=\frac{P(H_1)}{P(\lnot H_1)}=\frac{P(H_1)}{1-P(H_1)}\)</span>.</p>
+<p>Complementary = mutually exclusive and collectively exhaustive:</p>
+<p><span class="math display">\[H_1 \cap H_2 = \varnothing \quad \text{and} \quad H_1 \cup H_2 = \Omega\]</span> Equivalently,</p>
+<p><span class="math display">\[P(H_1) + P(H_2) = 1\]</span></p>
+<p><span class="math display">\[P(H_2) = 1 - P(H_1) = P(\lnot H_1)\]</span></p>
+</section>
 </section>
 </section>
 <section id="relative-entropy" class="level2">
