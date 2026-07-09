@@ -199,12 +199,13 @@ $$P = \frac{1}{1 + 10^{-\text{dB}/10}}$$
 
 $$P(\text{COVID} \mid +) = \frac{1}{1 + 10^{0.625}} = \frac{1}{5.217} = 0.192$$
 
-This conversion from odds (or dB) to probability is valid only when the odds are between two complementary hypotheses, i.e., $H_2 = \lnot H_1$, so that $\frac{P(H_1)}{P(H_2)}=\frac{P(H_1)}{P(\lnot H_1)}=\frac{P(H_1)}{1-P(H_1)}$.
+This conversion from odds (or dB) to probability is valid only when the odds are between complementary hypotheses (i.e., mutually exclusive and exhaustive hypotheses), so that $H_2=\neg H_1$ and $P(H_1)+P(H_2)=1$.
 
 Complementary = mutually exclusive and collectively exhaustive:
 
 $$H_1 \cap H_2 = \varnothing \quad \text{and} \quad H_1 \cup H_2 = \Omega$$
-Equivalently,
+
+Equivalently:
 
 $$P(H_1) + P(H_2) = 1$$
 

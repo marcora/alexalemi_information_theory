@@ -353,9 +353,10 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 <p><span class="math display">\[-19.96 + 13.71 = -6.25\ \text{dB}\]</span></p>
 <p><span class="math display">\[P = \frac{1}{1 + 10^{-\text{dB}/10}}\]</span></p>
 <p><span class="math display">\[P(\text{COVID} \mid +) = \frac{1}{1 + 10^{0.625}} = \frac{1}{5.217} = 0.192\]</span></p>
-<p>This conversion from odds (or dB) to probability is valid only when the odds are between two complementary hypotheses, i.e., <span class="math inline">\(H_2 = \lnot H_1\)</span>, so that <span class="math inline">\(\frac{P(H_1)}{P(H_2)}=\frac{P(H_1)}{P(\lnot H_1)}=\frac{P(H_1)}{1-P(H_1)}\)</span>.</p>
+<p>This conversion from odds (or dB) to probability is valid only when the odds are between complementary hypotheses (i.e., mutually exclusive and exhaustive hypotheses), so that <span class="math inline">\(H_2=\neg H_1\)</span> and <span class="math inline">\(P(H_1)+P(H_2)=1\)</span>.</p>
 <p>Complementary = mutually exclusive and collectively exhaustive:</p>
-<p><span class="math display">\[H_1 \cap H_2 = \varnothing \quad \text{and} \quad H_1 \cup H_2 = \Omega\]</span> Equivalently,</p>
+<p><span class="math display">\[H_1 \cap H_2 = \varnothing \quad \text{and} \quad H_1 \cup H_2 = \Omega\]</span></p>
+<p>Equivalently:</p>
 <p><span class="math display">\[P(H_1) + P(H_2) = 1\]</span></p>
 <p><span class="math display">\[P(H_2) = 1 - P(H_1) = P(\lnot H_1)\]</span></p>
 </section>
