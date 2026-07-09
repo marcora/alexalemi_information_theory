@@ -218,7 +218,7 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 <col style="width: 6%">
 <col style="width: 6%">
 <col style="width: 6%">
-<col style="width: 2%">
+<col style="width: 6%">
 </colgroup>
 <tbody>
 <tr class="odd">
@@ -317,6 +317,14 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 <section id="belief-o-meter" class="level3">
 <h3 class="anchored" data-anchor-id="belief-o-meter">Belief-O-Meter</h3>
 <p><img src="images/clipboard-1482521587.png" class="img-fluid"></p>
+</section>
+<section id="loaded-die" class="level3">
+<h3 class="anchored" data-anchor-id="loaded-die">Loaded die</h3>
+<p><span class="math inline">\(H_1 = \text{die is loaded, shows 6 1/3 of the times}\)</span></p>
+<p><span class="math inline">\(H_2 = \text{die is not loaded}\)</span></p>
+<p><span class="math inline">\(D : \text{die shows 6} \rightarrow 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{1}{3}}{\frac{1}{6}} = 10\log_{10}(2) \approx 3\ \text{dB}\)</span></p>
+<p><span class="math inline">\(D : \text{die shows 1, 2, 3, 4, or 5} \rightarrow 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{2}{3}}{\frac{5}{6}} = 10\log_{10}(0.8) \approx -1\ \text{dB}\)</span></p>
+<p><span class="math inline">\(\text{If we observe 1, 4, 6, 6} \rightarrow \text{weight of evidence} = -1 + (-1) + 3 + 3 = 4\ \text{dB}\)</span></p>
 </section>
 </section>
 <section id="relative-entropy" class="level2">
