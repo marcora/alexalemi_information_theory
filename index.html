@@ -24,6 +24,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 /* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
@@ -105,7 +140,7 @@ window.Quarto = {
   <li><a href="#units-of-weight-of-evidence" id="toc-units-of-weight-of-evidence" class="nav-link" data-scroll-target="#units-of-weight-of-evidence">Units of weight of evidence</a></li>
   <li><a href="#belief-o-meter" id="toc-belief-o-meter" class="nav-link" data-scroll-target="#belief-o-meter">Belief-O-Meter</a></li>
   </ul></li>
-  <li><a href="#relative-entropy" id="toc-relative-entropy" class="nav-link" data-scroll-target="#relative-entropy">Relative entropy</a></li>
+  <li><a href="#relative-entropy-kl-divergence" id="toc-relative-entropy-kl-divergence" class="nav-link" data-scroll-target="#relative-entropy-kl-divergence">Relative entropy (KL divergence)</a></li>
   <li><a href="#entropy" id="toc-entropy" class="nav-link" data-scroll-target="#entropy">Entropy</a></li>
   <li><a href="#mutual-information" id="toc-mutual-information" class="nav-link" data-scroll-target="#mutual-information">Mutual information</a></li>
   </ul>
@@ -389,24 +424,232 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 <p><span class="math display">\[P(H_1) + P(H_2) = 1\]</span></p>
 <p><span class="math display">\[P(H_2) = 1 - P(H_1) = P(\lnot H_1)\]</span></p>
 </section>
+<section id="mms" class="level4">
+<h4 class="anchored" data-anchor-id="mms">M&amp;Ms</h4>
+<p><img src="images/clipboard-3433517152.png" class="img-fluid" width="300"></p>
+<p>Bags of M&amp;Ms produced at the Cleveland and Hackettstown factories differ in their color composition and are stamped with distinct codes: bags with <code>CLV</code> in their serial no. are from Cleveland, while bags with <code>HKP</code> in their serial no. are from Hackettstown.</p>
+<p>The color proportions vary by factory as follows:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Color</th>
+<th style="text-align: right;">CLV</th>
+<th style="text-align: right;">HKP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Orange</td>
+<td style="text-align: right;">0.205</td>
+<td style="text-align: right;">0.250</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blue</td>
+<td style="text-align: right;">0.207</td>
+<td style="text-align: right;">0.250</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Green</td>
+<td style="text-align: right;">0.198</td>
+<td style="text-align: right;">0.125</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Red</td>
+<td style="text-align: right;">0.131</td>
+<td style="text-align: right;">0.125</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Yellow</td>
+<td style="text-align: right;">0.135</td>
+<td style="text-align: right;">0.125</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brown</td>
+<td style="text-align: right;">0.124</td>
+<td style="text-align: right;">0.125</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>&nbsp;</p>
+<p>If <code>CLV</code> is <span class="math inline">\(H_1\)</span> and <code>HKP</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence is (rounded to two decimals):</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Color</th>
+<th style="text-align: right;">dB</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Orange</td>
+<td style="text-align: right;">-0.86</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blue</td>
+<td style="text-align: right;">-0.82</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Green</td>
+<td style="text-align: right;">2.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Red</td>
+<td style="text-align: right;">0.20</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Yellow</td>
+<td style="text-align: right;">0.33</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brown</td>
+<td style="text-align: right;">-0.03</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>&nbsp;</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 <section id="continuous-hypotheses" class="level4">
 <h4 class="anchored" data-anchor-id="continuous-hypotheses">Continuous hypotheses</h4>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>Blue line is weight of evidence <span class="math inline">\(x\)</span> for <span class="math inline">\(H_1\)</span> (red line) vs.&nbsp;<span class="math inline">\(H_2\)</span> (green line).</p>
 </section>
-<section id="two-bags-of-mms" class="level4">
-<h4 class="anchored" data-anchor-id="two-bags-of-mms">Two bags of M&amp;Ms</h4>
-<p><img src="images/clipboard-3433517152.png" class="img-fluid" width="300"></p>
-<p>Bags of M&amp;Ms produced at the Hackettstown and Cleveland factories differ in their color distributions and are stamped with distinct codes: bags with <code>HKP</code> in their serial no. are from Hackettstown, while bags with <code>CLV</code> in their serial no. are from Cleveland.</p>
-<p>The color proportions vary by factory as follows:</p>
+</section>
+</section>
+<section id="relative-entropy-kl-divergence" class="level2">
+<h2 class="anchored" data-anchor-id="relative-entropy-kl-divergence">Relative entropy (KL divergence)</h2>
+<p>The <strong>relative entropy/Kullback–Leibler divergence</strong> from <span class="math inline">\(H_1\)</span> to <span class="math inline">\(H_2\)</span> is the <strong>expected weight of evidence</strong> (log-likelihood ratio/Bayes’ factor) of <span class="math inline">\(H_1\)</span> over <span class="math inline">\(H_2\)</span>, assuming <span class="math inline">\(P(D\mid H_1)\)</span> is the true data-generating distribution.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Unlike the KL divergence (which is a function of the two probability distributions <span class="math inline">\(P_1\)</span> and <span class="math inline">\(P_2\)</span>), the weight of evidence is a function of the observed data <span class="math inline">\(D\)</span> and does not assume that either <span class="math inline">\(P_1\)</span> or <span class="math inline">\(P_2\)</span> is the true data-generating distribution.</p>
+</div>
+</div>
+<p>Let <span class="math inline">\(P_1 = P(D\mid H_1)\)</span> be the true data-generating distribution and <span class="math inline">\(P_2 = P(D\mid H_2)\)</span> be the alternative distribution.</p>
+<p><span class="math display">\[D_{\mathrm{KL}}(P_1\|P_2)
+=
+\mathbb{E}_{D\sim P_1}
+\left[
+\log\frac{P(D\mid H_1)}{P(D\mid H_2)}
+\right]
+=
+\mathbb{E}_{D\sim P_1}
+\left[
+\log\frac{P_1}{P_2}
+\right]\]</span> or</p>
+<p><span class="math display">\[\mathcal{S}[p;q]
+=
+\mathbb{E}_{x \sim p(x)}
+\left[
+\log\frac{p(x)}{q(x)}
+\right]
+=
+\sum_i{p(x_i)}\ \log\frac{p(x_i)}{q(x_i)}
+=
+\Big\langle
+\log\frac{p(x)}{q(x)}
+\Big\rangle_p\]</span></p>
+<p>&nbsp;</p>
+<p>Back to the M&amp;Ms example, if <code>CLV</code> is <span class="math inline">\(H_1\)</span> and <code>HKP</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence is:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Color</th>
+<th style="text-align: right;">CLV</th>
+<th style="text-align: right;">HKP</th>
+<th style="text-align: right;">dB</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Orange</td>
+<td style="text-align: right;">0.205</td>
+<td style="text-align: right;">0.250</td>
+<td style="text-align: right;">-0.8619</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blue</td>
+<td style="text-align: right;">0.207</td>
+<td style="text-align: right;">0.250</td>
+<td style="text-align: right;">-0.8197</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Green</td>
+<td style="text-align: right;">0.198</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">1.9976</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Red</td>
+<td style="text-align: right;">0.131</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">0.2036</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Yellow</td>
+<td style="text-align: right;">0.135</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">0.3342</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brown</td>
+<td style="text-align: right;">0.124</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">-0.0349</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>and the KL divergence is:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="at">S =</span> <span class="fu">sum</span>(CLV<span class="sc">*</span>dB)) <span class="sc">%$%</span> S</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1166</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\mathcal{S}[\text{CLV};\text{HKP}] = 0.1166\ \text{dB}\)</span></p>
+<hr>
+<p>Back to the M&amp;Ms example, if <code>HKP</code> is <span class="math inline">\(H_1\)</span> and <code>CLV</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence is:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="kable-table">
@@ -461,13 +704,27 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 </div>
 </div>
 </div>
-<p><code>HKP</code> is <span class="math inline">\(H_1\)</span> and <code>CLV</code> is <span class="math inline">\(H_2\)</span></p>
-</section>
-</section>
-</section>
-<section id="relative-entropy" class="level2">
-<h2 class="anchored" data-anchor-id="relative-entropy">Relative entropy</h2>
-<p>xxx</p>
+<p>and the KL divergence is:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="at">S =</span> <span class="fu">sum</span>(HKP<span class="sc">*</span>dB)) <span class="sc">%$%</span> S</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1078</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(\mathcal{S}[\text{HKP};\text{CLV}] = 0.1078\ \text{dB}\)</span></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The KL divergence is a measure of the “distance” between two probability distributions but it’s not symmetric.</p>
+</div>
+</div>
 </section>
 <section id="entropy" class="level2">
 <h2 class="anchored" data-anchor-id="entropy">Entropy</h2>

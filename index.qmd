@@ -242,6 +242,57 @@ $$P(H_1) + P(H_2) = 1$$
 
 $$P(H_2) = 1 - P(H_1) = P(\lnot H_1)$$
 
+#### M&Ms
+
+![](images/clipboard-3433517152.png){width="300"}
+
+Bags of M&Ms produced at the Cleveland and Hackettstown factories differ in their color composition and are stamped with distinct codes: bags with `CLV` in their serial no. are from Cleveland, while bags with `HKP` in their serial no. are from Hackettstown.
+
+The color proportions vary by factory as follows:
+
+```{r}
+d <- tribble(
+  ~Color,    ~CLV,  ~HKP,  
+  "Orange",  0.205, 0.250, 
+  "Blue",    0.207, 0.250, 
+  "Green",   0.198, 0.125, 
+  "Red",     0.131, 0.125, 
+  "Yellow",  0.135, 0.125, 
+  "Brown",   0.124, 0.125, 
+)
+
+d
+```
+
+```{r}
+p_ds <- d %>%
+  pivot_longer(-c(Color), values_to = "p", names_to = "Factory") %>% 
+  mutate(color = str_to_lower(Color)) %>% 
+  gf_col(p ~ Color, fill = ~color) %>% 
+  gf_facet_wrap(~ Factory, nrow = 2) +
+  scale_fill_identity()
+```
+
+ 
+
+If `CLV` is $H_1$ and `HKP` is $H_2$, the weight of evidence is (rounded to two decimals):
+
+```{r}
+d %<>% mutate(dB = round(10*log10(CLV/HKP), 2)) %>% select(Color, dB)
+
+d
+```
+
+```{r}
+p_db <- gf_col(dB ~ Color, data = d) + ylim(c(-2.5, 2.5))
+```
+
+ 
+
+```{r}
+p_ds / p_db
+```
+
 #### Continuous hypotheses
 
 ```{r}
@@ -271,36 +322,99 @@ p_ds / p_db
 
 Blue line is weight of evidence $x$ for $H_1$ (red line) vs. $H_2$ (green line).
 
-#### Two bags of M&Ms
+## Relative entropy (KL divergence)
 
-![](images/clipboard-3433517152.png){width="300"}
+The **relative entropy/Kullback–Leibler divergence** from $H_1$ to $H_2$ is the **expected weight of evidence** (log-likelihood ratio/Bayes' factor) of $H_1$ over $H_2$, assuming $P(D\mid H_1)$ is the true data-generating distribution.
 
-Bags of M&Ms produced at the Hackettstown and Cleveland factories differ in their color distributions and are stamped with distinct codes: bags with `HKP` in their serial no. are from Hackettstown, while bags with `CLV` in their serial no. are from Cleveland.
+::: callout-note
+Unlike the KL divergence (which is a function of the two probability distributions $P_1$ and $P_2$), the weight of evidence is a function of the observed data $D$ and does not assume that either $P_1$ or $P_2$ is the true data-generating distribution.
+:::
 
-The color proportions vary by factory as follows:
+Let $P_1 = P(D\mid H_1)$ be the true data-generating distribution and $P_2 = P(D\mid H_2)$ be the alternative distribution.
+
+$$D_{\mathrm{KL}}(P_1\|P_2)
+=
+\mathbb{E}_{D\sim P_1}
+\left[
+\log\frac{P(D\mid H_1)}{P(D\mid H_2)}
+\right]
+=
+\mathbb{E}_{D\sim P_1}
+\left[
+\log\frac{P_1}{P_2}
+\right]$$
+or
+
+$$\mathcal{S}[p;q]
+=
+\mathbb{E}_{x \sim p(x)}
+\left[
+\log\frac{p(x)}{q(x)}
+\right]
+=
+\sum_i{p(x_i)}\ \log\frac{p(x_i)}{q(x_i)}
+=
+\Big\langle
+\log\frac{p(x)}{q(x)}
+\Big\rangle_p$$
+
+ 
+
+Back to the M&Ms example, if `CLV` is $H_1$ and `HKP` is $H_2$, the weight of evidence is:
 
 ```{r}
 d <- tribble(
-  ~Color,   ~HKP,   ~CLV,
-  "Orange", 0.250,  0.205,
-  "Blue",   0.250,  0.207,
-  "Green",  0.125,  0.198,
-  "Red",    0.125,  0.131,
-  "Yellow", 0.125,  0.135,
-  "Brown",  0.125,  0.124
-)
-
-d <- d %>% 
-  mutate(dB = 10*log10(HKP/CLV))
+  ~Color,    ~CLV,  ~HKP,  
+  "Orange",  0.205, 0.250, 
+  "Blue",    0.207, 0.250, 
+  "Green",   0.198, 0.125, 
+  "Red",     0.131, 0.125, 
+  "Yellow",  0.135, 0.125, 
+  "Brown",   0.124, 0.125, 
+) %>% mutate(dB = 10*log10(CLV/HKP))
 
 d
 ```
 
-`HKP` is $H_1$ and `CLV` is $H_2$
+and the KL divergence is:
 
-## Relative entropy
+```{r}
+#| echo: true
+d %>% summarize(S = sum(CLV*dB)) %$% S
+```
 
-xxx
+$\mathcal{S}[\text{CLV};\text{HKP}] = 0.1166\ \text{dB}$
+
+------------------------------------------------------------------------
+
+Back to the M&Ms example, if `HKP` is $H_1$ and `CLV` is $H_2$, the weight of evidence is:
+
+```{r}
+d <- tribble(
+  ~Color,   ~HKP,  ~CLV,
+  "Orange", 0.250, 0.205,
+  "Blue",   0.250, 0.207,
+  "Green",  0.125, 0.198,
+  "Red",    0.125, 0.131,
+  "Yellow", 0.125, 0.135,
+  "Brown",  0.125, 0.124
+) %>% mutate(dB = 10*log10(HKP/CLV))
+
+d
+```
+
+and the KL divergence is:
+
+```{r}
+#| echo: true
+d %>% summarize(S = sum(HKP*dB)) %$% S
+```
+
+$\mathcal{S}[\text{HKP};\text{CLV}] = 0.1078\ \text{dB}$
+
+::: callout-important
+The KL divergence is a measure of the "distance" between two probability distributions but it's not symmetric.
+:::
 
 ## Entropy
 
