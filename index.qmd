@@ -2,7 +2,25 @@
 title: "Information theory"
 author: "Alex Alemi"
 bibliography: references.bib
+format:
+  html:
+    toc: true
+    df-print: kable
+execute:
+  echo: false
 ---
+
+```{r}
+#| output: false
+library(tidyverse)
+library(magrittr)
+library(ggformula)
+library(patchwork)
+
+theme_set(theme_minimal())
+
+set.seed(666)
+```
 
 Notes from lectures of intro course on information theory for machine learning by [Alex Alemi](https://www.alexalemi.com), later summarized in a [blog post](https://blog.alexalemi.com/kl-is-all-you-need.html):
 
@@ -127,13 +145,26 @@ $\log_{10} : \text{dit, ban, hartley}$
 
 $10\log_{10} : \text{deciban}$
 
-|          |      |      |      |      |      |      |      |      |      |      |      |      |      |      |      |
-|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|-----|
-| **db**   | 0    | 1    | 2    | 3    | 4    | 5    | 6    | 7    | 8    | 9    | 10   | 11   | 12   | 13   | 20   |
-| **bit**  | 0    | ⅓    | ⅔    | 1    | 1⅓   | 1⅔   | 2    | 2⅓   | 2⅔   | 3    | 3⅓   | 3⅔   | 4    | 4⅓   | 6⅔   |
-| **nat**  | 0.00 | 0.23 | 0.46 | 0.69 | 0.92 | 1.15 | 1.38 | 1.61 | 1.84 | 2.07 | 2.30 | 2.53 | 2.76 | 2.99 | 4.60 |
-| **odds** | 1:1  | 5:4  | π:2  | 2:1  | 5:2  | π:1  | 4:1  | 5:1  | 2π:1 | 8:1  | 10:1 | 4π:1 | 16:1 | 20:1 | 99:1 |
-| **p**    | 50%  | 56%  | 61%  | 67%  | 72%  | 76%  | 80%  | 83%  | 86%  | 89%  | 91%  | 93%  | 94%  | 95%  | 99%  |
+```{r}
+tribble(
+  ~db, ~bit,  ~nat, ~odds,   ~p,
+   0,  "0",   0.00, "1:1",   "50%",
+   1,  "⅓",   0.23, "5:4",   "56%",
+   2,  "⅔",   0.46, "π:2",   "61%",
+   3,  "1",   0.69, "2:1",   "67%",
+   4,  "1⅓",  0.92, "5:2",   "72%",
+   5,  "1⅔",  1.15, "π:1",   "76%",
+   6,  "2",   1.38, "4:1",   "80%",
+   7,  "2⅓",  1.61, "5:1",   "83%",
+   8,  "2⅔",  1.84, "2π:1",  "86%",
+   9,  "3",   2.07, "8:1",   "89%",
+  10,  "3⅓",  2.30, "10:1",  "91%",
+  11,  "3⅔",  2.53, "4π:1",  "93%",
+  12,  "4",   2.76, "16:1",  "94%",
+  13,  "4⅓",  2.99, "20:1",  "95%",
+  20,  "6⅔",  4.60, "99:1",  "99%"
+)
+```
 
 Independent observations decompose additively in (logarithmic) evidence space, as opposed to multiplicatively in probability space.
 
@@ -210,6 +241,62 @@ Equivalently:
 $$P(H_1) + P(H_2) = 1$$
 
 $$P(H_2) = 1 - P(H_1) = P(\lnot H_1)$$
+
+#### Continuous hypotheses
+
+```{r}
+d <- tibble(
+  x  = seq(-5, 5, length.out = 101),
+  d1 = dnorm(x),
+  d2 = dnorm(x, 1),
+  dB = 10 * log10(d1 / d2)
+)
+
+p_ds <- d %>%
+  pivot_longer(c(d1, d2), names_to = "d", values_to = "y") %>%
+  gf_line(y ~ x, color = ~d) %>%
+  gf_vline(xintercept = 0.5, linetype = "dotted") %>%
+  gf_hline(yintercept = 0, linewidth = .1) %>%
+  gf_labs(y = "p", x = NULL) %>%
+  gf_theme(legend.position = "none")
+
+p_db <- d %>%
+  gf_line(dB ~ x, color = "blue") %>%
+  gf_vline(xintercept = 0.5, linetype = "dotted") %>%
+  gf_hline(yintercept = 0, linewidth = .1) %>%
+  gf_labs(y = "dB", x = "x")
+
+p_ds / p_db
+```
+
+Blue line is weight of evidence $x$ for $H_1$ (red line) vs. $H_2$ (green line).
+
+#### Two bags of M&Ms
+
+![](images/clipboard-3433517152.png){width="300"}
+
+Bags of M&Ms produced at the Hackettstown and Cleveland factories differ in their color distributions and are stamped with distinct codes: bags with `HKP` in their serial no. are from Hackettstown, while bags with `CLV` in their serial no. are from Cleveland.
+
+The color proportions vary by factory as follows:
+
+```{r}
+d <- tribble(
+  ~Color,   ~HKP,   ~CLV,
+  "Orange", 0.250,  0.205,
+  "Blue",   0.250,  0.207,
+  "Green",  0.125,  0.198,
+  "Red",    0.125,  0.131,
+  "Yellow", 0.125,  0.135,
+  "Brown",  0.125,  0.124
+)
+
+d <- d %>% 
+  mutate(dB = 10*log10(HKP/CLV))
+
+d
+```
+
+`HKP` is $H_1$ and `CLV` is $H_2$
 
 ## Relative entropy
 
