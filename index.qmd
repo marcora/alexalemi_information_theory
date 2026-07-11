@@ -418,7 +418,11 @@ The KL divergence ≥ 0.
 Minimize the "distance/difference" (KL divergence) between the real world and your model:
 
 $$
-\min \mathcal{S}[\text{real};\text{model}]
+\min \mathcal{S}[\text{real world};\text{model}]
+$$
+
+$$
+\min \mathcal{S}[p(x);q(x)]
 $$
 
 $$
@@ -432,6 +436,7 @@ which is equivalent to minimizing the **cross-entropy**:
 $$
 \min_q \sum_i p(x_i)\ \log q(x_i)
 $$
+But we do not know $p(x)$. What we know is xxx
 
 ## Entropy
 

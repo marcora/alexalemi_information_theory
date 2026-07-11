@@ -756,7 +756,10 @@ Note
 <h2 class="anchored" data-anchor-id="a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</h2>
 <p>Minimize the “distance/difference” (KL divergence) between the real world and your model:</p>
 <p><span class="math display">\[
-\min \mathcal{S}[\text{real};\text{model}]
+\min \mathcal{S}[\text{real world};\text{model}]
+\]</span></p>
+<p><span class="math display">\[
+\min \mathcal{S}[p(x);q(x)]
 \]</span></p>
 <p><span class="math display">\[
 \min_q \sum_i p(x_i)\ \log\frac{p(x_i)}{q(x_i)}
@@ -765,7 +768,7 @@ Note
 \]</span> which is equivalent to minimizing the <strong>cross-entropy</strong>:</p>
 <p><span class="math display">\[
 \min_q \sum_i p(x_i)\ \log q(x_i)
-\]</span></p>
+\]</span> But we do not know <span class="math inline">\(p(x)\)</span>. What we know is xxx</p>
 </section>
 <section id="entropy" class="level2">
 <h2 class="anchored" data-anchor-id="entropy">Entropy</h2>
