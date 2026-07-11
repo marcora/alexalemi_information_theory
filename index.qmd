@@ -46,15 +46,15 @@ $$w[x;p,q] \equiv \log \frac{p(x)}{q(x)}$$
 
 - [relative entropy](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) (a.k.a. Kullback–Leibler (KL) divergence): measures a "distance" between two distributions
 
-$$\mathcal{S}[p;q] \equiv \sum p(x) \log \frac{p(x)}{q(x)}$$
+$$\mathcal{S}[p;q] \equiv \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
 
 - [entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)): measures the "complexity" of a distribution
 
-$$\mathcal{S}[p] \equiv - \sum p(x) \log p(x)$$
+$$\mathcal{S}[p] \equiv - \sum_x p(x) \cdot \log p(x)$$
 
 - [mutual information](https://en.wikipedia.org/wiki/Mutual_information): measures the "complexity" of the association between two variables
 
-$$\mathcal{I}(X;Y) \equiv \sum p(x,y) \log \frac{p(x,y)}{p(x)p(y)}$$
+$$\mathcal{I}(X;Y) \equiv \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}$$
 
 ## Weight of evidence
 
@@ -230,7 +230,6 @@ $$P = \frac{1}{1 + 10^{-\text{dB}/10}}$$
 
 $$P(\text{COVID} \mid +) = \frac{1}{1 + 10^{0.625}} = \frac{1}{5.217} = 0.192$$
 
-
 ### Example: M&Ms (discrete distributions)
 
 ![](images/clipboard-3433517152.png){width="300"}
@@ -331,8 +330,7 @@ $$D_{\mathrm{KL}}(P_1\|P_2)
 \mathbb{E}_{D\sim P_1}
 \left[
 \log\frac{P_1}{P_2}
-\right]$$
-or
+\right]$$ or
 
 $$\mathcal{S}[p;q]
 =
@@ -341,11 +339,11 @@ $$\mathcal{S}[p;q]
 \log \frac{p(x)}{q(x)}
 \right]
 =
-\sum_i p(x_i)\ \log \frac{p(x_i)}{q(x_i)}
-=
 \Big\langle
 \log \frac{p(x)}{q(x)}
-\Big\rangle_p$$
+\Big\rangle_p
+=
+\sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
 
  
 
@@ -405,43 +403,70 @@ $\mathcal{S}[\text{HKP};\text{CLV}] = 0.1078\ \text{dB}$
 The KL divergence measures the "distance/difference" between two probability distributions, but it's not symmetric.
 :::
 
+{{< video 143326704-8361446e-721c-47e5-95e7-4e8fd20460ec.mp4 >}}
+
+<https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9>
+
 ::: callout-note
 The KL divergence quantifies the information gained—or equivalently, the change in beliefs—when a (prior) distribution $q$ is updated to a (posterior) distribution $p$.
 :::
 
 ::: callout-note
-The KL divergence ≥ 0. 
+The KL divergence is ≥ 0.
 :::
 
 ## A principle for learning: cross-entropy minimization
 
-Minimize the "distance/difference" (KL divergence) between the real world and your model:
+Minimize the "distance/difference" (KL divergence) between the real world $p(x)$ and your model of the world $q(x)$:
 
-$$
-\min \mathcal{S}[\text{real world};\text{model}]
-$$
+$$\min_q \mathcal{S}[\text{p};\text{q}]$$
 
-$$
-\min \mathcal{S}[p(x);q(x)]
-$$
+$$\min_q \sum_x p(x) \cdot \log\frac{p(x)}{q(x)}$$
 
-$$
-\min_q \sum_i p(x_i)\ \log\frac{p(x_i)}{q(x_i)}
-$$
-$$
-\min_q \sum_i p(x_i)\ \log \frac{p(x_i)}{q(x_i)} = \sum p(x_i) \log p(x_i) - \min_q \sum_i p(x_i)\ \log q(x_i)
-$$
-which is equivalent to minimizing the **cross-entropy**:
+$$\min_q \sum_x p(x) \cdot \log \frac{p(x)}{q(x)} = \sum_x p(x) \cdot \log p(x) - \min_q \sum_x p(x) \cdot \log q(x)$$ which is equivalent to minimizing the **cross-entropy**:
 
-$$
-\min_q \sum_i p(x_i)\ \log q(x_i)
-$$
-But we do not know $p(x)$. What we know is xxx
+$$\min_q \mathcal{H}[p;q]$$
+
+$$\mathcal{H}[p;q] = - \sum_x p(x) \cdot \log q(x)$$
+
+But we do not know $p(x)$, i.e., we do not have access to all data points/the true distribution of the data, only $n$ samples, i.e., the empirical distribution of the data $\hat p(x)$:
+
+$$\hat p(x) = \frac{1}{n} \sum_i \delta(x - x_i)$$
+
+Assuming $\hat p(x)$ is a good approximation of $p(x)$:
+
+$$\mathcal{H}[\hat p;q]
+=
+- \sum_x \hat p(x) \cdot \log q(x)
+=
+- \sum_x \frac{1}{n} \sum_i \delta(x - x_i) \cdot \log q(x)
+=
+- \frac{1}{n} \sum_i \log q(x_i)$$
+
+minimizing this **empirical cross-entropy** is equivalent to maximizing the (log) likelihood of the observed data.
 
 ## Entropy
 
-xxx
+The uniform distribution is special and therefore the relative entropy (KL divergence) of a distribution with respect to the uniform distribution is special.
+
+**Entropy** is the relative entropy (KL divergence) of a distribution with respect to the uniform distribution:
+
+$$\mathcal{H}[p]
+=
+\mathcal{S}[p; u]
+=
+- \sum_x p(x) \cdot \log p(x)$$
+
+Entropy is a measure of ignorance.
+
+Entropy is a measure of how un-uniform a distribution is, i.e., how easy it is to distinguish it from a uniform distribution.
 
 ## Mutual information
 
-xxx
+Mutual information is the relative entropy (KL divergence) of a joint distribution and the product of its marginal distributions:
+
+$$\mathcal{I}[X;Y] = \mathcal{S}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \log \frac{p(x,y)}{p(x)p(y)}$$
+
+Entropy is a measure of how easy it is to distinguish whether the two variables are associated, rather than them being independent.
+
+## 

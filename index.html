@@ -92,6 +92,8 @@ div.csl-indent {
 <script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="index_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="index_files/libs/quarto-contrib/videojs/video.min.js"></script>
+<link href="index_files/libs/quarto-contrib/videojs/video-js.css" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -149,6 +151,7 @@ window.Quarto = {
   <li><a href="#a-principle-for-learning-cross-entropy-minimization" id="toc-a-principle-for-learning-cross-entropy-minimization" class="nav-link" data-scroll-target="#a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</a></li>
   <li><a href="#entropy" id="toc-entropy" class="nav-link" data-scroll-target="#entropy">Entropy</a></li>
   <li><a href="#mutual-information" id="toc-mutual-information" class="nav-link" data-scroll-target="#mutual-information">Mutual information</a></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"></a></li>
   </ul>
 </nav>
 </div>
@@ -198,15 +201,15 @@ window.Quarto = {
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence">relative entropy</a> (a.k.a. Kullback–Leibler (KL) divergence): measures a “distance” between two distributions</li>
 </ul>
-<p><span class="math display">\[\mathcal{S}[p;q] \equiv \sum p(x) \log \frac{p(x)}{q(x)}\]</span></p>
+<p><span class="math display">\[\mathcal{S}[p;q] \equiv \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}\]</span></p>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">entropy</a>: measures the “complexity” of a distribution</li>
 </ul>
-<p><span class="math display">\[\mathcal{S}[p] \equiv - \sum p(x) \log p(x)\]</span></p>
+<p><span class="math display">\[\mathcal{S}[p] \equiv - \sum_x p(x) \cdot \log p(x)\]</span></p>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Mutual_information">mutual information</a>: measures the “complexity” of the association between two variables</li>
 </ul>
-<p><span class="math display">\[\mathcal{I}(X;Y) \equiv \sum p(x,y) \log \frac{p(x,y)}{p(x)p(y)}\]</span></p>
+<p><span class="math display">\[\mathcal{I}(X;Y) \equiv \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}\]</span></p>
 </section>
 <section id="weight-of-evidence" class="level2">
 <h2 class="anchored" data-anchor-id="weight-of-evidence">Weight of evidence</h2>
@@ -579,11 +582,11 @@ Note
 \log \frac{p(x)}{q(x)}
 \right]
 =
-\sum_i p(x_i)\ \log \frac{p(x_i)}{q(x_i)}
-=
 \Big\langle
 \log \frac{p(x)}{q(x)}
-\Big\rangle_p\]</span></p>
+\Big\rangle_p
+=
+\sum_x p(x) \cdot \log \frac{p(x)}{q(x)}\]</span></p>
 <p>&nbsp;</p>
 <p>Back to the M&amp;Ms example, if <code>CLV</code> is <span class="math inline">\(H_1\)</span> and <code>HKP</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence is:</p>
 <div class="cell">
@@ -725,6 +728,8 @@ Important
 <p>The KL divergence measures the “distance/difference” between two probability distributions, but it’s not symmetric.</p>
 </div>
 </div>
+<div class="quarto-video"><video id="video_shortcode_videojs_video1" class="video-js vjs-default-skin vjs-big-play-centered vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="143326704-8361446e-721c-47e5-95e7-4e8fd20460ec.mp4"></video></div>
+<p><a href="https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9" class="uri">https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9</a></p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -748,35 +753,50 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The KL divergence ≥ 0.</p>
+<p>The KL divergence is ≥ 0.</p>
 </div>
 </div>
 </section>
 <section id="a-principle-for-learning-cross-entropy-minimization" class="level2">
 <h2 class="anchored" data-anchor-id="a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</h2>
-<p>Minimize the “distance/difference” (KL divergence) between the real world and your model:</p>
-<p><span class="math display">\[
-\min \mathcal{S}[\text{real world};\text{model}]
-\]</span></p>
-<p><span class="math display">\[
-\min \mathcal{S}[p(x);q(x)]
-\]</span></p>
-<p><span class="math display">\[
-\min_q \sum_i p(x_i)\ \log\frac{p(x_i)}{q(x_i)}
-\]</span> <span class="math display">\[
-\min_q \sum_i p(x_i)\ \log \frac{p(x_i)}{q(x_i)} = \sum p(x_i) \log p(x_i) - \min_q \sum_i p(x_i)\ \log q(x_i)
-\]</span> which is equivalent to minimizing the <strong>cross-entropy</strong>:</p>
-<p><span class="math display">\[
-\min_q \sum_i p(x_i)\ \log q(x_i)
-\]</span> But we do not know <span class="math inline">\(p(x)\)</span>. What we know is xxx</p>
+<p>Minimize the “distance/difference” (KL divergence) between the real world <span class="math inline">\(p(x)\)</span> and your model of the world <span class="math inline">\(q(x)\)</span>:</p>
+<p><span class="math display">\[\min_q \mathcal{S}[\text{p};\text{q}]\]</span></p>
+<p><span class="math display">\[\min_q \sum_x p(x) \cdot \log\frac{p(x)}{q(x)}\]</span></p>
+<p><span class="math display">\[\min_q \sum_x p(x) \cdot \log \frac{p(x)}{q(x)} = \sum_x p(x) \cdot \log p(x) - \min_q \sum_x p(x) \cdot \log q(x)\]</span> which is equivalent to minimizing the <strong>cross-entropy</strong>:</p>
+<p><span class="math display">\[\min_q \mathcal{H}[p;q]\]</span></p>
+<p><span class="math display">\[\mathcal{H}[p;q] = - \sum_x p(x) \cdot \log q(x)\]</span></p>
+<p>But we do not know <span class="math inline">\(p(x)\)</span>, i.e., we do not have access to all data points/the true distribution of the data, only <span class="math inline">\(n\)</span> samples, i.e., the empirical distribution of the data <span class="math inline">\(\hat p(x)\)</span>:</p>
+<p><span class="math display">\[\hat p(x) = \frac{1}{n} \sum_i \delta(x - x_i)\]</span></p>
+<p>Assuming <span class="math inline">\(\hat p(x)\)</span> is a good approximation of <span class="math inline">\(p(x)\)</span>:</p>
+<p><span class="math display">\[\mathcal{H}[\hat p;q]
+=
+- \sum_x \hat p(x) \cdot \log q(x)
+=
+- \sum_x \frac{1}{n} \sum_i \delta(x - x_i) \cdot \log q(x)
+=
+- \frac{1}{n} \sum_i \log q(x_i)\]</span></p>
+<p>minimizing this <strong>empirical cross-entropy</strong> is equivalent to maximizing the (log) likelihood of the observed data.</p>
 </section>
 <section id="entropy" class="level2">
 <h2 class="anchored" data-anchor-id="entropy">Entropy</h2>
-<p>xxx</p>
+<p>The uniform distribution is special and therefore the relative entropy (KL divergence) of a distribution with respect to the uniform distribution is special.</p>
+<p><strong>Entropy</strong> is the relative entropy (KL divergence) of a distribution with respect to the uniform distribution:</p>
+<p><span class="math display">\[\mathcal{H}[p]
+=
+\mathcal{S}[p; u]
+=
+- \sum_x p(x) \cdot \log p(x)\]</span></p>
+<p>Entropy is a measure of ignorance.</p>
+<p>Entropy is a measure of how un-uniform a distribution is, i.e., how easy it is to distinguish it from a uniform distribution.</p>
 </section>
 <section id="mutual-information" class="level2">
 <h2 class="anchored" data-anchor-id="mutual-information">Mutual information</h2>
-<p>xxx</p>
+<p>Mutual information is the relative entropy (KL divergence) of a joint distribution and the product of its marginal distributions:</p>
+<p><span class="math display">\[\mathcal{I}[X;Y] = \mathcal{S}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \log \frac{p(x,y)}{p(x)p(y)}\]</span></p>
+<p>Entropy is a measure of how easy it is to distinguish whether the two variables are associated, rather than them being independent.</p>
+</section>
+<section id="section" class="level2 unnumbered">
+
 
 </section>
 
@@ -1187,6 +1207,7 @@ Shannon, C. E. 1948. <span>“A Mathematical Theory of Communication.”</span> 
   });
   </script>
 </div> <!-- /content -->
+<script>videojs(video_shortcode_videojs_video1);</script>
 
 
 
