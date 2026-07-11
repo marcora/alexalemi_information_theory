@@ -174,7 +174,7 @@ $$\log \frac{p(x_1, x_2, \ldots)}{q(x_1, x_2, \ldots)} = \log \frac{p(x_1)\ p(x_
 
 ![](images/clipboard-1482521587.png)
 
-#### Loaded die
+### Example: Loaded die
 
 $H_1 : \text{die is loaded, shows 6 1/3 of the times (and 1, 2, 3, 4, or 5 2/3 of the times)}$
 
@@ -186,7 +186,7 @@ $D : \text{die shows 1, 2, 3, 4, or 5} \implies 10\log_{10}\frac{P(D \mid H_1)}{
 
 If we observe $\{1, 4, 6, 6\}$ then (assuming i.i.d.) the weight of the evidence is $-1 + (-1) + 3 + 3 = 4\ \text{dB}$. Thus, if our prior log odds were $0\ \text{dB}$ (i.e., $H_1$ and $H_2$ are equally likely, max entropy), then our posterior log odds are $4\ \text{dB}$ , corresponding to $16:1\ \text{odds}$ in favor of $H_1$ vs. $H_2$.
 
-#### Human births
+### Example: Human births
 
 $H_1 : \text{human births are 50% ♂ and 50% ♀}$
 
@@ -200,7 +200,7 @@ $$251,527 \cdot 10\log_{10} \frac{0.51}{0.50} + 241,945 \cdot 10\log_{10} \frac{
 
 corresponding to $2.51\times 10^{40}:1\ \text{odds}$ in favor of $H_1$ vs. $H_2$ (25.1 duodecillions to one).
 
-#### COVID test
+### Example: COVID test
 
 $H_1 : \text{you have COVID}$
 
@@ -230,19 +230,8 @@ $$P = \frac{1}{1 + 10^{-\text{dB}/10}}$$
 
 $$P(\text{COVID} \mid +) = \frac{1}{1 + 10^{0.625}} = \frac{1}{5.217} = 0.192$$
 
-This conversion from odds (or dB) to probability is valid only when the odds are between complementary hypotheses (i.e., mutually exclusive and exhaustive hypotheses), so that $H_2=\neg H_1$ and $P(H_1)+P(H_2)=1$.
 
-Complementary = mutually exclusive and collectively exhaustive:
-
-$$H_1 \cap H_2 = \varnothing \quad \text{and} \quad H_1 \cup H_2 = \Omega$$
-
-Equivalently:
-
-$$P(H_1) + P(H_2) = 1$$
-
-$$P(H_2) = 1 - P(H_1) = P(\lnot H_1)$$
-
-#### M&Ms
+### Example: M&Ms (discrete distributions)
 
 ![](images/clipboard-3433517152.png){width="300"}
 
@@ -293,7 +282,7 @@ p_db <- gf_col(dB ~ Color, data = d) + ylim(c(-2.5, 2.5))
 p_ds / p_db
 ```
 
-#### Continuous hypotheses
+### Example: Gaussians (continuous distributions)
 
 ```{r}
 d <- tibble(
@@ -349,13 +338,13 @@ $$\mathcal{S}[p;q]
 =
 \mathbb{E}_{x \sim p(x)}
 \left[
-\log\frac{p(x)}{q(x)}
+\log \frac{p(x)}{q(x)}
 \right]
 =
-\sum_i{p(x_i)}\ \log\frac{p(x_i)}{q(x_i)}
+\sum_i p(x_i)\ \log \frac{p(x_i)}{q(x_i)}
 =
 \Big\langle
-\log\frac{p(x)}{q(x)}
+\log \frac{p(x)}{q(x)}
 \Big\rangle_p$$
 
  
@@ -413,8 +402,36 @@ d %>% summarize(S = sum(HKP*dB)) %$% S
 $\mathcal{S}[\text{HKP};\text{CLV}] = 0.1078\ \text{dB}$
 
 ::: callout-important
-The KL divergence is a measure of the "distance" between two probability distributions but it's not symmetric.
+The KL divergence measures the "distance/difference" between two probability distributions, but it's not symmetric.
 :::
+
+::: callout-note
+The KL divergence quantifies the information gained—or equivalently, the change in beliefs—when a (prior) distribution $q$ is updated to a (posterior) distribution $p$.
+:::
+
+::: callout-note
+The KL divergence ≥ 0. 
+:::
+
+## A principle for learning: cross-entropy minimization
+
+Minimize the "distance/difference" (KL divergence) between the real world and your model:
+
+$$
+\min \mathcal{S}[\text{real};\text{model}]
+$$
+
+$$
+\min_q \sum_i p(x_i)\ \log\frac{p(x_i)}{q(x_i)}
+$$
+$$
+\min_q \sum_i p(x_i)\ \log \frac{p(x_i)}{q(x_i)} = \sum p(x_i) \log p(x_i) - \min_q \sum_i p(x_i)\ \log q(x_i)
+$$
+which is equivalent to minimizing the **cross-entropy**:
+
+$$
+\min_q \sum_i p(x_i)\ \log q(x_i)
+$$
 
 ## Entropy
 

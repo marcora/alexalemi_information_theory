@@ -139,8 +139,14 @@ window.Quarto = {
   <li><a href="#change-of-notation" id="toc-change-of-notation" class="nav-link" data-scroll-target="#change-of-notation">Change of notation</a></li>
   <li><a href="#units-of-weight-of-evidence" id="toc-units-of-weight-of-evidence" class="nav-link" data-scroll-target="#units-of-weight-of-evidence">Units of weight of evidence</a></li>
   <li><a href="#belief-o-meter" id="toc-belief-o-meter" class="nav-link" data-scroll-target="#belief-o-meter">Belief-O-Meter</a></li>
+  <li><a href="#example-loaded-die" id="toc-example-loaded-die" class="nav-link" data-scroll-target="#example-loaded-die">Example: Loaded die</a></li>
+  <li><a href="#example-human-births" id="toc-example-human-births" class="nav-link" data-scroll-target="#example-human-births">Example: Human births</a></li>
+  <li><a href="#example-covid-test" id="toc-example-covid-test" class="nav-link" data-scroll-target="#example-covid-test">Example: COVID test</a></li>
+  <li><a href="#example-mms-discrete-distributions" id="toc-example-mms-discrete-distributions" class="nav-link" data-scroll-target="#example-mms-discrete-distributions">Example: M&amp;Ms (discrete distributions)</a></li>
+  <li><a href="#example-gaussians-continuous-distributions" id="toc-example-gaussians-continuous-distributions" class="nav-link" data-scroll-target="#example-gaussians-continuous-distributions">Example: Gaussians (continuous distributions)</a></li>
   </ul></li>
   <li><a href="#relative-entropy-kl-divergence" id="toc-relative-entropy-kl-divergence" class="nav-link" data-scroll-target="#relative-entropy-kl-divergence">Relative entropy (KL divergence)</a></li>
+  <li><a href="#a-principle-for-learning-cross-entropy-minimization" id="toc-a-principle-for-learning-cross-entropy-minimization" class="nav-link" data-scroll-target="#a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</a></li>
   <li><a href="#entropy" id="toc-entropy" class="nav-link" data-scroll-target="#entropy">Entropy</a></li>
   <li><a href="#mutual-information" id="toc-mutual-information" class="nav-link" data-scroll-target="#mutual-information">Mutual information</a></li>
   </ul>
@@ -384,16 +390,17 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 <section id="belief-o-meter" class="level3">
 <h3 class="anchored" data-anchor-id="belief-o-meter">Belief-O-Meter</h3>
 <p><img src="images/clipboard-1482521587.png" class="img-fluid"></p>
-<section id="loaded-die" class="level4">
-<h4 class="anchored" data-anchor-id="loaded-die">Loaded die</h4>
+</section>
+<section id="example-loaded-die" class="level3">
+<h3 class="anchored" data-anchor-id="example-loaded-die">Example: Loaded die</h3>
 <p><span class="math inline">\(H_1 : \text{die is loaded, shows 6 1/3 of the times (and 1, 2, 3, 4, or 5 2/3 of the times)}\)</span></p>
 <p><span class="math inline">\(H_2 : \text{die is not loaded, shows 6 1/6 of the times (and 1, 2, 3, 4, or 5 5/6 of the times})\)</span></p>
 <p><span class="math inline">\(D : \text{die shows 6} \implies 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{1}{3}}{\frac{1}{6}} = 10\log_{10}(2) \approx 3\ \text{dB}\)</span></p>
 <p><span class="math inline">\(D : \text{die shows 1, 2, 3, 4, or 5} \implies 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{2}{3}}{\frac{5}{6}} = 10\log_{10}(0.8) \approx -1\ \text{dB}\)</span></p>
 <p>If we observe <span class="math inline">\(\{1, 4, 6, 6\}\)</span> then (assuming i.i.d.) the weight of the evidence is <span class="math inline">\(-1 + (-1) + 3 + 3 = 4\ \text{dB}\)</span>. Thus, if our prior log odds were <span class="math inline">\(0\ \text{dB}\)</span> (i.e., <span class="math inline">\(H_1\)</span> and <span class="math inline">\(H_2\)</span> are equally likely, max entropy), then our posterior log odds are <span class="math inline">\(4\ \text{dB}\)</span> , corresponding to <span class="math inline">\(16:1\ \text{odds}\)</span> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>.</p>
 </section>
-<section id="human-births" class="level4">
-<h4 class="anchored" data-anchor-id="human-births">Human births</h4>
+<section id="example-human-births" class="level3">
+<h3 class="anchored" data-anchor-id="example-human-births">Example: Human births</h3>
 <p><span class="math inline">\(H_1 : \text{human births are 50% ♂ and 50% ♀}\)</span></p>
 <p><span class="math inline">\(H_2 : \text{human births are 51% ♂ and 49% ♀}\)</span></p>
 <p>Laplace looked at Parisian birth records and found that between 1745 and 1770, 251,527 ♂ and 241,945 ♀ were born.</p>
@@ -401,8 +408,8 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 <p><span class="math display">\[251,527 \cdot 10\log_{10} \frac{0.51}{0.50} + 241,945 \cdot 10\log_{10} \frac{0.49}{0.50} = 21,632 + (-21,228) = 404\ \text{dB}\]</span></p>
 <p>corresponding to <span class="math inline">\(2.51\times 10^{40}:1\ \text{odds}\)</span> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span> (25.1 duodecillions to one).</p>
 </section>
-<section id="covid-test" class="level4">
-<h4 class="anchored" data-anchor-id="covid-test">COVID test</h4>
+<section id="example-covid-test" class="level3">
+<h3 class="anchored" data-anchor-id="example-covid-test">Example: COVID test</h3>
 <p><span class="math inline">\(H_1 : \text{you have COVID}\)</span></p>
 <p><span class="math inline">\(H_2 : \text{you don't have COVID}\)</span></p>
 <p>Typical sensitivity of a COVID test:</p>
@@ -417,15 +424,9 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 <p><span class="math display">\[-19.96 + 13.71 = -6.25\ \text{dB}\]</span></p>
 <p><span class="math display">\[P = \frac{1}{1 + 10^{-\text{dB}/10}}\]</span></p>
 <p><span class="math display">\[P(\text{COVID} \mid +) = \frac{1}{1 + 10^{0.625}} = \frac{1}{5.217} = 0.192\]</span></p>
-<p>This conversion from odds (or dB) to probability is valid only when the odds are between complementary hypotheses (i.e., mutually exclusive and exhaustive hypotheses), so that <span class="math inline">\(H_2=\neg H_1\)</span> and <span class="math inline">\(P(H_1)+P(H_2)=1\)</span>.</p>
-<p>Complementary = mutually exclusive and collectively exhaustive:</p>
-<p><span class="math display">\[H_1 \cap H_2 = \varnothing \quad \text{and} \quad H_1 \cup H_2 = \Omega\]</span></p>
-<p>Equivalently:</p>
-<p><span class="math display">\[P(H_1) + P(H_2) = 1\]</span></p>
-<p><span class="math display">\[P(H_2) = 1 - P(H_1) = P(\lnot H_1)\]</span></p>
 </section>
-<section id="mms" class="level4">
-<h4 class="anchored" data-anchor-id="mms">M&amp;Ms</h4>
+<section id="example-mms-discrete-distributions" class="level3">
+<h3 class="anchored" data-anchor-id="example-mms-discrete-distributions">Example: M&amp;Ms (discrete distributions)</h3>
 <p><img src="images/clipboard-3433517152.png" class="img-fluid" width="300"></p>
 <p>Bags of M&amp;Ms produced at the Cleveland and Hackettstown factories differ in their color composition and are stamped with distinct codes: bags with <code>CLV</code> in their serial no. are from Cleveland, while bags with <code>HKP</code> in their serial no. are from Hackettstown.</p>
 <p>The color proportions vary by factory as follows:</p>
@@ -529,8 +530,8 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 </div>
 </div>
 </section>
-<section id="continuous-hypotheses" class="level4">
-<h4 class="anchored" data-anchor-id="continuous-hypotheses">Continuous hypotheses</h4>
+<section id="example-gaussians-continuous-distributions" class="level3">
+<h3 class="anchored" data-anchor-id="example-gaussians-continuous-distributions">Example: Gaussians (continuous distributions)</h3>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -541,7 +542,6 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 </div>
 </div>
 <p>Blue line is weight of evidence <span class="math inline">\(x\)</span> for <span class="math inline">\(H_1\)</span> (red line) vs.&nbsp;<span class="math inline">\(H_2\)</span> (green line).</p>
-</section>
 </section>
 </section>
 <section id="relative-entropy-kl-divergence" class="level2">
@@ -576,13 +576,13 @@ Note
 =
 \mathbb{E}_{x \sim p(x)}
 \left[
-\log\frac{p(x)}{q(x)}
+\log \frac{p(x)}{q(x)}
 \right]
 =
-\sum_i{p(x_i)}\ \log\frac{p(x_i)}{q(x_i)}
+\sum_i p(x_i)\ \log \frac{p(x_i)}{q(x_i)}
 =
 \Big\langle
-\log\frac{p(x)}{q(x)}
+\log \frac{p(x)}{q(x)}
 \Big\rangle_p\]</span></p>
 <p>&nbsp;</p>
 <p>Back to the M&amp;Ms example, if <code>CLV</code> is <span class="math inline">\(H_1\)</span> and <code>HKP</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence is:</p>
@@ -722,9 +722,50 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The KL divergence is a measure of the “distance” between two probability distributions but it’s not symmetric.</p>
+<p>The KL divergence measures the “distance/difference” between two probability distributions, but it’s not symmetric.</p>
 </div>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The KL divergence quantifies the information gained—or equivalently, the change in beliefs—when a (prior) distribution <span class="math inline">\(q\)</span> is updated to a (posterior) distribution <span class="math inline">\(p\)</span>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The KL divergence ≥ 0.</p>
+</div>
+</div>
+</section>
+<section id="a-principle-for-learning-cross-entropy-minimization" class="level2">
+<h2 class="anchored" data-anchor-id="a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</h2>
+<p>Minimize the “distance/difference” (KL divergence) between the real world and your model:</p>
+<p><span class="math display">\[
+\min \mathcal{S}[\text{real};\text{model}]
+\]</span></p>
+<p><span class="math display">\[
+\min_q \sum_i p(x_i)\ \log\frac{p(x_i)}{q(x_i)}
+\]</span> <span class="math display">\[
+\min_q \sum_i p(x_i)\ \log \frac{p(x_i)}{q(x_i)} = \sum p(x_i) \log p(x_i) - \min_q \sum_i p(x_i)\ \log q(x_i)
+\]</span> which is equivalent to minimizing the <strong>cross-entropy</strong>:</p>
+<p><span class="math display">\[
+\min_q \sum_i p(x_i)\ \log q(x_i)
+\]</span></p>
 </section>
 <section id="entropy" class="level2">
 <h2 class="anchored" data-anchor-id="entropy">Entropy</h2>
