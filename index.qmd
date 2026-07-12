@@ -42,19 +42,19 @@ Fundamentally, information theory is about [measures](https://en.wikipedia.org/w
 
 - [weight of evidence](https://en.wikipedia.org/wiki/Bayes%27_theorem): measures the "importance" of data for distinguishing between two hypotheses
 
-$$w[x;p,q] \equiv \log \frac{p(x)}{q(x)}$$
+$$\mathcal{W}[x;p,q] = \log \frac{p(x)}{q(x)}$$
 
 - [relative entropy](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) (a.k.a. Kullback–Leibler (KL) divergence): measures a "distance" between two distributions
 
-$$\mathcal{S}[p;q] \equiv \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
+$$\mathcal{S}[p;q] = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
 
 - [entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)): measures the "complexity" of a distribution
 
-$$\mathcal{S}[p] \equiv - \sum_x p(x) \cdot \log p(x)$$
+$$\mathcal{S}[p] = \mathcal{S}[p;u] = - \sum_x p(x) \cdot \log p(x)$$
 
 - [mutual information](https://en.wikipedia.org/wiki/Mutual_information): measures the "complexity" of the association between two variables
 
-$$\mathcal{I}(X;Y) \equiv \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}$$
+$$\mathcal{I}(X;Y) = \mathcal{S}[p(x,y);p(x)p(x)] = \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}$$
 
 ## Weight of evidence
 
@@ -127,11 +127,11 @@ P(X = x \mid P) & \rightarrow p(x) \\
 P(X = x \mid Q) & \rightarrow q(x) \\
 \end{align}$$
 
-The probability that some variable $X$ takes on a value $x$ given that some model/hypothesis is true.
+The probability that some variable $X$ takes on a value $x$ given that some model/hypothesis $P$ or $Q$ is true.
 
 The weight of evidence is:
 
-$$\log \frac{p(x)}{q(x)}$$
+$$\mathcal{W}[x;p,q] = \log \frac{p(x)}{q(x)}$$
 
 ### Units of weight of evidence
 
@@ -173,6 +173,18 @@ $$\log \frac{p(x_1, x_2, \ldots)}{q(x_1, x_2, \ldots)} = \log \frac{p(x_1)\ p(x_
 ### Belief-O-Meter
 
 ![](images/clipboard-1482521587.png)
+
+The belief-o-meter has two hypotheses, one at each end, e.g.:
+
+![](images/clipboard-3230710903.png)
+
+The two hypotheses, one at each end of the belief-o-meter, do not have to be exhaustive, e.g.:
+
+![](images/clipboard-553127107.png)
+
+The two hypotheses, one at each end of the belief-o-meter, can however be exhaustive, e.g.:
+
+![](images/clipboard-2419376339.png)
 
 ### Example: Loaded die
 
@@ -415,9 +427,9 @@ The KL divergence quantifies the information gained—or equivalently, the chang
 The KL divergence is ≥ 0.
 :::
 
-## A principle for learning: cross-entropy minimization
+### A principle for learning: cross-entropy minimization
 
-Minimize the "distance/difference" (KL divergence) between the real world $p(x)$ and your model of the world $q(x)$:
+Minimize the "distance/difference" (KL divergence) between the real world $p(x)$ and a model of the world $q(x)$:
 
 $$\min_q \mathcal{S}[\text{p};\text{q}]$$
 
@@ -445,7 +457,7 @@ $$\mathcal{H}[\hat p;q]
 
 minimizing this **empirical cross-entropy** is equivalent to maximizing the (log) likelihood of the observed data.
 
-## Entropy
+### Entropy
 
 The uniform distribution is special and therefore the relative entropy (KL divergence) of a distribution with respect to the uniform distribution is special.
 
@@ -461,7 +473,7 @@ Entropy is a measure of ignorance.
 
 Entropy is a measure of how un-uniform a distribution is, i.e., how easy it is to distinguish it from a uniform distribution.
 
-## Mutual information
+### Mutual information
 
 Mutual information is the relative entropy (KL divergence) of a joint distribution and the product of its marginal distributions:
 
@@ -469,4 +481,102 @@ $$\mathcal{I}[X;Y] = \mathcal{S}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \lo
 
 Entropy is a measure of how easy it is to distinguish whether the two variables are associated, rather than them being independent.
 
-## 
+## Surprise and weight of evidence
+
+![](images/clipboard-4176444107.png)
+
+$$\begin{align}
+H_1 &= ⚀ \\
+H_2 &= \{ ⚀, ⚁, ⚂, ⚃, ⚄, ⚅ \} = \Omega \\
+\end{align}$$
+
+$$\begin{align}
+P(H_2) & = P(\Omega) = 1 \\
+P(H_2 \mid D) & = P(\Omega \mid D) = 1 \\
+\end{align}$$
+
+$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{P(H_2)}$$
+
+$$\log \frac{P(H_1 \mid D)}{1}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{1}$$
+
+$$\log P(H_1 \mid D)
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log P(H_1)$$
+
+$$\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
+=
+\log P(H_1 \mid D) - \log P(H_1)
+=
+\log \frac{P(H_1 \mid D)}{P(H_1)}$$
+
+$$\mathcal{W}[D;H_1;H_2] = \log \frac{P(H_1 \mid D)}{P(H_1)}$$
+
+If $D = ⚀$, $P(H_1 \mid D = ⚀) = 1$ and $\mathcal{W}[D = ⚀;H_1;H_2] = \log \frac{1}{P(H_1)} = - \log P(H_1)$
+
+## Surprise and weight of evidence
+
+Let $H_1$ and $H_2$ be two competing hypotheses, and let $D$ be observed data.
+
+The posterior log-odds can be written as:
+
+$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{P(H_2)}$$
+
+The first term on the right-hand side is the **weight of evidence** in favor of $H_1$ over $H_2$:
+
+$$W(D; H_1; H_2)
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}$$
+
+So in general,
+
+$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+W(D; H_1; H_2)
++
+\log \frac{P(H_1)}{P(H_2)}$$
+
+Now take the special case where $H_2 = \Omega$, the exhaustive hypothesis, so that $P(H_2) = P(\Omega)=1$ and $P(H_2 \mid D) = P(\Omega \mid D)=1$. Then
+
+$$\log P(H_1 \mid D)
+=
+W(D; H_1; \Omega)
++
+\log P(H_1)$$
+
+Rearranging gives
+
+$$W(D; H_1; \Omega) = \log \frac{P(H_1 \mid D)}{P(H_1)}$$
+
+Now take the special case where $D = H_1$, so that $P(H_1 \mid D) = P(H_1 \mid H_1) = 1$. Then
+
+$$W(H_1; H_1; \Omega)
+=
+\log \frac{1}{P(H_1)}
+=
+-\log P(H_1)$$
+
+This is the **surprise** or **self-information** (information content) of $H_1$ under its prior probability.
+
+This derivation elegantly connects I.J. Good’s **weight of evidence** to Claude Shannon’s **surprise** (self-information) by using a clever choice for the alternative hypothesis, the tautological alternative $H_2 = \Omega$. It successfully proves that **surprise is simply a special case of the weight of evidence**. An intuitive way to think about this derivation is to view surprise as a measure of **how much your mind has to change** when an uncertain prediction becomes an absolute certainty.
+
+- If $H_1$ is a likely event (i.e., $P(H_1)$ is high), then seeing it happen is not surprising (i.e., $-\log P(H_1)$ is low).
+
+- If $H_1$ is an unlikely event (i.e., $P(H_1)$ is low), then seeing it happen is surprising (i.e., $-\log P(H_1)$ is high).
+
+```{r}
+gf_function(\(x) - log2(x), xlim = c(0.001,0.999)) %>% gf_labs(x = "P", y = "S = -log2(P)") + scale_y_continuous(breaks = seq(0, 10, by = 1))
+```

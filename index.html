@@ -147,11 +147,14 @@ window.Quarto = {
   <li><a href="#example-mms-discrete-distributions" id="toc-example-mms-discrete-distributions" class="nav-link" data-scroll-target="#example-mms-discrete-distributions">Example: M&amp;Ms (discrete distributions)</a></li>
   <li><a href="#example-gaussians-continuous-distributions" id="toc-example-gaussians-continuous-distributions" class="nav-link" data-scroll-target="#example-gaussians-continuous-distributions">Example: Gaussians (continuous distributions)</a></li>
   </ul></li>
-  <li><a href="#relative-entropy-kl-divergence" id="toc-relative-entropy-kl-divergence" class="nav-link" data-scroll-target="#relative-entropy-kl-divergence">Relative entropy (KL divergence)</a></li>
+  <li><a href="#relative-entropy-kl-divergence" id="toc-relative-entropy-kl-divergence" class="nav-link" data-scroll-target="#relative-entropy-kl-divergence">Relative entropy (KL divergence)</a>
+  <ul class="collapse">
   <li><a href="#a-principle-for-learning-cross-entropy-minimization" id="toc-a-principle-for-learning-cross-entropy-minimization" class="nav-link" data-scroll-target="#a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</a></li>
   <li><a href="#entropy" id="toc-entropy" class="nav-link" data-scroll-target="#entropy">Entropy</a></li>
   <li><a href="#mutual-information" id="toc-mutual-information" class="nav-link" data-scroll-target="#mutual-information">Mutual information</a></li>
-  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"></a></li>
+  </ul></li>
+  <li><a href="#surprise-and-weight-of-evidence" id="toc-surprise-and-weight-of-evidence" class="nav-link" data-scroll-target="#surprise-and-weight-of-evidence">Surprise and weight of evidence</a></li>
+  <li><a href="#surprise-and-weight-of-evidence-1" id="toc-surprise-and-weight-of-evidence-1" class="nav-link" data-scroll-target="#surprise-and-weight-of-evidence-1">Surprise and weight of evidence</a></li>
   </ul>
 </nav>
 </div>
@@ -197,19 +200,19 @@ window.Quarto = {
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Bayes%27_theorem">weight of evidence</a>: measures the “importance” of data for distinguishing between two hypotheses</li>
 </ul>
-<p><span class="math display">\[w[x;p,q] \equiv \log \frac{p(x)}{q(x)}\]</span></p>
+<p><span class="math display">\[\mathcal{W}[x;p,q] = \log \frac{p(x)}{q(x)}\]</span></p>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence">relative entropy</a> (a.k.a. Kullback–Leibler (KL) divergence): measures a “distance” between two distributions</li>
 </ul>
-<p><span class="math display">\[\mathcal{S}[p;q] \equiv \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}\]</span></p>
+<p><span class="math display">\[\mathcal{S}[p;q] = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}\]</span></p>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">entropy</a>: measures the “complexity” of a distribution</li>
 </ul>
-<p><span class="math display">\[\mathcal{S}[p] \equiv - \sum_x p(x) \cdot \log p(x)\]</span></p>
+<p><span class="math display">\[\mathcal{S}[p] = \mathcal{S}[p;u] = - \sum_x p(x) \cdot \log p(x)\]</span></p>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Mutual_information">mutual information</a>: measures the “complexity” of the association between two variables</li>
 </ul>
-<p><span class="math display">\[\mathcal{I}(X;Y) \equiv \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}\]</span></p>
+<p><span class="math display">\[\mathcal{I}(X;Y) = \mathcal{S}[p(x,y);p(x)p(x)] = \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}\]</span></p>
 </section>
 <section id="weight-of-evidence" class="level2">
 <h2 class="anchored" data-anchor-id="weight-of-evidence">Weight of evidence</h2>
@@ -252,9 +255,9 @@ window.Quarto = {
 P(X = x \mid P) &amp; \rightarrow p(x) \\
 P(X = x \mid Q) &amp; \rightarrow q(x) \\
 \end{align}\]</span></p>
-<p>The probability that some variable <span class="math inline">\(X\)</span> takes on a value <span class="math inline">\(x\)</span> given that some model/hypothesis is true.</p>
+<p>The probability that some variable <span class="math inline">\(X\)</span> takes on a value <span class="math inline">\(x\)</span> given that some model/hypothesis <span class="math inline">\(P\)</span> or <span class="math inline">\(Q\)</span> is true.</p>
 <p>The weight of evidence is:</p>
-<p><span class="math display">\[\log \frac{p(x)}{q(x)}\]</span></p>
+<p><span class="math display">\[\mathcal{W}[x;p,q] = \log \frac{p(x)}{q(x)}\]</span></p>
 </section>
 <section id="units-of-weight-of-evidence" class="level3">
 <h3 class="anchored" data-anchor-id="units-of-weight-of-evidence">Units of weight of evidence</h3>
@@ -393,6 +396,12 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 <section id="belief-o-meter" class="level3">
 <h3 class="anchored" data-anchor-id="belief-o-meter">Belief-O-Meter</h3>
 <p><img src="images/clipboard-1482521587.png" class="img-fluid"></p>
+<p>The belief-o-meter has two hypotheses, one at each end, e.g.:</p>
+<p><img src="images/clipboard-3230710903.png" class="img-fluid"></p>
+<p>The two hypotheses, one at each end of the belief-o-meter, do not have to be exhaustive, e.g.:</p>
+<p><img src="images/clipboard-553127107.png" class="img-fluid"></p>
+<p>The two hypotheses, one at each end of the belief-o-meter, can however be exhaustive, e.g.:</p>
+<p><img src="images/clipboard-2419376339.png" class="img-fluid"></p>
 </section>
 <section id="example-loaded-die" class="level3">
 <h3 class="anchored" data-anchor-id="example-loaded-die">Example: Loaded die</h3>
@@ -756,10 +765,9 @@ Note
 <p>The KL divergence is ≥ 0.</p>
 </div>
 </div>
-</section>
-<section id="a-principle-for-learning-cross-entropy-minimization" class="level2">
-<h2 class="anchored" data-anchor-id="a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</h2>
-<p>Minimize the “distance/difference” (KL divergence) between the real world <span class="math inline">\(p(x)\)</span> and your model of the world <span class="math inline">\(q(x)\)</span>:</p>
+<section id="a-principle-for-learning-cross-entropy-minimization" class="level3">
+<h3 class="anchored" data-anchor-id="a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</h3>
+<p>Minimize the “distance/difference” (KL divergence) between the real world <span class="math inline">\(p(x)\)</span> and a model of the world <span class="math inline">\(q(x)\)</span>:</p>
 <p><span class="math display">\[\min_q \mathcal{S}[\text{p};\text{q}]\]</span></p>
 <p><span class="math display">\[\min_q \sum_x p(x) \cdot \log\frac{p(x)}{q(x)}\]</span></p>
 <p><span class="math display">\[\min_q \sum_x p(x) \cdot \log \frac{p(x)}{q(x)} = \sum_x p(x) \cdot \log p(x) - \min_q \sum_x p(x) \cdot \log q(x)\]</span> which is equivalent to minimizing the <strong>cross-entropy</strong>:</p>
@@ -777,8 +785,8 @@ Note
 - \frac{1}{n} \sum_i \log q(x_i)\]</span></p>
 <p>minimizing this <strong>empirical cross-entropy</strong> is equivalent to maximizing the (log) likelihood of the observed data.</p>
 </section>
-<section id="entropy" class="level2">
-<h2 class="anchored" data-anchor-id="entropy">Entropy</h2>
+<section id="entropy" class="level3">
+<h3 class="anchored" data-anchor-id="entropy">Entropy</h3>
 <p>The uniform distribution is special and therefore the relative entropy (KL divergence) of a distribution with respect to the uniform distribution is special.</p>
 <p><strong>Entropy</strong> is the relative entropy (KL divergence) of a distribution with respect to the uniform distribution:</p>
 <p><span class="math display">\[\mathcal{H}[p]
@@ -789,14 +797,95 @@ Note
 <p>Entropy is a measure of ignorance.</p>
 <p>Entropy is a measure of how un-uniform a distribution is, i.e., how easy it is to distinguish it from a uniform distribution.</p>
 </section>
-<section id="mutual-information" class="level2">
-<h2 class="anchored" data-anchor-id="mutual-information">Mutual information</h2>
+<section id="mutual-information" class="level3">
+<h3 class="anchored" data-anchor-id="mutual-information">Mutual information</h3>
 <p>Mutual information is the relative entropy (KL divergence) of a joint distribution and the product of its marginal distributions:</p>
 <p><span class="math display">\[\mathcal{I}[X;Y] = \mathcal{S}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \log \frac{p(x,y)}{p(x)p(y)}\]</span></p>
 <p>Entropy is a measure of how easy it is to distinguish whether the two variables are associated, rather than them being independent.</p>
 </section>
-<section id="section" class="level2 unnumbered">
-
+</section>
+<section id="surprise-and-weight-of-evidence" class="level2">
+<h2 class="anchored" data-anchor-id="surprise-and-weight-of-evidence">Surprise and weight of evidence</h2>
+<p><img src="images/clipboard-4176444107.png" class="img-fluid"></p>
+<p><span class="math display">\[\begin{align}
+H_1 &amp;= ⚀ \\
+H_2 &amp;= \{ ⚀, ⚁, ⚂, ⚃, ⚄, ⚅ \} = \Omega \\
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+P(H_2) &amp; = P(\Omega) = 1 \\
+P(H_2 \mid D) &amp; = P(\Omega \mid D) = 1 \\
+\end{align}\]</span></p>
+<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{P(H_2)}\]</span></p>
+<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{1}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{1}\]</span></p>
+<p><span class="math display">\[\log P(H_1 \mid D)
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log P(H_1)\]</span></p>
+<p><span class="math display">\[\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
+=
+\log P(H_1 \mid D) - \log P(H_1)
+=
+\log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
+<p><span class="math display">\[\mathcal{W}[D;H_1;H_2] = \log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
+<p>If <span class="math inline">\(D = ⚀\)</span>, <span class="math inline">\(P(H_1 \mid D = ⚀) = 1\)</span> and <span class="math inline">\(\mathcal{W}[D = ⚀;H_1;H_2] = \log \frac{1}{P(H_1)} = - \log P(H_1)\)</span></p>
+</section>
+<section id="surprise-and-weight-of-evidence-1" class="level2">
+<h2 class="anchored" data-anchor-id="surprise-and-weight-of-evidence-1">Surprise and weight of evidence</h2>
+<p>Let <span class="math inline">\(H_1\)</span> and <span class="math inline">\(H_2\)</span> be two competing hypotheses, and let <span class="math inline">\(D\)</span> be observed data.</p>
+<p>The posterior log-odds can be written as:</p>
+<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{P(H_2)}\]</span></p>
+<p>The first term on the right-hand side is the <strong>weight of evidence</strong> in favor of <span class="math inline">\(H_1\)</span> over <span class="math inline">\(H_2\)</span>:</p>
+<p><span class="math display">\[W(D; H_1; H_2)
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}\]</span></p>
+<p>So in general,</p>
+<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+W(D; H_1; H_2)
++
+\log \frac{P(H_1)}{P(H_2)}\]</span></p>
+<p>Now take the special case where <span class="math inline">\(H_2 = \Omega\)</span>, the exhaustive hypothesis, so that <span class="math inline">\(P(H_2) = P(\Omega)=1\)</span> and <span class="math inline">\(P(H_2 \mid D) = P(\Omega \mid D)=1\)</span>. Then</p>
+<p><span class="math display">\[\log P(H_1 \mid D)
+=
+W(D; H_1; \Omega)
++
+\log P(H_1)\]</span></p>
+<p>Rearranging gives</p>
+<p><span class="math display">\[W(D; H_1; \Omega) = \log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
+<p>Now take the special case where <span class="math inline">\(D = H_1\)</span>, so that <span class="math inline">\(P(H_1 \mid D) = P(H_1 \mid H_1) = 1\)</span>. Then</p>
+<p><span class="math display">\[W(H_1; H_1; \Omega)
+=
+\log \frac{1}{P(H_1)}
+=
+-\log P(H_1)\]</span></p>
+<p>This is the <strong>surprise</strong> or <strong>self-information</strong> (information content) of <span class="math inline">\(H_1\)</span> under its prior probability.</p>
+<p>This derivation elegantly connects I.J. Good’s <strong>weight of evidence</strong> to Claude Shannon’s <strong>surprise</strong> (self-information) by using a clever choice for the alternative hypothesis, the tautological alternative <span class="math inline">\(H_2 = \Omega\)</span>. It successfully proves that <strong>surprise is simply a special case of the weight of evidence</strong>. An intuitive way to think about this derivation is to view surprise as a measure of <strong>how much your mind has to change</strong> when an uncertain prediction becomes an absolute certainty.</p>
+<ul>
+<li><p>If <span class="math inline">\(H_1\)</span> is a likely event (i.e., <span class="math inline">\(P(H_1)\)</span> is high), then seeing it happen is not surprising (i.e., <span class="math inline">\(-\log P(H_1)\)</span> is low).</p></li>
+<li><p>If <span class="math inline">\(H_1\)</span> is an unlikely event (i.e., <span class="math inline">\(P(H_1)\)</span> is low), then seeing it happen is surprising (i.e., <span class="math inline">\(-\log P(H_1)\)</span> is high).</p></li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 
 </section>
 
