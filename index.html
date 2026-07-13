@@ -147,12 +147,10 @@ window.Quarto = {
   <li><a href="#example-mms-discrete-distributions" id="toc-example-mms-discrete-distributions" class="nav-link" data-scroll-target="#example-mms-discrete-distributions">Example: M&amp;Ms (discrete distributions)</a></li>
   <li><a href="#example-gaussians-continuous-distributions" id="toc-example-gaussians-continuous-distributions" class="nav-link" data-scroll-target="#example-gaussians-continuous-distributions">Example: Gaussians (continuous distributions)</a></li>
   </ul></li>
-  <li><a href="#relative-entropy-kl-divergence" id="toc-relative-entropy-kl-divergence" class="nav-link" data-scroll-target="#relative-entropy-kl-divergence">Relative entropy (KL divergence)</a>
-  <ul class="collapse">
+  <li><a href="#relative-entropy-kl-divergence" id="toc-relative-entropy-kl-divergence" class="nav-link" data-scroll-target="#relative-entropy-kl-divergence">Relative entropy (KL divergence)</a></li>
   <li><a href="#a-principle-for-learning-cross-entropy-minimization" id="toc-a-principle-for-learning-cross-entropy-minimization" class="nav-link" data-scroll-target="#a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</a></li>
   <li><a href="#entropy" id="toc-entropy" class="nav-link" data-scroll-target="#entropy">Entropy</a></li>
   <li><a href="#mutual-information" id="toc-mutual-information" class="nav-link" data-scroll-target="#mutual-information">Mutual information</a></li>
-  </ul></li>
   <li><a href="#surprise-and-weight-of-evidence" id="toc-surprise-and-weight-of-evidence" class="nav-link" data-scroll-target="#surprise-and-weight-of-evidence">Surprise and weight of evidence</a></li>
   <li><a href="#surprise-and-weight-of-evidence-1" id="toc-surprise-and-weight-of-evidence-1" class="nav-link" data-scroll-target="#surprise-and-weight-of-evidence-1">Surprise and weight of evidence</a></li>
   </ul>
@@ -246,9 +244,8 @@ window.Quarto = {
 <p><span class="math display">\[P(A) = 0.5 = \frac{1}{2} \rightarrow \text{Odds}(A) = \frac{\frac{1}{2}}{\frac{1}{2}} = 1 = 1 : 1\]</span></p>
 <p><span class="math display">\[P(A) = 0.75 = \frac{3}{4} \rightarrow \text{Odds}(A) = \frac{\frac{3}{4}}{\frac{1}{4}} = 3 = 3 : 1\]</span></p>
 <p>More generally, odds are the ratio of any two probabilities, not necessarily <span class="math inline">\(P(A)\)</span> and <span class="math inline">\(P(\lnot A)\)</span>, e.g., <span class="math inline">\(\frac{P(H_1)}{P(H_2)}\)</span>.</p>
-<blockquote class="blockquote">
-<p>We define the logarithm of the likelihood ration as the <strong>information</strong> in data <span class="math inline">\(X = x\)</span> for discrimination in favor of <span class="math inline">\(H_1\)</span> against <span class="math inline">\(H_2\)</span>, i.e., the <strong>weight of evidence</strong> for <span class="math inline">\(H_1\)</span> (against <span class="math inline">\(H_2\)</span>) given data <span class="math inline">\(X = x\)</span>.</p>
-</blockquote>
+<p>In the words of I. J. Good and Alan Turing, the weight of evidence (WoE) is a measure of the information in observed data <span class="math inline">\(D\)</span> (or <span class="math inline">\(X = x\)</span>) in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>.</p>
+<p><img src="images/clipboard-1511756704.png" class="img-fluid"></p>
 <section id="change-of-notation" class="level3">
 <h3 class="anchored" data-anchor-id="change-of-notation">Change of notation</h3>
 <p><span class="math display">\[\begin{align}
@@ -400,7 +397,7 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 <p><img src="images/clipboard-3230710903.png" class="img-fluid"></p>
 <p>The two hypotheses, one at each end of the belief-o-meter, do not have to be exhaustive, e.g.:</p>
 <p><img src="images/clipboard-553127107.png" class="img-fluid"></p>
-<p>The two hypotheses, one at each end of the belief-o-meter, can however be exhaustive, e.g.:</p>
+<p>Often one hypothesis and its complement are placed at each end of the belief-o-meter, e.g.:</p>
 <p><img src="images/clipboard-2419376339.png" class="img-fluid"></p>
 </section>
 <section id="example-loaded-die" class="level3">
@@ -553,12 +550,13 @@ P(X = x \mid Q) &amp; \rightarrow q(x) \\
 </div>
 </div>
 </div>
-<p>Blue line is weight of evidence <span class="math inline">\(x\)</span> for <span class="math inline">\(H_1\)</span> (red line) vs.&nbsp;<span class="math inline">\(H_2\)</span> (green line).</p>
+<p>Blue line is weight of evidence <span class="math inline">\(x\)</span> in favor of <span class="math inline">\(H_1\)</span> (red line) vs.&nbsp;<span class="math inline">\(H_2\)</span> (green line).</p>
 </section>
 </section>
 <section id="relative-entropy-kl-divergence" class="level2">
 <h2 class="anchored" data-anchor-id="relative-entropy-kl-divergence">Relative entropy (KL divergence)</h2>
-<p>The <strong>relative entropy/Kullback–Leibler divergence</strong> from <span class="math inline">\(H_1\)</span> to <span class="math inline">\(H_2\)</span> is the <strong>expected weight of evidence</strong> (log-likelihood ratio/Bayes’ factor) of <span class="math inline">\(H_1\)</span> over <span class="math inline">\(H_2\)</span>, assuming <span class="math inline">\(P(D\mid H_1)\)</span> is the true data-generating distribution.</p>
+<p>The <strong>relative entropy/Kullback–Leibler divergence</strong> from <span class="math inline">\(H_1\)</span> to <span class="math inline">\(H_2\)</span> is the <strong>expected weight of evidence</strong> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>, assuming <span class="math inline">\(P(D\mid H_1)\)</span> is the true data-generating distribution.</p>
+<p>Let <span class="math inline">\(P_1 = P(D\mid H_1)\)</span> be the true data-generating distribution and <span class="math inline">\(P_2 = P(D\mid H_2)\)</span> be the other distribution.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -569,10 +567,9 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Unlike the KL divergence (which is a function of the two probability distributions <span class="math inline">\(P_1\)</span> and <span class="math inline">\(P_2\)</span>), the weight of evidence is a function of the observed data <span class="math inline">\(D\)</span> and does not assume that either <span class="math inline">\(P_1\)</span> or <span class="math inline">\(P_2\)</span> is the true data-generating distribution.</p>
+<p>Unlike the KL divergence (which is a function of only <span class="math inline">\(P_1\)</span> and <span class="math inline">\(P_2\)</span>), the weight of evidence is a function of <span class="math inline">\(P_1\)</span>, <span class="math inline">\(P_2\)</span>, and the observed data <span class="math inline">\(D\)</span>, and it does not assume that either <span class="math inline">\(P_1\)</span> or <span class="math inline">\(P_2\)</span> is the true data-generating distribution.</p>
 </div>
 </div>
-<p>Let <span class="math inline">\(P_1 = P(D\mid H_1)\)</span> be the true data-generating distribution and <span class="math inline">\(P_2 = P(D\mid H_2)\)</span> be the alternative distribution.</p>
 <p><span class="math display">\[D_{\mathrm{KL}}(P_1\|P_2)
 =
 \mathbb{E}_{D\sim P_1}
@@ -583,7 +580,8 @@ Note
 \mathbb{E}_{D\sim P_1}
 \left[
 \log\frac{P_1}{P_2}
-\right]\]</span> or</p>
+\right]\]</span></p>
+<p>or</p>
 <p><span class="math display">\[\mathcal{S}[p;q]
 =
 \mathbb{E}_{x \sim p(x)}
@@ -596,7 +594,21 @@ Note
 \Big\rangle_p
 =
 \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}\]</span></p>
-<p>&nbsp;</p>
+<p>The KL divergence can also be decomposed into entropy and cross-entropy:</p>
+<p><span class="math display">\[\mathcal{S}[p;q]
+=
+\sum_x p(x) \cdot \log \frac{p(x)}{q(x)}
+=
+\sum_x p(x) \cdot [\log p(x) - \log q(x)]
+=
+\sum_x p(x) \cdot \log p(x) - \sum_x p(x) \cdot \log q(x)\]</span></p>
+<p>Entropy:</p>
+<p><span class="math display">\[H[p] = -\sum_x p(x) \log p(x)\]</span> Cross-entropy:</p>
+<p><span class="math display">\[H[p; q] = -\sum_x p(x) \log q(x)\]</span></p>
+<p>Therefore,</p>
+<p><span class="math display">\[\mathcal{S}[p;q] = \underbrace{\sum_x p(x) \log p(x)}_{-H(p)} - \underbrace{\sum_x p(x) \log q(x)}_{-H(p,q)}\]</span></p>
+<p><span class="math display">\[\mathcal{S}[p;q] = -H[p] - (-H[p;q]) = - H[p] + H[p;q] = H[p;q] - H[p]\]</span> KL divergence is simply the extra surprise/cost incurred by using distribution <span class="math inline">\(q\)</span> to approximate distribution <span class="math inline">\(p\)</span>.</p>
+<hr>
 <p>Back to the M&amp;Ms example, if <code>CLV</code> is <span class="math inline">\(H_1\)</span> and <code>HKP</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence is:</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -765,14 +777,13 @@ Note
 <p>The KL divergence is ≥ 0.</p>
 </div>
 </div>
-<section id="a-principle-for-learning-cross-entropy-minimization" class="level3">
-<h3 class="anchored" data-anchor-id="a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</h3>
-<p>Minimize the “distance/difference” (KL divergence) between the real world <span class="math inline">\(p(x)\)</span> and a model of the world <span class="math inline">\(q(x)\)</span>:</p>
-<p><span class="math display">\[\min_q \mathcal{S}[\text{p};\text{q}]\]</span></p>
-<p><span class="math display">\[\min_q \sum_x p(x) \cdot \log\frac{p(x)}{q(x)}\]</span></p>
-<p><span class="math display">\[\min_q \sum_x p(x) \cdot \log \frac{p(x)}{q(x)} = \sum_x p(x) \cdot \log p(x) - \min_q \sum_x p(x) \cdot \log q(x)\]</span> which is equivalent to minimizing the <strong>cross-entropy</strong>:</p>
-<p><span class="math display">\[\min_q \mathcal{H}[p;q]\]</span></p>
-<p><span class="math display">\[\mathcal{H}[p;q] = - \sum_x p(x) \cdot \log q(x)\]</span></p>
+</section>
+<section id="a-principle-for-learning-cross-entropy-minimization" class="level2">
+<h2 class="anchored" data-anchor-id="a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</h2>
+<p>Minimize the “distance/difference” (relative entropy/KL divergence) between the real world <span class="math inline">\(p(x)\)</span> and a model of the world <span class="math inline">\(q(x)\)</span>:</p>
+<p><span class="math display">\[\min_q \mathcal{S}[\text{p};\text{q}] = \min_q \sum_x p(x) \cdot \log\frac{p(x)}{q(x)} = \min_q (\mathcal{H}[p;q] - \mathcal{H}[p])\]</span></p>
+<p>which (since entropy does not depend on <span class="math inline">\(q\)</span>) is equivalent to minimizing the <strong>cross-entropy</strong>:</p>
+<p><span class="math display">\[\min_q \mathcal{H}[p;q] = \min_q \big(- \sum_x p(x) \cdot \log q(x)\big)\]</span></p>
 <p>But we do not know <span class="math inline">\(p(x)\)</span>, i.e., we do not have access to all data points/the true distribution of the data, only <span class="math inline">\(n\)</span> samples, i.e., the empirical distribution of the data <span class="math inline">\(\hat p(x)\)</span>:</p>
 <p><span class="math display">\[\hat p(x) = \frac{1}{n} \sum_i \delta(x - x_i)\]</span></p>
 <p>Assuming <span class="math inline">\(\hat p(x)\)</span> is a good approximation of <span class="math inline">\(p(x)\)</span>:</p>
@@ -785,8 +796,8 @@ Note
 - \frac{1}{n} \sum_i \log q(x_i)\]</span></p>
 <p>minimizing this <strong>empirical cross-entropy</strong> is equivalent to maximizing the (log) likelihood of the observed data.</p>
 </section>
-<section id="entropy" class="level3">
-<h3 class="anchored" data-anchor-id="entropy">Entropy</h3>
+<section id="entropy" class="level2">
+<h2 class="anchored" data-anchor-id="entropy">Entropy</h2>
 <p>The uniform distribution is special and therefore the relative entropy (KL divergence) of a distribution with respect to the uniform distribution is special.</p>
 <p><strong>Entropy</strong> is the relative entropy (KL divergence) of a distribution with respect to the uniform distribution:</p>
 <p><span class="math display">\[\mathcal{H}[p]
@@ -797,12 +808,11 @@ Note
 <p>Entropy is a measure of ignorance.</p>
 <p>Entropy is a measure of how un-uniform a distribution is, i.e., how easy it is to distinguish it from a uniform distribution.</p>
 </section>
-<section id="mutual-information" class="level3">
-<h3 class="anchored" data-anchor-id="mutual-information">Mutual information</h3>
+<section id="mutual-information" class="level2">
+<h2 class="anchored" data-anchor-id="mutual-information">Mutual information</h2>
 <p>Mutual information is the relative entropy (KL divergence) of a joint distribution and the product of its marginal distributions:</p>
 <p><span class="math display">\[\mathcal{I}[X;Y] = \mathcal{S}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \log \frac{p(x,y)}{p(x)p(y)}\]</span></p>
 <p>Entropy is a measure of how easy it is to distinguish whether the two variables are associated, rather than them being independent.</p>
-</section>
 </section>
 <section id="surprise-and-weight-of-evidence" class="level2">
 <h2 class="anchored" data-anchor-id="surprise-and-weight-of-evidence">Surprise and weight of evidence</h2>
@@ -847,7 +857,7 @@ P(H_2 \mid D) &amp; = P(\Omega \mid D) = 1 \\
 \log \frac{P(D \mid H_1)}{P(D \mid H_2)}
 +
 \log \frac{P(H_1)}{P(H_2)}\]</span></p>
-<p>The first term on the right-hand side is the <strong>weight of evidence</strong> in favor of <span class="math inline">\(H_1\)</span> over <span class="math inline">\(H_2\)</span>:</p>
+<p>The first term on the right-hand side is the <strong>weight of evidence</strong> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>:</p>
 <p><span class="math display">\[W(D; H_1; H_2)
 =
 \log \frac{P(D \mid H_1)}{P(D \mid H_2)}\]</span></p>

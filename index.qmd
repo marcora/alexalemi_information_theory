@@ -118,7 +118,9 @@ $$P(A) = 0.75 = \frac{3}{4} \rightarrow \text{Odds}(A) = \frac{\frac{3}{4}}{\fra
 
 More generally, odds are the ratio of any two probabilities, not necessarily $P(A)$ and $P(\lnot A)$, e.g., $\frac{P(H_1)}{P(H_2)}$.
 
-> We define the logarithm of the likelihood ration as the **information** in data $X = x$ for discrimination in favor of $H_1$ against $H_2$, i.e., the **weight of evidence** for $H_1$ (against $H_2$) given data $X = x$.
+In the words of I. J. Good and Alan Turing, the weight of evidence (WoE) is a measure of the information in observed data $D$ (or $X = x$) in favor of $H_1$ vs. $H_2$.
+
+![](images/clipboard-1511756704.png)
 
 ### Change of notation
 
@@ -182,7 +184,7 @@ The two hypotheses, one at each end of the belief-o-meter, do not have to be exh
 
 ![](images/clipboard-553127107.png)
 
-The two hypotheses, one at each end of the belief-o-meter, can however be exhaustive, e.g.:
+Often one hypothesis and its complement are placed at each end of the belief-o-meter, e.g.:
 
 ![](images/clipboard-2419376339.png)
 
@@ -320,17 +322,17 @@ p_db <- d %>%
 p_ds / p_db
 ```
 
-Blue line is weight of evidence $x$ for $H_1$ (red line) vs. $H_2$ (green line).
+Blue line is weight of evidence $x$ in favor of $H_1$ (red line) vs. $H_2$ (green line).
 
 ## Relative entropy (KL divergence)
 
-The **relative entropy/Kullback–Leibler divergence** from $H_1$ to $H_2$ is the **expected weight of evidence** (log-likelihood ratio/Bayes' factor) of $H_1$ over $H_2$, assuming $P(D\mid H_1)$ is the true data-generating distribution.
+The **relative entropy/Kullback–Leibler divergence** from $H_1$ to $H_2$ is the **expected weight of evidence** in favor of $H_1$ vs. $H_2$, assuming $P(D\mid H_1)$ is the true data-generating distribution.
+
+Let $P_1 = P(D\mid H_1)$ be the true data-generating distribution and $P_2 = P(D\mid H_2)$ be the other distribution.
 
 ::: callout-note
-Unlike the KL divergence (which is a function of the two probability distributions $P_1$ and $P_2$), the weight of evidence is a function of the observed data $D$ and does not assume that either $P_1$ or $P_2$ is the true data-generating distribution.
+Unlike the KL divergence (which is a function of only $P_1$ and $P_2$), the weight of evidence is a function of $P_1$, $P_2$, and the observed data $D$, and it does not assume that either $P_1$ or $P_2$ is the true data-generating distribution.
 :::
-
-Let $P_1 = P(D\mid H_1)$ be the true data-generating distribution and $P_2 = P(D\mid H_2)$ be the alternative distribution.
 
 $$D_{\mathrm{KL}}(P_1\|P_2)
 =
@@ -342,7 +344,9 @@ $$D_{\mathrm{KL}}(P_1\|P_2)
 \mathbb{E}_{D\sim P_1}
 \left[
 \log\frac{P_1}{P_2}
-\right]$$ or
+\right]$$
+
+or
 
 $$\mathcal{S}[p;q]
 =
@@ -357,7 +361,31 @@ $$\mathcal{S}[p;q]
 =
 \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
 
- 
+The KL divergence can also be decomposed into entropy and cross-entropy:
+
+$$\mathcal{S}[p;q]
+=
+\sum_x p(x) \cdot \log \frac{p(x)}{q(x)}
+=
+\sum_x p(x) \cdot [\log p(x) - \log q(x)]
+=
+\sum_x p(x) \cdot \log p(x) - \sum_x p(x) \cdot \log q(x)$$
+
+Entropy:
+
+$$H[p] = -\sum_x p(x) \log p(x)$$
+Cross-entropy:
+
+$$H[p; q] = -\sum_x p(x) \log q(x)$$
+
+Therefore,
+
+$$\mathcal{S}[p;q] = \underbrace{\sum_x p(x) \log p(x)}_{-H(p)} - \underbrace{\sum_x p(x) \log q(x)}_{-H(p,q)}$$
+
+$$\mathcal{S}[p;q] = -H[p] - (-H[p;q]) = - H[p] + H[p;q] = H[p;q] - H[p]$$
+KL divergence is simply the extra surprise/cost incurred by using distribution $q$ to approximate distribution $p$.
+
+------------------------------------------------------------------------
 
 Back to the M&Ms example, if `CLV` is $H_1$ and `HKP` is $H_2$, the weight of evidence is:
 
@@ -427,19 +455,15 @@ The KL divergence quantifies the information gained—or equivalently, the chang
 The KL divergence is ≥ 0.
 :::
 
-### A principle for learning: cross-entropy minimization
+## A principle for learning: cross-entropy minimization
 
-Minimize the "distance/difference" (KL divergence) between the real world $p(x)$ and a model of the world $q(x)$:
+Minimize the "distance/difference" (relative entropy/KL divergence) between the real world $p(x)$ and a model of the world $q(x)$:
 
-$$\min_q \mathcal{S}[\text{p};\text{q}]$$
+$$\min_q \mathcal{S}[\text{p};\text{q}] = \min_q \sum_x p(x) \cdot \log\frac{p(x)}{q(x)} = \min_q (\mathcal{H}[p;q] - \mathcal{H}[p])$$
 
-$$\min_q \sum_x p(x) \cdot \log\frac{p(x)}{q(x)}$$
+which (since entropy does not depend on $q$) is equivalent to minimizing the **cross-entropy**:
 
-$$\min_q \sum_x p(x) \cdot \log \frac{p(x)}{q(x)} = \sum_x p(x) \cdot \log p(x) - \min_q \sum_x p(x) \cdot \log q(x)$$ which is equivalent to minimizing the **cross-entropy**:
-
-$$\min_q \mathcal{H}[p;q]$$
-
-$$\mathcal{H}[p;q] = - \sum_x p(x) \cdot \log q(x)$$
+$$\min_q \mathcal{H}[p;q] = \min_q \big(- \sum_x p(x) \cdot \log q(x)\big)$$
 
 But we do not know $p(x)$, i.e., we do not have access to all data points/the true distribution of the data, only $n$ samples, i.e., the empirical distribution of the data $\hat p(x)$:
 
@@ -457,7 +481,7 @@ $$\mathcal{H}[\hat p;q]
 
 minimizing this **empirical cross-entropy** is equivalent to maximizing the (log) likelihood of the observed data.
 
-### Entropy
+## Entropy
 
 The uniform distribution is special and therefore the relative entropy (KL divergence) of a distribution with respect to the uniform distribution is special.
 
@@ -473,7 +497,7 @@ Entropy is a measure of ignorance.
 
 Entropy is a measure of how un-uniform a distribution is, i.e., how easy it is to distinguish it from a uniform distribution.
 
-### Mutual information
+## Mutual information
 
 Mutual information is the relative entropy (KL divergence) of a joint distribution and the product of its marginal distributions:
 
@@ -535,7 +559,7 @@ $$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
 +
 \log \frac{P(H_1)}{P(H_2)}$$
 
-The first term on the right-hand side is the **weight of evidence** in favor of $H_1$ over $H_2$:
+The first term on the right-hand side is the **weight of evidence** in favor of $H_1$ vs. $H_2$:
 
 $$W(D; H_1; H_2)
 =
