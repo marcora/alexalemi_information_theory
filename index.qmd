@@ -125,8 +125,8 @@ In the words of I. J. Good and Alan Turing, the weight of evidence (WoE) is a me
 ### Change of notation
 
 $$\begin{align}
-P(X = x \mid P) & \rightarrow p(x) \\
-P(X = x \mid Q) & \rightarrow q(x) \\
+\mathbb{P}(X = x \mid P) & \rightarrow p(x) \\
+\mathbb{P}(X = x \mid Q) & \rightarrow q(x) \\
 \end{align}$$
 
 The probability that some variable $X$ takes on a value $x$ given that some model/hypothesis $P$ or $Q$ is true.
@@ -324,31 +324,19 @@ p_ds / p_db
 
 Blue line is weight of evidence $x$ in favor of $H_1$ (red line) vs. $H_2$ (green line).
 
-## Relative entropy (KL divergence)
+## KL divergence
 
-The **relative entropy/Kullback–Leibler divergence** from $H_1$ to $H_2$ is the **expected weight of evidence** in favor of $H_1$ vs. $H_2$, assuming $P(D\mid H_1)$ is the true data-generating distribution.
+The **Kullback–Leibler divergence** (a.k.a. **relative entropy**) is the **expected weight of evidence** in favor of $H_1$ vs. $H_2$, assuming $P(D\mid H_1)$ is the true data-generating distribution.
 
-Let $P_1 = P(D\mid H_1)$ be the true data-generating distribution and $P_2 = P(D\mid H_2)$ be the other distribution.
+Let $p(x) \equiv P(D\mid H_1)$ be the true data-generating distribution and $q(x) \equiv P(D\mid H_2)$ be the other distribution.
 
 ::: callout-note
-Unlike the KL divergence (which is a function of only $P_1$ and $P_2$), the weight of evidence is a function of $P_1$, $P_2$, and the observed data $D$, and it does not assume that either $P_1$ or $P_2$ is the true data-generating distribution.
+Unlike the KL divergence (which is a function of only $p$ and $q$), the weight of evidence is a function of $p$, $q$, and the observed data $D$ (or $X = x$), and it does not assume that either $p$ or $q$ is the true data-generating distribution.
 :::
 
-$$D_{\mathrm{KL}}(P_1\|P_2)
-=
-\mathbb{E}_{D\sim P_1}
-\left[
-\log\frac{P(D\mid H_1)}{P(D\mid H_2)}
-\right]
-=
-\mathbb{E}_{D\sim P_1}
-\left[
-\log\frac{P_1}{P_2}
-\right]$$
-
-or
-
 $$\mathcal{S}[p;q]
+=
+D_{\mathrm{KL}}(p\|q)
 =
 \mathbb{E}_{x \sim p(x)}
 \left[
@@ -373,17 +361,13 @@ $$\mathcal{S}[p;q]
 
 Entropy:
 
-$$H[p] = -\sum_x p(x) \log p(x)$$
-Cross-entropy:
+$$H[p] = -\sum_x p(x) \log p(x)$$ Cross-entropy:
 
 $$H[p; q] = -\sum_x p(x) \log q(x)$$
 
 Therefore,
 
-$$\mathcal{S}[p;q] = \underbrace{\sum_x p(x) \log p(x)}_{-H(p)} - \underbrace{\sum_x p(x) \log q(x)}_{-H(p,q)}$$
-
-$$\mathcal{S}[p;q] = -H[p] - (-H[p;q]) = - H[p] + H[p;q] = H[p;q] - H[p]$$
-KL divergence is simply the extra surprise/cost incurred by using distribution $q$ to approximate distribution $p$.
+$$\mathcal{S}[p;q] = H[p;q] - H[p]$$ KL divergence is simply the extra surprise/cost incurred by using distribution $q$ to approximate distribution $p$.
 
 ------------------------------------------------------------------------
 
@@ -489,8 +473,7 @@ $$u(x) = \frac{1}{N}$$
 
 **Entropy** is the relative entropy (KL divergence) of a distribution with respect to the uniform distribution (i.e., the maximum entropy distribution):
 
-$$
-\mathcal{S}[p; u]
+$$\mathcal{S}[p; u]
 =
 \sum_x p(x) \cdot \log \frac{p(x)}{u(x)}
 =
@@ -504,16 +487,13 @@ $$
 =
 \sum_x p(x) \log p(x) + \log N \cdot \sum_x p(x)
 =
-\sum_x p(x) \log p(x) + \log N
-$$
+\sum_x p(x) \log p(x) + \log N$$
 
 $\mathcal{S}[p;u]$ is the "distance" between the distribution $u$ with maximum entropy ($\log N$) and the distribution $p$.
 
 Therefore, the entropy of $p$ ($H[p]$) is:
 
-$$
-\mathcal{H}[p] = \log N - \mathcal{S}[p; u] = - \sum_x p(x) \log p(x)
-$$
+$$\mathcal{H}[p] = \log N - \mathcal{S}[p; u] = - \sum_x p(x) \log p(x)$$
 
 Entropy is a measure of ignorance.
 
