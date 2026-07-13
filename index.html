@@ -794,19 +794,38 @@ Note
 - \sum_x \frac{1}{n} \sum_i \delta(x - x_i) \cdot \log q(x)
 =
 - \frac{1}{n} \sum_i \log q(x_i)\]</span></p>
-<p>minimizing this <strong>empirical cross-entropy</strong> is equivalent to maximizing the (log) likelihood of the observed data.</p>
+<p>minimizing this <strong>empirical cross-entropy</strong> is equivalent to maximizing the likelihood of the observed data.</p>
 </section>
 <section id="entropy" class="level2">
 <h2 class="anchored" data-anchor-id="entropy">Entropy</h2>
-<p>The uniform distribution is special and therefore the relative entropy (KL divergence) of a distribution with respect to the uniform distribution is special.</p>
-<p><strong>Entropy</strong> is the relative entropy (KL divergence) of a distribution with respect to the uniform distribution:</p>
-<p><span class="math display">\[\mathcal{H}[p]
-=
+<p>The uniform distribution is special (i.e., is the maximum entropy distribution) and therefore the relative entropy (KL divergence) of a distribution with respect to the uniform distribution is special.</p>
+<p><span class="math display">\[u(x) = \frac{1}{N}\]</span></p>
+<p><strong>Entropy</strong> is the relative entropy (KL divergence) of a distribution with respect to the uniform distribution (i.e., the maximum entropy distribution):</p>
+<p><span class="math display">\[
 \mathcal{S}[p; u]
 =
-- \sum_x p(x) \cdot \log p(x)\]</span></p>
+\sum_x p(x) \cdot \log \frac{p(x)}{u(x)}
+=
+\sum_x p(x) \log \frac{p(x)}{1/N}
+=
+\sum_x p(x) \log \big( p(x) \cdot N \big)
+=
+\sum_x p(x) \big[ \log p(x) + \log N \big]
+=
+\sum_x p(x) \log p(x) + \sum_x p(x) \log N
+=
+\sum_x p(x) \log p(x) + \log N \cdot \sum_x p(x)
+=
+\sum_x p(x) \log p(x) + \log N
+\]</span></p>
+<p><span class="math inline">\(\mathcal{S}[p;u]\)</span> is the “distance” between the distribution <span class="math inline">\(u\)</span> with maximum entropy (<span class="math inline">\(\log N\)</span>) and the distribution <span class="math inline">\(p\)</span>.</p>
+<p>Therefore, the entropy of <span class="math inline">\(p\)</span> (<span class="math inline">\(H[p]\)</span>) is:</p>
+<p><span class="math display">\[
+\mathcal{H}[p] = \log N - \mathcal{S}[p; u] = - \sum_x p(x) \log p(x)
+\]</span></p>
 <p>Entropy is a measure of ignorance.</p>
 <p>Entropy is a measure of how un-uniform a distribution is, i.e., how easy it is to distinguish it from a uniform distribution.</p>
+<p><span class="math display">\[\mathcal{S}[p; u] = \log N - H[p]\]</span></p>
 </section>
 <section id="mutual-information" class="level2">
 <h2 class="anchored" data-anchor-id="mutual-information">Mutual information</h2>
