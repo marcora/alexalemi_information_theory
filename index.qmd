@@ -324,6 +324,108 @@ p_ds / p_db
 
 Blue line is weight of evidence $x$ in favor of $H_1$ (red line) vs. $H_2$ (green line).
 
+
+## Weight of evidence and surprise
+
+![](images/clipboard-4176444107.png)
+
+$$\begin{align}
+H_1 &= ⚀ \\
+H_2 &= \{ ⚀, ⚁, ⚂, ⚃, ⚄, ⚅ \} = \Omega \\
+\end{align}$$
+
+$$\begin{align}
+P(H_2) & = P(\Omega) = 1 \\
+P(H_2 \mid D) & = P(\Omega \mid D) = 1 \\
+\end{align}$$
+
+$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{P(H_2)}$$
+
+$$\log \frac{P(H_1 \mid D)}{1}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{1}$$
+
+$$\log P(H_1 \mid D)
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log P(H_1)$$
+
+$$\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
+=
+\log P(H_1 \mid D) - \log P(H_1)
+=
+\log \frac{P(H_1 \mid D)}{P(H_1)}$$
+
+$$\mathcal{W}[D;H_1;H_2] = \log \frac{P(H_1 \mid D)}{P(H_1)}$$
+
+If $D = ⚀$, $P(H_1 \mid D = ⚀) = 1$ and $\mathcal{W}[D = ⚀;H_1;H_2] = \log \frac{1}{P(H_1)} = - \log P(H_1)$
+
+## Weight of evidence and surprise
+
+Let $H_1$ and $H_2$ be two competing hypotheses, and let $D$ be observed data.
+
+The posterior log-odds can be written as:
+
+$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{P(H_2)}$$
+
+The first term on the right-hand side is the **weight of evidence** in favor of $H_1$ vs. $H_2$:
+
+$$W(D; H_1; H_2)
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}$$
+
+So in general,
+
+$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+W(D; H_1; H_2)
++
+\log \frac{P(H_1)}{P(H_2)}$$
+
+Now take the special case where $H_2 = \Omega$, the exhaustive hypothesis, so that $P(H_2) = P(\Omega)=1$ and $P(H_2 \mid D) = P(\Omega \mid D)=1$. Then
+
+$$\log P(H_1 \mid D)
+=
+W(D; H_1; \Omega)
++
+\log P(H_1)$$
+
+Rearranging gives
+
+$$W(D; H_1; \Omega) = \log \frac{P(H_1 \mid D)}{P(H_1)}$$
+
+Now take the special case where $D = H_1$, so that $P(H_1 \mid D) = P(H_1 \mid H_1) = 1$. Then
+
+$$W(H_1; H_1; \Omega)
+=
+\log \frac{1}{P(H_1)}
+=
+-\log P(H_1)$$
+
+This is the **surprise** or **self-information** (information content) of $H_1$ under its prior probability.
+
+This derivation elegantly connects I.J. Good’s **weight of evidence** to Claude Shannon’s **surprise** (self-information) by using a clever choice for the alternative hypothesis, the tautological alternative $H_2 = \Omega$. It successfully proves that **surprise is simply a special case of the weight of evidence**. An intuitive way to think about this derivation is to view surprise as a measure of **how much your mind has to change** when an uncertain prediction becomes an absolute certainty.
+
+- If $H_1$ is a likely event (i.e., $P(H_1)$ is high), then seeing it happen is not surprising (i.e., $-\log P(H_1)$ is low).
+
+- If $H_1$ is an unlikely event (i.e., $P(H_1)$ is low), then seeing it happen is surprising (i.e., $-\log P(H_1)$ is high).
+
+```{r}
+gf_function(\(x) - log2(x), xlim = c(0.001,0.999)) %>% gf_labs(x = "P", y = "S = -log2(P)") + scale_y_continuous(breaks = seq(0, 10, by = 1))
+```
+
+
 ## KL divergence
 
 The **Kullback–Leibler divergence** (a.k.a. **relative entropy**) is the **expected weight of evidence** in favor of $H_1$ vs. $H_2$, assuming $P(D\mid H_1)$ is the true data-generating distribution.
@@ -336,7 +438,7 @@ Unlike the KL divergence (which is a function of only $p$ and $q$), the weight o
 
 $$\mathcal{S}[p;q]
 =
-D_{\mathrm{KL}}(p\|q)
+D_{\mathrm{KL}}(P\|Q)
 =
 \mathbb{E}_{x \sim p(x)}
 \left[
@@ -509,102 +611,3 @@ $$\mathcal{I}[X;Y] = \mathcal{S}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \lo
 
 Entropy is a measure of how easy it is to distinguish whether the two variables are associated, rather than them being independent.
 
-## Surprise and weight of evidence
-
-![](images/clipboard-4176444107.png)
-
-$$\begin{align}
-H_1 &= ⚀ \\
-H_2 &= \{ ⚀, ⚁, ⚂, ⚃, ⚄, ⚅ \} = \Omega \\
-\end{align}$$
-
-$$\begin{align}
-P(H_2) & = P(\Omega) = 1 \\
-P(H_2 \mid D) & = P(\Omega \mid D) = 1 \\
-\end{align}$$
-
-$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
-=
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
-+
-\log \frac{P(H_1)}{P(H_2)}$$
-
-$$\log \frac{P(H_1 \mid D)}{1}
-=
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
-+
-\log \frac{P(H_1)}{1}$$
-
-$$\log P(H_1 \mid D)
-=
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
-+
-\log P(H_1)$$
-
-$$\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
-=
-\log P(H_1 \mid D) - \log P(H_1)
-=
-\log \frac{P(H_1 \mid D)}{P(H_1)}$$
-
-$$\mathcal{W}[D;H_1;H_2] = \log \frac{P(H_1 \mid D)}{P(H_1)}$$
-
-If $D = ⚀$, $P(H_1 \mid D = ⚀) = 1$ and $\mathcal{W}[D = ⚀;H_1;H_2] = \log \frac{1}{P(H_1)} = - \log P(H_1)$
-
-## Surprise and weight of evidence
-
-Let $H_1$ and $H_2$ be two competing hypotheses, and let $D$ be observed data.
-
-The posterior log-odds can be written as:
-
-$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
-=
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
-+
-\log \frac{P(H_1)}{P(H_2)}$$
-
-The first term on the right-hand side is the **weight of evidence** in favor of $H_1$ vs. $H_2$:
-
-$$W(D; H_1; H_2)
-=
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}$$
-
-So in general,
-
-$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
-=
-W(D; H_1; H_2)
-+
-\log \frac{P(H_1)}{P(H_2)}$$
-
-Now take the special case where $H_2 = \Omega$, the exhaustive hypothesis, so that $P(H_2) = P(\Omega)=1$ and $P(H_2 \mid D) = P(\Omega \mid D)=1$. Then
-
-$$\log P(H_1 \mid D)
-=
-W(D; H_1; \Omega)
-+
-\log P(H_1)$$
-
-Rearranging gives
-
-$$W(D; H_1; \Omega) = \log \frac{P(H_1 \mid D)}{P(H_1)}$$
-
-Now take the special case where $D = H_1$, so that $P(H_1 \mid D) = P(H_1 \mid H_1) = 1$. Then
-
-$$W(H_1; H_1; \Omega)
-=
-\log \frac{1}{P(H_1)}
-=
--\log P(H_1)$$
-
-This is the **surprise** or **self-information** (information content) of $H_1$ under its prior probability.
-
-This derivation elegantly connects I.J. Good’s **weight of evidence** to Claude Shannon’s **surprise** (self-information) by using a clever choice for the alternative hypothesis, the tautological alternative $H_2 = \Omega$. It successfully proves that **surprise is simply a special case of the weight of evidence**. An intuitive way to think about this derivation is to view surprise as a measure of **how much your mind has to change** when an uncertain prediction becomes an absolute certainty.
-
-- If $H_1$ is a likely event (i.e., $P(H_1)$ is high), then seeing it happen is not surprising (i.e., $-\log P(H_1)$ is low).
-
-- If $H_1$ is an unlikely event (i.e., $P(H_1)$ is low), then seeing it happen is surprising (i.e., $-\log P(H_1)$ is high).
-
-```{r}
-gf_function(\(x) - log2(x), xlim = c(0.001,0.999)) %>% gf_labs(x = "P", y = "S = -log2(P)") + scale_y_continuous(breaks = seq(0, 10, by = 1))
-```
