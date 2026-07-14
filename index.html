@@ -146,9 +146,9 @@ window.Quarto = {
   <li><a href="#example-covid-test" id="toc-example-covid-test" class="nav-link" data-scroll-target="#example-covid-test">Example: COVID test</a></li>
   <li><a href="#example-mms-discrete-distributions" id="toc-example-mms-discrete-distributions" class="nav-link" data-scroll-target="#example-mms-discrete-distributions">Example: M&amp;Ms (discrete distributions)</a></li>
   <li><a href="#example-gaussians-continuous-distributions" id="toc-example-gaussians-continuous-distributions" class="nav-link" data-scroll-target="#example-gaussians-continuous-distributions">Example: Gaussians (continuous distributions)</a></li>
-  </ul></li>
   <li><a href="#weight-of-evidence-and-surprise" id="toc-weight-of-evidence-and-surprise" class="nav-link" data-scroll-target="#weight-of-evidence-and-surprise">Weight of evidence and surprise</a></li>
-  <li><a href="#weight-of-evidence-and-surprise-1" id="toc-weight-of-evidence-and-surprise-1" class="nav-link" data-scroll-target="#weight-of-evidence-and-surprise-1">Weight of evidence and surprise</a></li>
+  <li><a href="#weight-of-evidence-and-surpriseself-information" id="toc-weight-of-evidence-and-surpriseself-information" class="nav-link" data-scroll-target="#weight-of-evidence-and-surpriseself-information">Weight of evidence and surprise/self-information</a></li>
+  </ul></li>
   <li><a href="#kl-divergence" id="toc-kl-divergence" class="nav-link" data-scroll-target="#kl-divergence">KL divergence</a></li>
   <li><a href="#a-principle-for-learning-cross-entropy-minimization" id="toc-a-principle-for-learning-cross-entropy-minimization" class="nav-link" data-scroll-target="#a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</a></li>
   <li><a href="#entropy" id="toc-entropy" class="nav-link" data-scroll-target="#entropy">Entropy</a></li>
@@ -552,9 +552,8 @@ window.Quarto = {
 </div>
 <p>Blue line is weight of evidence <span class="math inline">\(x\)</span> in favor of <span class="math inline">\(H_1\)</span> (red line) vs.&nbsp;<span class="math inline">\(H_2\)</span> (green line).</p>
 </section>
-</section>
-<section id="weight-of-evidence-and-surprise" class="level2">
-<h2 class="anchored" data-anchor-id="weight-of-evidence-and-surprise">Weight of evidence and surprise</h2>
+<section id="weight-of-evidence-and-surprise" class="level3">
+<h3 class="anchored" data-anchor-id="weight-of-evidence-and-surprise">Weight of evidence and surprise</h3>
 <p><img src="images/clipboard-4176444107.png" class="img-fluid"></p>
 <p><span class="math display">\[\begin{align}
 H_1 &amp;= ⚀ \\
@@ -584,11 +583,19 @@ P(H_2 \mid D) &amp; = P(\Omega \mid D) = 1 \\
 \log P(H_1 \mid D) - \log P(H_1)
 =
 \log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
-<p><span class="math display">\[\mathcal{W}[D;H_1;H_2] = \log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
-<p>If <span class="math inline">\(D = ⚀\)</span>, <span class="math inline">\(P(H_1 \mid D = ⚀) = 1\)</span> and <span class="math inline">\(\mathcal{W}[D = ⚀;H_1;H_2] = \log \frac{1}{P(H_1)} = - \log P(H_1)\)</span></p>
+<p><span class="math display">\[\mathcal{W}[D;H_1;\Theta] = \log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
+<p>Let <span class="math inline">\(D = H_1\)</span>,</p>
+<p><span class="math display">\[P(H_1 \mid D) = P(H_1 \mid H_1) = 1\]</span></p>
+<p><span class="math display">\[\mathcal{W}[H_1;H_1;\Theta] = \log \frac{1}{P(H_1)} = - \log P(H_1)\]</span></p>
+<p>Shannon’s surprisal (or self-information) = information gained when observing an event occur amongst an exhaustive set of events.</p>
+<p><span class="math display">\[\begin{align}
+H_1 : X = x \\
+H_2 : x \in \mathcal{X} \\
+\end{align}\]</span></p>
+<p><span class="math display">\[I(x) = \log \frac{1}{p(x)} = - \log p(x)\]</span></p>
 </section>
-<section id="weight-of-evidence-and-surprise-1" class="level2">
-<h2 class="anchored" data-anchor-id="weight-of-evidence-and-surprise-1">Weight of evidence and surprise</h2>
+<section id="weight-of-evidence-and-surpriseself-information" class="level3">
+<h3 class="anchored" data-anchor-id="weight-of-evidence-and-surpriseself-information">Weight of evidence and surprise/self-information</h3>
 <p>Let <span class="math inline">\(H_1\)</span> and <span class="math inline">\(H_2\)</span> be two competing hypotheses, and let <span class="math inline">\(D\)</span> be observed data.</p>
 <p>The posterior log-odds can be written as:</p>
 <p><span class="math display">\[\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
@@ -635,6 +642,7 @@ W(D; H_1; \Omega)
 </div>
 </div>
 </div>
+</section>
 </section>
 <section id="kl-divergence" class="level2">
 <h2 class="anchored" data-anchor-id="kl-divergence">KL divergence</h2>
