@@ -24,7 +24,7 @@ true_sigma <- 1.8
 y <- true_b0 + (true_b1 * x1) + (true_b2 * x2) + rnorm(n, mean = 0, sd = true_sigma)
 ```
 
-## Specify loss function (empirical cross-entropy)
+## Specify loss function as the empirical cross-entropy
 
 ```{r}
 xh <- function(par, x1, x2, y) {
@@ -45,12 +45,15 @@ xh <- function(par, x1, x2, y) {
 }
 ```
 
-## Fit model to data
+## Empirical cross-entropy fit
+
+Initial set of parameters:
 
 ```{r}
-# initial set of parameters
 par <- c(0, 0, 0, 0) # par[4] : log(σ) = 0 -> σ = 1
+```
 
+```{r}
 xh_fit <- optim(
   par = par,
   fn = xh,
@@ -60,8 +63,6 @@ xh_fit <- optim(
   method = "BFGS"
 )
 ```
-
-## Empirical cross-entropy fit
 
 ```{r}
 cat("Intercept (b0):", xh_fit$par[1], "\n")
