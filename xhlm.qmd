@@ -1,0 +1,76 @@
+---
+title: "Empirical cross-entropy minimization for model fitting"
+format: html
+---
+
+## Simulate data
+
+```{r}
+set.seed(666)
+
+n <- 100
+
+x1 <- rnorm(n, mean = 5, sd = 2)
+x2 <- rnorm(n, mean = -2, sd = 1.5)
+
+# true parameters
+true_b0 <- 3.0
+true_b1 <- 1.5
+true_b2 <- -2.5
+true_sigma <- 1.8
+
+y <- true_b0 + (true_b1 * x1) + (true_b2 * x2) + rnorm(n, mean = 0, sd = true_sigma)
+```
+
+## Specify loss function (empirical cross-entropy)
+
+```{r}
+xh <- function(params, x1, x2, y) {
+  b0    <- params[1]
+  b1    <- params[2]
+  b2    <- params[3]
+  log_sigma <- params[4] # log(sigma) trick to avoid issues with the optimizer
+  
+  mu <- b0 + (b1 * x1) + (b2 * x2)
+  
+  sigma <- exp(log_sigma)
+  
+  log_q <- dnorm(y, mean = mu, sd = sigma, log = TRUE)
+  
+  # empirical cross-entropy: -1/N * sum(log(q(y | x)))
+  loss <- -mean(log_q)
+  return(loss)
+}
+```
+
+## Fit model to data
+
+```{r}
+par <- c(0, 0, 0, 0) # log(sigma) = 0 -> sigma = 1
+
+xh_fit <- optim(
+  par = par,
+  fn = xh,
+  x1 = x1,
+  x2 = x2,
+  y = y,
+  method = "BFGS"
+)
+```
+
+## Empirical cross-entropy fit
+
+```{r}
+cat("Intercept (b0):", xh_fit$par[1], "\n")
+cat("Slope X1 (b1): ", xh_fit$par[2], "\n")
+cat("Slope X2 (b2): ", xh_fit$par[3], "\n")
+cat("Sigma:         ", exp(xh_fit$par[4]), "\n")
+```
+
+## Standard OLS fit
+
+```{r}
+ols_fit <- lm(y ~ x1 + x2)
+coef(ols_fit)
+sigma(ols_fit)
+```
