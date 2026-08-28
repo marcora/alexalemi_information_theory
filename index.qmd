@@ -228,21 +228,56 @@ Typical specificity of a COVID test:
 
 $$P(- \mid \lnot\text{COVID}) = 0.96$$
 
-Typical prevalence of COVID is between 0.5-1.5%. Thus, assuming 1% prevalence of COVID, i.e., $P{(\text{COVID})} = 0.01$:
+Assuming 5% prevalence of COVID, i.e., $\mathbb{P}{(\text{COVID})} = 0.05$:
 
-$$10\log_{10}\frac{0.01}{0.99} \approx 10\log_{10}(0.0101) = -19.96$$
+$$10\log_{10}\frac{0.05}{0.95} \approx 10\log_{10}(0.0526) = -12.79$$
 
 $D : + \implies 10\log_{10}\frac{P(+ \mid \text{COVID})}{P(+ \mid \lnot \text{COVID})} = 10\log_{10}\frac{0.94}{0.04} = 10\log_{10}(23.5) = 13.71\ \text{dB}$
 
 $D : - \implies 10\log_{10}\frac{P(- \mid \text{COVID})}{P(- \mid \lnot \text{COVID})} = 10\log_{10}\frac{0.06}{0.96} = 10\log_{10}(0.0625) = -12.04\ \text{dB}$
 
-So, if a person drawn at random from the population tests positive for COVID, they are only approx. 19% likely to have COVID:
+So, if a person drawn at random from a population with 5% prevalence tests positive for COVID, they are approx. 55% likely to have COVID:
 
-$$-19.96 + 13.71 = -6.25\ \text{dB}$$
+$$-12.79 + 13.71 = 0.92\ \text{dB}$$
 
-$$P = \frac{1}{1 + 10^{-\text{dB}/10}}$$
+$$\mathbb{P} = \frac{1}{1 + 10^{-\text{dB}/10}}$$
 
-$$P(\text{COVID} \mid +) = \frac{1}{1 + 10^{0.625}} = \frac{1}{5.217} = 0.192$$
+$$\mathbb{P}(\text{COVID} \mid +) = \frac{1}{1 + 10^{-0.92/10}}
+=
+\frac{1}{1+10^{-0.092}} = 0.5528$$
+
+![](images/clipboard-3425795160.png)
+
+This example also shows how easy it is to integrate different sources of information using Bayesian updating, because "*today's posterior is tomorrow's prior*". Therefore, if the same person woke up with a fever the next day and the probability of having a fever assuming that you have COVID is 66%, then (assuming independence) simply add 3dB to yesterday's posterior odds/today's prior odds of 0.92dB to obtain a new posterior odds of 3.92 or approx. 71% probability that they have COVID.
+
+::: callout-note
+“*today’s posterior is tomorrow’s prior*”
+
+$$
+\begin{align}
+p(\theta\mid D_1)
+& \propto
+p(D_1\mid\theta) \cdot p(\theta) \\
+\\
+p(\theta\mid D_1,D_2)
+& \propto
+p(D_2\mid D_1,\theta) \cdot
+p(\theta\mid D_1) \\
+\end{align}
+$$
+
+If $D_2 \perp D_1\mid\theta$, then
+
+$$p(D_2\mid D_1,\theta)=p(D_2\mid\theta)$$
+
+and
+
+$$
+\begin{align}
+p(\theta\mid D_1,D_2) & \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
+\end{align}
+$$
+:::
 
 ### Example: M&Ms (discrete distributions)
 
@@ -254,14 +289,14 @@ The color proportions vary by factory as follows:
 
 ```{r}
 d <- tribble(
-  ~Color,    ~CLV,  ~HKP,  
+  ~Color,    ~`P(Color | CLV)`,  ~`P(Color | HKP)`,  
   "Orange",  0.205, 0.250, 
   "Blue",    0.207, 0.250, 
   "Green",   0.198, 0.125, 
   "Red",     0.131, 0.125, 
   "Yellow",  0.135, 0.125, 
   "Brown",   0.124, 0.125, 
-)
+) %>% arrange(Color)
 
 d
 ```
@@ -269,7 +304,8 @@ d
 ```{r}
 p_ds <- d %>%
   pivot_longer(-c(Color), values_to = "p", names_to = "Factory") %>% 
-  mutate(color = str_to_lower(Color)) %>% 
+  mutate(color = str_to_lower(Color), Factory = fct_relevel(Factory, "P(Color | CLV)")) %>%
+  arrange(color) %>% 
   gf_col(p ~ Color, fill = ~color) %>% 
   gf_facet_wrap(~ Factory, nrow = 2) +
   scale_fill_identity()
@@ -277,16 +313,16 @@ p_ds <- d %>%
 
  
 
-If `CLV` is $H_1$ and `HKP` is $H_2$, the weight of evidence is (rounded to two decimals):
+If `CLV` is $H_1$ and `HKP` is $H_2$, the weight of evidence in favor of $CLV$ vs. $HKP$ is (in decibans):
 
 ```{r}
-d %<>% mutate(dB = round(10*log10(CLV/HKP), 2)) %>% select(Color, dB)
+d %<>% mutate(`W(Color;CLV,HKP) [dB]` = 10*log10(`P(Color | CLV)`/`P(Color | HKP)`)) %>% select(Color, `W(Color;CLV,HKP) [dB]`)
 
 d
 ```
 
 ```{r}
-p_db <- gf_col(dB ~ Color, data = d) + ylim(c(-2.5, 2.5))
+p_db <- gf_col(`W(Color;CLV,HKP) [dB]` ~ Color, data = d) + ylim(c(-2.5, 2.5))
 ```
 
  
@@ -295,7 +331,43 @@ p_db <- gf_col(dB ~ Color, data = d) + ylim(c(-2.5, 2.5))
 p_ds / p_db
 ```
 
-### Example: Gaussians (continuous distributions)
+On the other hand, if `HKP` is $H_1$ and `CLV` is $H_2$, the weight of evidence in favor of $HKP$ vs. $CLV$ is (in decibans):
+
+```{r}
+d <- tribble(
+  ~Color,    ~`P(Color | CLV)`,  ~`P(Color | HKP)`,  
+  "Orange",  0.205, 0.250, 
+  "Blue",    0.207, 0.250, 
+  "Green",   0.198, 0.125, 
+  "Red",     0.131, 0.125, 
+  "Yellow",  0.135, 0.125, 
+  "Brown",   0.124, 0.125, 
+) %>% arrange(Color)
+
+p_ds <- d %>%
+  pivot_longer(-c(Color), values_to = "p", names_to = "Factory") %>% 
+  mutate(color = str_to_lower(Color), Factory = fct_relevel(Factory, "P(Color | HKP)")) %>% 
+  arrange(color) %>% 
+  gf_col(p ~ Color, fill = ~color) %>% 
+  gf_facet_wrap(~ Factory, nrow = 2) +
+  scale_fill_identity()
+
+d %<>% mutate(`W(Color;HKP,CLV) [dB]` = 10*log10(`P(Color | HKP)`/`P(Color | CLV)`)) %>% select(Color, `W(Color;HKP,CLV) [dB]`)
+
+d
+```
+
+```{r}
+p_db <- gf_col(`W(Color;HKP,CLV) [dB]` ~ Color, data = d) + ylim(c(-2.5, 2.5))
+```
+
+ 
+
+```{r}
+p_ds / p_db
+```
+
+### Example: Two Gaussian likelihoods (continuous distributions)
 
 ```{r}
 d <- tibble(
@@ -324,7 +396,151 @@ p_ds / p_db
 
 Blue line is weight of evidence $x$ in favor of $H_1$ (red line) vs. $H_2$ (green line).
 
-### Weight of evidence and surprise
+
+## KL divergence
+
+Back to the M&Ms example, the weight of evidence in favor of $CLV$ vs. $HKP$ is (in decibans):
+
+```{r}
+d <- tribble(
+  ~Color,    ~`P(Color | CLV)`,  ~`P(Color | HKP)`,  
+  "Orange",  0.205, 0.250, 
+  "Blue",    0.207, 0.250, 
+  "Green",   0.198, 0.125, 
+  "Red",     0.131, 0.125, 
+  "Yellow",  0.135, 0.125, 
+  "Brown",   0.124, 0.125, 
+) %>% arrange(Color) %>%
+  mutate(`W(Color;CLV,HKP) [dB]` = 10*log10(`P(Color | CLV)`/`P(Color | HKP)`))
+
+d
+```
+
+The **Kullback–Leibler divergence** of $CLV$ vs. $HKP$ is the **expected weight of evidence** in favor of $CLV$ vs. $HKP$, assuming the bag is from $CLV$, i.e., $P(\text{Color} \mid CLV)$:
+
+```{r}
+#| echo: true
+d %>% summarize(`DKL(CLV,HKP) [dB]` = sum(`P(Color | CLV)`*`W(Color;CLV,HKP) [dB]`))
+```
+
+On the other hand, Back to the M&Ms example, the weight of evidence in favor of $HKP$ vs. $CLV$ is (in decibans):
+
+```{r}
+d <- tribble(
+  ~Color,    ~`P(Color | CLV)`,  ~`P(Color | HKP)`,  
+  "Orange",  0.205, 0.250, 
+  "Blue",    0.207, 0.250, 
+  "Green",   0.198, 0.125, 
+  "Red",     0.131, 0.125, 
+  "Yellow",  0.135, 0.125, 
+  "Brown",   0.124, 0.125, 
+) %>% arrange(Color) %>%
+  mutate(`W(Color;HKP,CLV) [dB]` = 10*log10(`P(Color | HKP)`/`P(Color | CLV)`))
+
+d
+```
+
+The **Kullback–Leibler divergence** of $HKP$ vs. $CLV$ is the **expected weight of evidence** in favor of $HKP$ vs. $CLV$, assuming the bag is from $HKP$, i.e., $P(\text{Color} \mid HKP)$:
+
+```{r}
+#| echo: true
+d %>% summarize(`DKL(HKP,CLV) [dB]` = sum(`P(Color | HKP)`*`W(Color;HKP,CLV) [dB]`))
+```
+
+
+In general,
+
+$$D_{KL}(p;q) = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
+
+
+
+
+
+Let $p(x) \equiv P(D\mid H_1)$ be the true data-generating distribution and $q(x) \equiv P(D\mid H_2)$ be the other distribution.
+
+::: callout-note
+Unlike the KL divergence (which is a function of only $p$ and $q$), the weight of evidence is a function of $p$, $q$, and the observed data $D$ (or $X = x$), and it does not assume that either $p$ or $q$ is the true data-generating distribution.
+:::
+
+$$\mathcal{S}[p;q]
+=
+D_{\mathrm{KL}}(P\|Q)
+=
+\mathbb{E}_{x \sim p(x)}
+\left[
+\log \frac{p(x)}{q(x)}
+\right]
+=
+\Big\langle
+\log \frac{p(x)}{q(x)}
+\Big\rangle_p
+=
+\sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
+
+The KL divergence can also be decomposed into entropy and cross-entropy:
+
+$$\mathcal{S}[p;q]
+=
+\sum_x p(x) \cdot \log \frac{p(x)}{q(x)}
+=
+\sum_x p(x) \cdot [\log p(x) - \log q(x)]
+=
+\sum_x p(x) \cdot \log p(x) - \sum_x p(x) \cdot \log q(x)$$
+
+Entropy:
+
+$$H[p] = -\sum_x p(x) \log p(x)$$ Cross-entropy:
+
+$$H[p; q] = -\sum_x p(x) \log q(x)$$
+
+Therefore,
+
+$$\mathcal{S}[p;q] = H[p;q] - H[p]$$ KL divergence is simply the extra surprise/cost incurred by using distribution $q$ to approximate distribution $p$.
+
+------------------------------------------------------------------------
+
+Back to the M&Ms example, if `HKP` is $H_1$ and `CLV` is $H_2$, the weight of evidence is:
+
+```{r}
+d <- tribble(
+  ~Color,   ~HKP,  ~CLV,
+  "Orange", 0.250, 0.205,
+  "Blue",   0.250, 0.207,
+  "Green",  0.125, 0.198,
+  "Red",    0.125, 0.131,
+  "Yellow", 0.125, 0.135,
+  "Brown",  0.125, 0.124
+) %>% mutate(dB = 10*log10(HKP/CLV))
+
+d
+```
+
+and the KL divergence is:
+
+```{r}
+#| echo: true
+d %>% summarize(S = sum(HKP*dB)) %$% S
+```
+
+$\mathcal{S}[\text{HKP};\text{CLV}] = 0.1078\ \text{dB}$
+
+::: callout-important
+The KL divergence measures the "distance/difference" between two probability distributions, but it's not symmetric.
+:::
+
+{{< video 143326704-8361446e-721c-47e5-95e7-4e8fd20460ec.mp4 >}}
+
+<https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9>
+
+::: callout-note
+The KL divergence quantifies the information gained—or equivalently, the change in beliefs—when a (prior) distribution $q$ is updated to a (posterior) distribution $p$.
+:::
+
+::: callout-note
+The KL divergence is ≥ 0.
+:::
+
+## Weight of evidence and surprise
 
 ![](images/clipboard-4176444107.png)
 
@@ -379,7 +595,7 @@ H_2 : x \in \mathcal{X} \\
 
 $$I(x) = \log \frac{1}{p(x)} = - \log p(x)$$
 
-### Weight of evidence and surprise/self-information
+## Weight of evidence and surprise/self-information
 
 Let $H_1$ and $H_2$ be two competing hypotheses, and let $D$ be observed data.
 
@@ -437,120 +653,6 @@ This derivation elegantly connects I.J. Good’s **weight of evidence** to Claud
 gf_function(\(x) - log2(x), xlim = c(0.001,0.999)) %>% gf_labs(x = "P", y = "S = -log2(P)") + scale_y_continuous(breaks = seq(0, 10, by = 1))
 ```
 
-## KL divergence
-
-The **Kullback–Leibler divergence** (a.k.a. **relative entropy**) is the **expected weight of evidence** in favor of $H_1$ vs. $H_2$, assuming $P(D\mid H_1)$ is the true data-generating distribution.
-
-Let $p(x) \equiv P(D\mid H_1)$ be the true data-generating distribution and $q(x) \equiv P(D\mid H_2)$ be the other distribution.
-
-::: callout-note
-Unlike the KL divergence (which is a function of only $p$ and $q$), the weight of evidence is a function of $p$, $q$, and the observed data $D$ (or $X = x$), and it does not assume that either $p$ or $q$ is the true data-generating distribution.
-:::
-
-$$\mathcal{S}[p;q]
-=
-D_{\mathrm{KL}}(P\|Q)
-=
-\mathbb{E}_{x \sim p(x)}
-\left[
-\log \frac{p(x)}{q(x)}
-\right]
-=
-\Big\langle
-\log \frac{p(x)}{q(x)}
-\Big\rangle_p
-=
-\sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
-
-The KL divergence can also be decomposed into entropy and cross-entropy:
-
-$$\mathcal{S}[p;q]
-=
-\sum_x p(x) \cdot \log \frac{p(x)}{q(x)}
-=
-\sum_x p(x) \cdot [\log p(x) - \log q(x)]
-=
-\sum_x p(x) \cdot \log p(x) - \sum_x p(x) \cdot \log q(x)$$
-
-Entropy:
-
-$$H[p] = -\sum_x p(x) \log p(x)$$ Cross-entropy:
-
-$$H[p; q] = -\sum_x p(x) \log q(x)$$
-
-Therefore,
-
-$$\mathcal{S}[p;q] = H[p;q] - H[p]$$ KL divergence is simply the extra surprise/cost incurred by using distribution $q$ to approximate distribution $p$.
-
-------------------------------------------------------------------------
-
-Back to the M&Ms example, if `CLV` is $H_1$ and `HKP` is $H_2$, the weight of evidence is:
-
-```{r}
-d <- tribble(
-  ~Color,    ~CLV,  ~HKP,  
-  "Orange",  0.205, 0.250, 
-  "Blue",    0.207, 0.250, 
-  "Green",   0.198, 0.125, 
-  "Red",     0.131, 0.125, 
-  "Yellow",  0.135, 0.125, 
-  "Brown",   0.124, 0.125, 
-) %>% mutate(dB = 10*log10(CLV/HKP))
-
-d
-```
-
-and the KL divergence is:
-
-```{r}
-#| echo: true
-d %>% summarize(S = sum(CLV*dB)) %$% S
-```
-
-$\mathcal{S}[\text{CLV};\text{HKP}] = 0.1166\ \text{dB}$
-
-------------------------------------------------------------------------
-
-Back to the M&Ms example, if `HKP` is $H_1$ and `CLV` is $H_2$, the weight of evidence is:
-
-```{r}
-d <- tribble(
-  ~Color,   ~HKP,  ~CLV,
-  "Orange", 0.250, 0.205,
-  "Blue",   0.250, 0.207,
-  "Green",  0.125, 0.198,
-  "Red",    0.125, 0.131,
-  "Yellow", 0.125, 0.135,
-  "Brown",  0.125, 0.124
-) %>% mutate(dB = 10*log10(HKP/CLV))
-
-d
-```
-
-and the KL divergence is:
-
-```{r}
-#| echo: true
-d %>% summarize(S = sum(HKP*dB)) %$% S
-```
-
-$\mathcal{S}[\text{HKP};\text{CLV}] = 0.1078\ \text{dB}$
-
-::: callout-important
-The KL divergence measures the "distance/difference" between two probability distributions, but it's not symmetric.
-:::
-
-{{< video 143326704-8361446e-721c-47e5-95e7-4e8fd20460ec.mp4 >}}
-
-<https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9>
-
-::: callout-note
-The KL divergence quantifies the information gained—or equivalently, the change in beliefs—when a (prior) distribution $q$ is updated to a (posterior) distribution $p$.
-:::
-
-::: callout-note
-The KL divergence is ≥ 0.
-:::
 
 ## A principle for learning: cross-entropy minimization
 

@@ -148,11 +148,11 @@ window.Quarto = {
   <li><a href="#example-human-births" id="toc-example-human-births" class="nav-link" data-scroll-target="#example-human-births">Example: Human births</a></li>
   <li><a href="#example-covid-test" id="toc-example-covid-test" class="nav-link" data-scroll-target="#example-covid-test">Example: COVID test</a></li>
   <li><a href="#example-mms-discrete-distributions" id="toc-example-mms-discrete-distributions" class="nav-link" data-scroll-target="#example-mms-discrete-distributions">Example: M&amp;Ms (discrete distributions)</a></li>
-  <li><a href="#example-gaussians-continuous-distributions" id="toc-example-gaussians-continuous-distributions" class="nav-link" data-scroll-target="#example-gaussians-continuous-distributions">Example: Gaussians (continuous distributions)</a></li>
-  <li><a href="#weight-of-evidence-and-surprise" id="toc-weight-of-evidence-and-surprise" class="nav-link" data-scroll-target="#weight-of-evidence-and-surprise">Weight of evidence and surprise</a></li>
-  <li><a href="#weight-of-evidence-and-surpriseself-information" id="toc-weight-of-evidence-and-surpriseself-information" class="nav-link" data-scroll-target="#weight-of-evidence-and-surpriseself-information">Weight of evidence and surprise/self-information</a></li>
+  <li><a href="#example-two-gaussian-likelihoods-continuous-distributions" id="toc-example-two-gaussian-likelihoods-continuous-distributions" class="nav-link" data-scroll-target="#example-two-gaussian-likelihoods-continuous-distributions">Example: Two Gaussian likelihoods (continuous distributions)</a></li>
   </ul></li>
   <li><a href="#kl-divergence" id="toc-kl-divergence" class="nav-link" data-scroll-target="#kl-divergence">KL divergence</a></li>
+  <li><a href="#weight-of-evidence-and-surprise" id="toc-weight-of-evidence-and-surprise" class="nav-link" data-scroll-target="#weight-of-evidence-and-surprise">Weight of evidence and surprise</a></li>
+  <li><a href="#weight-of-evidence-and-surpriseself-information" id="toc-weight-of-evidence-and-surpriseself-information" class="nav-link" data-scroll-target="#weight-of-evidence-and-surpriseself-information">Weight of evidence and surprise/self-information</a></li>
   <li><a href="#a-principle-for-learning-cross-entropy-minimization" id="toc-a-principle-for-learning-cross-entropy-minimization" class="nav-link" data-scroll-target="#a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</a></li>
   <li><a href="#entropy" id="toc-entropy" class="nav-link" data-scroll-target="#entropy">Entropy</a></li>
   <li><a href="#mutual-information" id="toc-mutual-information" class="nav-link" data-scroll-target="#mutual-information">Mutual information</a></li>
@@ -428,14 +428,51 @@ window.Quarto = {
 <p><span class="math display">\[P(+ \mid \text{COVID}) = 0.94\]</span></p>
 <p>Typical specificity of a COVID test:</p>
 <p><span class="math display">\[P(- \mid \lnot\text{COVID}) = 0.96\]</span></p>
-<p>Typical prevalence of COVID is between 0.5-1.5%. Thus, assuming 1% prevalence of COVID, i.e., <span class="math inline">\(P{(\text{COVID})} = 0.01\)</span>:</p>
-<p><span class="math display">\[10\log_{10}\frac{0.01}{0.99} \approx 10\log_{10}(0.0101) = -19.96\]</span></p>
+<p>Assuming 5% prevalence of COVID, i.e., <span class="math inline">\(\mathbb{P}{(\text{COVID})} = 0.05\)</span>:</p>
+<p><span class="math display">\[10\log_{10}\frac{0.05}{0.95} \approx 10\log_{10}(0.0526) = -12.79\]</span></p>
 <p><span class="math inline">\(D : + \implies 10\log_{10}\frac{P(+ \mid \text{COVID})}{P(+ \mid \lnot \text{COVID})} = 10\log_{10}\frac{0.94}{0.04} = 10\log_{10}(23.5) = 13.71\ \text{dB}\)</span></p>
 <p><span class="math inline">\(D : - \implies 10\log_{10}\frac{P(- \mid \text{COVID})}{P(- \mid \lnot \text{COVID})} = 10\log_{10}\frac{0.06}{0.96} = 10\log_{10}(0.0625) = -12.04\ \text{dB}\)</span></p>
-<p>So, if a person drawn at random from the population tests positive for COVID, they are only approx. 19% likely to have COVID:</p>
-<p><span class="math display">\[-19.96 + 13.71 = -6.25\ \text{dB}\]</span></p>
-<p><span class="math display">\[P = \frac{1}{1 + 10^{-\text{dB}/10}}\]</span></p>
-<p><span class="math display">\[P(\text{COVID} \mid +) = \frac{1}{1 + 10^{0.625}} = \frac{1}{5.217} = 0.192\]</span></p>
+<p>So, if a person drawn at random from a population with 5% prevalence tests positive for COVID, they are approx. 55% likely to have COVID:</p>
+<p><span class="math display">\[-12.79 + 13.71 = 0.92\ \text{dB}\]</span></p>
+<p><span class="math display">\[\mathbb{P} = \frac{1}{1 + 10^{-\text{dB}/10}}\]</span></p>
+<p><span class="math display">\[\mathbb{P}(\text{COVID} \mid +) = \frac{1}{1 + 10^{-0.92/10}}
+=
+\frac{1}{1+10^{-0.092}} = 0.5528\]</span></p>
+<p><img src="images/clipboard-3425795160.png" class="img-fluid"></p>
+<p>This example also shows how easy it is to integrate different sources of information using Bayesian updating, because “<em>today’s posterior is tomorrow’s prior</em>”. Therefore, if the same person woke up with a fever the next day and the probability of having a fever assuming that you have COVID is 66%, then (assuming independence) simply add 3dB to yesterday’s posterior odds/today’s prior odds of 0.92dB to obtain a new posterior odds of 3.92 or approx. 71% probability that they have COVID.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>“<em>today’s posterior is tomorrow’s prior</em>”</p>
+<p><span class="math display">\[
+\begin{align}
+p(\theta\mid D_1)
+&amp; \propto
+p(D_1\mid\theta) \cdot p(\theta) \\
+\\
+p(\theta\mid D_1,D_2)
+&amp; \propto
+p(D_2\mid D_1,\theta) \cdot
+p(\theta\mid D_1) \\
+\end{align}
+\]</span></p>
+<p>If <span class="math inline">\(D_2 \perp D_1\mid\theta\)</span>, then</p>
+<p><span class="math display">\[p(D_2\mid D_1,\theta)=p(D_2\mid\theta)\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+\begin{align}
+p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
+\end{align}
+\]</span></p>
+</div>
+</div>
 </section>
 <section id="example-mms-discrete-distributions" class="level3">
 <h3 class="anchored" data-anchor-id="example-mms-discrete-distributions">Example: M&amp;Ms (discrete distributions)</h3>
@@ -449,20 +486,20 @@ window.Quarto = {
 <thead>
 <tr class="header">
 <th style="text-align: left;">Color</th>
-<th style="text-align: right;">CLV</th>
-<th style="text-align: right;">HKP</th>
+<th style="text-align: right;">P(Color | CLV)</th>
+<th style="text-align: right;">P(Color | HKP)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Orange</td>
-<td style="text-align: right;">0.205</td>
-<td style="text-align: right;">0.250</td>
-</tr>
-<tr class="even">
 <td style="text-align: left;">Blue</td>
 <td style="text-align: right;">0.207</td>
 <td style="text-align: right;">0.250</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brown</td>
+<td style="text-align: right;">0.124</td>
+<td style="text-align: right;">0.125</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Green</td>
@@ -470,18 +507,18 @@ window.Quarto = {
 <td style="text-align: right;">0.125</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">Orange</td>
+<td style="text-align: right;">0.205</td>
+<td style="text-align: right;">0.250</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">Red</td>
 <td style="text-align: right;">0.131</td>
 <td style="text-align: right;">0.125</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">Yellow</td>
 <td style="text-align: right;">0.135</td>
-<td style="text-align: right;">0.125</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Brown</td>
-<td style="text-align: right;">0.124</td>
 <td style="text-align: right;">0.125</td>
 </tr>
 </tbody>
@@ -490,7 +527,7 @@ window.Quarto = {
 </div>
 </div>
 <p>&nbsp;</p>
-<p>If <code>CLV</code> is <span class="math inline">\(H_1\)</span> and <code>HKP</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence is (rounded to two decimals):</p>
+<p>If <code>CLV</code> is <span class="math inline">\(H_1\)</span> and <code>HKP</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence in favor of <span class="math inline">\(CLV\)</span> vs.&nbsp;<span class="math inline">\(HKP\)</span> is (in decibans):</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="kable-table">
@@ -498,33 +535,33 @@ window.Quarto = {
 <thead>
 <tr class="header">
 <th style="text-align: left;">Color</th>
-<th style="text-align: right;">dB</th>
+<th style="text-align: right;">W(Color;CLV,HKP) [dB]</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Orange</td>
-<td style="text-align: right;">-0.86</td>
-</tr>
-<tr class="even">
 <td style="text-align: left;">Blue</td>
-<td style="text-align: right;">-0.82</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Green</td>
-<td style="text-align: right;">2.00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Red</td>
-<td style="text-align: right;">0.20</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Yellow</td>
-<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">-0.8197</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Brown</td>
-<td style="text-align: right;">-0.03</td>
+<td style="text-align: right;">-0.0349</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Green</td>
+<td style="text-align: right;">1.9976</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Orange</td>
+<td style="text-align: right;">-0.8619</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Red</td>
+<td style="text-align: right;">0.2036</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yellow</td>
+<td style="text-align: right;">0.3342</td>
 </tr>
 </tbody>
 </table>
@@ -541,115 +578,238 @@ window.Quarto = {
 </div>
 </div>
 </div>
-</section>
-<section id="example-gaussians-continuous-distributions" class="level3">
-<h3 class="anchored" data-anchor-id="example-gaussians-continuous-distributions">Example: Gaussians (continuous distributions)</h3>
+<p>On the other hand, if <code>HKP</code> is <span class="math inline">\(H_1\)</span> and <code>CLV</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence in favor of <span class="math inline">\(HKP\)</span> vs.&nbsp;<span class="math inline">\(CLV\)</span> is (in decibans):</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Color</th>
+<th style="text-align: right;">W(Color;HKP,CLV) [dB]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Blue</td>
+<td style="text-align: right;">0.8197</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brown</td>
+<td style="text-align: right;">0.0349</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Green</td>
+<td style="text-align: right;">-1.9976</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Orange</td>
+<td style="text-align: right;">0.8619</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Red</td>
+<td style="text-align: right;">-0.2036</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yellow</td>
+<td style="text-align: right;">-0.3342</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>&nbsp;</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="example-two-gaussian-likelihoods-continuous-distributions" class="level3">
+<h3 class="anchored" data-anchor-id="example-two-gaussian-likelihoods-continuous-distributions">Example: Two Gaussian likelihoods (continuous distributions)</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>Blue line is weight of evidence <span class="math inline">\(x\)</span> in favor of <span class="math inline">\(H_1\)</span> (red line) vs.&nbsp;<span class="math inline">\(H_2\)</span> (green line).</p>
 </section>
-<section id="weight-of-evidence-and-surprise" class="level3">
-<h3 class="anchored" data-anchor-id="weight-of-evidence-and-surprise">Weight of evidence and surprise</h3>
-<p><img src="images/clipboard-4176444107.png" class="img-fluid"></p>
-<p><span class="math display">\[\begin{align}
-H_1 &amp;= ⚀ \\
-H_2 &amp;= \{ ⚀, ⚁, ⚂, ⚃, ⚄, ⚅ \} = \Omega \\
-\end{align}\]</span></p>
-<p><span class="math display">\[\begin{align}
-P(H_2) &amp; = P(\Omega) = 1 \\
-P(H_2 \mid D) &amp; = P(\Omega \mid D) = 1 \\
-\end{align}\]</span></p>
-<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
-=
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
-+
-\log \frac{P(H_1)}{P(H_2)}\]</span></p>
-<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{1}
-=
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
-+
-\log \frac{P(H_1)}{1}\]</span></p>
-<p><span class="math display">\[\log P(H_1 \mid D)
-=
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
-+
-\log P(H_1)\]</span></p>
-<p><span class="math display">\[\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
-=
-\log P(H_1 \mid D) - \log P(H_1)
-=
-\log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
-<p><span class="math display">\[\mathcal{W}[D;H_1;\Theta] = \log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
-<p>Let <span class="math inline">\(D = H_1\)</span>,</p>
-<p><span class="math display">\[P(H_1 \mid D) = P(H_1 \mid H_1) = 1\]</span></p>
-<p><span class="math display">\[\mathcal{W}[H_1;H_1;\Theta] = \log \frac{1}{P(H_1)} = - \log P(H_1)\]</span></p>
-<p>Shannon’s surprisal (or self-information) = information gained when observing an event occur amongst an exhaustive set of events.</p>
-<p><span class="math display">\[\begin{align}
-H_1 : X = x \\
-H_2 : x \in \mathcal{X} \\
-\end{align}\]</span></p>
-<p><span class="math display">\[I(x) = \log \frac{1}{p(x)} = - \log p(x)\]</span></p>
-</section>
-<section id="weight-of-evidence-and-surpriseself-information" class="level3">
-<h3 class="anchored" data-anchor-id="weight-of-evidence-and-surpriseself-information">Weight of evidence and surprise/self-information</h3>
-<p>Let <span class="math inline">\(H_1\)</span> and <span class="math inline">\(H_2\)</span> be two competing hypotheses, and let <span class="math inline">\(D\)</span> be observed data.</p>
-<p>The posterior log-odds can be written as:</p>
-<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
-=
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
-+
-\log \frac{P(H_1)}{P(H_2)}\]</span></p>
-<p>The first term on the right-hand side is the <strong>weight of evidence</strong> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>:</p>
-<p><span class="math display">\[W(D; H_1; H_2)
-=
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}\]</span></p>
-<p>So in general,</p>
-<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
-=
-W(D; H_1; H_2)
-+
-\log \frac{P(H_1)}{P(H_2)}\]</span></p>
-<p>Now take the special case where <span class="math inline">\(H_2 = \Omega\)</span>, the exhaustive hypothesis, so that <span class="math inline">\(P(H_2) = P(\Omega)=1\)</span> and <span class="math inline">\(P(H_2 \mid D) = P(\Omega \mid D)=1\)</span>. Then</p>
-<p><span class="math display">\[\log P(H_1 \mid D)
-=
-W(D; H_1; \Omega)
-+
-\log P(H_1)\]</span></p>
-<p>Rearranging gives</p>
-<p><span class="math display">\[W(D; H_1; \Omega) = \log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
-<p>Now take the special case where <span class="math inline">\(D = H_1\)</span>, so that <span class="math inline">\(P(H_1 \mid D) = P(H_1 \mid H_1) = 1\)</span>. Then</p>
-<p><span class="math display">\[W(H_1; H_1; \Omega)
-=
-\log \frac{1}{P(H_1)}
-=
--\log P(H_1)\]</span></p>
-<p>This is the <strong>surprise</strong> or <strong>self-information</strong> (information content) of <span class="math inline">\(H_1\)</span> under its prior probability.</p>
-<p>This derivation elegantly connects I.J. Good’s <strong>weight of evidence</strong> to Claude Shannon’s <strong>surprise</strong> (self-information) by using a clever choice for the alternative hypothesis, the tautological alternative <span class="math inline">\(H_2 = \Omega\)</span>. It successfully proves that <strong>surprise is simply a special case of the weight of evidence</strong>. An intuitive way to think about this derivation is to view surprise as a measure of <strong>how much your mind has to change</strong> when an uncertain prediction becomes an absolute certainty.</p>
-<ul>
-<li><p>If <span class="math inline">\(H_1\)</span> is a likely event (i.e., <span class="math inline">\(P(H_1)\)</span> is high), then seeing it happen is not surprising (i.e., <span class="math inline">\(-\log P(H_1)\)</span> is low).</p></li>
-<li><p>If <span class="math inline">\(H_1\)</span> is an unlikely event (i.e., <span class="math inline">\(P(H_1)\)</span> is low), then seeing it happen is surprising (i.e., <span class="math inline">\(-\log P(H_1)\)</span> is high).</p></li>
-</ul>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
 </section>
 <section id="kl-divergence" class="level2">
 <h2 class="anchored" data-anchor-id="kl-divergence">KL divergence</h2>
-<p>The <strong>Kullback–Leibler divergence</strong> (a.k.a. <strong>relative entropy</strong>) is the <strong>expected weight of evidence</strong> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>, assuming <span class="math inline">\(P(D\mid H_1)\)</span> is the true data-generating distribution.</p>
+<p>Back to the M&amp;Ms example, the weight of evidence in favor of <span class="math inline">\(CLV\)</span> vs.&nbsp;<span class="math inline">\(HKP\)</span> is (in decibans):</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 28%">
+<col style="width: 28%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Color</th>
+<th style="text-align: right;">P(Color | CLV)</th>
+<th style="text-align: right;">P(Color | HKP)</th>
+<th style="text-align: right;">W(Color;CLV,HKP) [dB]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Blue</td>
+<td style="text-align: right;">0.207</td>
+<td style="text-align: right;">0.250</td>
+<td style="text-align: right;">-0.8197</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brown</td>
+<td style="text-align: right;">0.124</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">-0.0349</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Green</td>
+<td style="text-align: right;">0.198</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">1.9976</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Orange</td>
+<td style="text-align: right;">0.205</td>
+<td style="text-align: right;">0.250</td>
+<td style="text-align: right;">-0.8619</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Red</td>
+<td style="text-align: right;">0.131</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">0.2036</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yellow</td>
+<td style="text-align: right;">0.135</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">0.3342</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The <strong>Kullback–Leibler divergence</strong> of <span class="math inline">\(CLV\)</span> vs.&nbsp;<span class="math inline">\(HKP\)</span> is the <strong>expected weight of evidence</strong> in favor of <span class="math inline">\(CLV\)</span> vs.&nbsp;<span class="math inline">\(HKP\)</span>, assuming the bag is from <span class="math inline">\(CLV\)</span>, i.e., <span class="math inline">\(P(\text{Color} \mid CLV)\)</span>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="st">`</span><span class="at">DKL(CLV,HKP) [dB]</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">P(Color | CLV)</span><span class="st">`</span><span class="sc">*</span><span class="st">`</span><span class="at">W(Color;CLV,HKP) [dB]</span><span class="st">`</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">DKL(CLV,HKP) [dB]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.1166</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>On the other hand, Back to the M&amp;Ms example, the weight of evidence in favor of <span class="math inline">\(HKP\)</span> vs.&nbsp;<span class="math inline">\(CLV\)</span> is (in decibans):</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 28%">
+<col style="width: 28%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Color</th>
+<th style="text-align: right;">P(Color | CLV)</th>
+<th style="text-align: right;">P(Color | HKP)</th>
+<th style="text-align: right;">W(Color;HKP,CLV) [dB]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Blue</td>
+<td style="text-align: right;">0.207</td>
+<td style="text-align: right;">0.250</td>
+<td style="text-align: right;">0.8197</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brown</td>
+<td style="text-align: right;">0.124</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">0.0349</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Green</td>
+<td style="text-align: right;">0.198</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">-1.9976</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Orange</td>
+<td style="text-align: right;">0.205</td>
+<td style="text-align: right;">0.250</td>
+<td style="text-align: right;">0.8619</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Red</td>
+<td style="text-align: right;">0.131</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">-0.2036</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yellow</td>
+<td style="text-align: right;">0.135</td>
+<td style="text-align: right;">0.125</td>
+<td style="text-align: right;">-0.3342</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The <strong>Kullback–Leibler divergence</strong> of <span class="math inline">\(HKP\)</span> vs.&nbsp;<span class="math inline">\(CLV\)</span> is the <strong>expected weight of evidence</strong> in favor of <span class="math inline">\(HKP\)</span> vs.&nbsp;<span class="math inline">\(CLV\)</span>, assuming the bag is from <span class="math inline">\(HKP\)</span>, i.e., <span class="math inline">\(P(\text{Color} \mid HKP)\)</span>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="st">`</span><span class="at">DKL(HKP,CLV) [dB]</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">P(Color | HKP)</span><span class="st">`</span><span class="sc">*</span><span class="st">`</span><span class="at">W(Color;HKP,CLV) [dB]</span><span class="st">`</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">DKL(HKP,CLV) [dB]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.1078</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>In general,</p>
+<p><span class="math display">\[D_{KL}(p;q) = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}\]</span></p>
 <p>Let <span class="math inline">\(p(x) \equiv P(D\mid H_1)\)</span> be the true data-generating distribution and <span class="math inline">\(q(x) \equiv P(D\mid H_2)\)</span> be the other distribution.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -691,70 +851,6 @@ D_{\mathrm{KL}}(P\|Q)
 <p><span class="math display">\[H[p; q] = -\sum_x p(x) \log q(x)\]</span></p>
 <p>Therefore,</p>
 <p><span class="math display">\[\mathcal{S}[p;q] = H[p;q] - H[p]\]</span> KL divergence is simply the extra surprise/cost incurred by using distribution <span class="math inline">\(q\)</span> to approximate distribution <span class="math inline">\(p\)</span>.</p>
-<hr>
-<p>Back to the M&amp;Ms example, if <code>CLV</code> is <span class="math inline">\(H_1\)</span> and <code>HKP</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence is:</p>
-<div class="cell">
-<div class="cell-output-display">
-<div class="kable-table">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Color</th>
-<th style="text-align: right;">CLV</th>
-<th style="text-align: right;">HKP</th>
-<th style="text-align: right;">dB</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Orange</td>
-<td style="text-align: right;">0.205</td>
-<td style="text-align: right;">0.250</td>
-<td style="text-align: right;">-0.8619</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Blue</td>
-<td style="text-align: right;">0.207</td>
-<td style="text-align: right;">0.250</td>
-<td style="text-align: right;">-0.8197</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Green</td>
-<td style="text-align: right;">0.198</td>
-<td style="text-align: right;">0.125</td>
-<td style="text-align: right;">1.9976</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Red</td>
-<td style="text-align: right;">0.131</td>
-<td style="text-align: right;">0.125</td>
-<td style="text-align: right;">0.2036</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Yellow</td>
-<td style="text-align: right;">0.135</td>
-<td style="text-align: right;">0.125</td>
-<td style="text-align: right;">0.3342</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Brown</td>
-<td style="text-align: right;">0.124</td>
-<td style="text-align: right;">0.125</td>
-<td style="text-align: right;">-0.0349</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<p>and the KL divergence is:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="at">S =</span> <span class="fu">sum</span>(CLV<span class="sc">*</span>dB)) <span class="sc">%$%</span> S</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.1166</code></pre>
-</div>
-</div>
-<p><span class="math inline">\(\mathcal{S}[\text{CLV};\text{HKP}] = 0.1166\ \text{dB}\)</span></p>
 <hr>
 <p>Back to the M&amp;Ms example, if <code>HKP</code> is <span class="math inline">\(H_1\)</span> and <code>CLV</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence is:</p>
 <div class="cell">
@@ -858,6 +954,97 @@ Note
 </div>
 <div class="callout-body-container callout-body">
 <p>The KL divergence is ≥ 0.</p>
+</div>
+</div>
+</section>
+<section id="weight-of-evidence-and-surprise" class="level2">
+<h2 class="anchored" data-anchor-id="weight-of-evidence-and-surprise">Weight of evidence and surprise</h2>
+<p><img src="images/clipboard-4176444107.png" class="img-fluid"></p>
+<p><span class="math display">\[\begin{align}
+H_1 &amp;= ⚀ \\
+H_2 &amp;= \{ ⚀, ⚁, ⚂, ⚃, ⚄, ⚅ \} = \Omega \\
+\end{align}\]</span></p>
+<p><span class="math display">\[\begin{align}
+P(H_2) &amp; = P(\Omega) = 1 \\
+P(H_2 \mid D) &amp; = P(\Omega \mid D) = 1 \\
+\end{align}\]</span></p>
+<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{P(H_2)}\]</span></p>
+<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{1}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{1}\]</span></p>
+<p><span class="math display">\[\log P(H_1 \mid D)
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log P(H_1)\]</span></p>
+<p><span class="math display">\[\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
+=
+\log P(H_1 \mid D) - \log P(H_1)
+=
+\log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
+<p><span class="math display">\[\mathcal{W}[D;H_1;\Theta] = \log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
+<p>Let <span class="math inline">\(D = H_1\)</span>,</p>
+<p><span class="math display">\[P(H_1 \mid D) = P(H_1 \mid H_1) = 1\]</span></p>
+<p><span class="math display">\[\mathcal{W}[H_1;H_1;\Theta] = \log \frac{1}{P(H_1)} = - \log P(H_1)\]</span></p>
+<p>Shannon’s surprisal (or self-information) = information gained when observing an event occur amongst an exhaustive set of events.</p>
+<p><span class="math display">\[\begin{align}
+H_1 : X = x \\
+H_2 : x \in \mathcal{X} \\
+\end{align}\]</span></p>
+<p><span class="math display">\[I(x) = \log \frac{1}{p(x)} = - \log p(x)\]</span></p>
+</section>
+<section id="weight-of-evidence-and-surpriseself-information" class="level2">
+<h2 class="anchored" data-anchor-id="weight-of-evidence-and-surpriseself-information">Weight of evidence and surprise/self-information</h2>
+<p>Let <span class="math inline">\(H_1\)</span> and <span class="math inline">\(H_2\)</span> be two competing hypotheses, and let <span class="math inline">\(D\)</span> be observed data.</p>
+<p>The posterior log-odds can be written as:</p>
+<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
++
+\log \frac{P(H_1)}{P(H_2)}\]</span></p>
+<p>The first term on the right-hand side is the <strong>weight of evidence</strong> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>:</p>
+<p><span class="math display">\[W(D; H_1; H_2)
+=
+\log \frac{P(D \mid H_1)}{P(D \mid H_2)}\]</span></p>
+<p>So in general,</p>
+<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+=
+W(D; H_1; H_2)
++
+\log \frac{P(H_1)}{P(H_2)}\]</span></p>
+<p>Now take the special case where <span class="math inline">\(H_2 = \Omega\)</span>, the exhaustive hypothesis, so that <span class="math inline">\(P(H_2) = P(\Omega)=1\)</span> and <span class="math inline">\(P(H_2 \mid D) = P(\Omega \mid D)=1\)</span>. Then</p>
+<p><span class="math display">\[\log P(H_1 \mid D)
+=
+W(D; H_1; \Omega)
++
+\log P(H_1)\]</span></p>
+<p>Rearranging gives</p>
+<p><span class="math display">\[W(D; H_1; \Omega) = \log \frac{P(H_1 \mid D)}{P(H_1)}\]</span></p>
+<p>Now take the special case where <span class="math inline">\(D = H_1\)</span>, so that <span class="math inline">\(P(H_1 \mid D) = P(H_1 \mid H_1) = 1\)</span>. Then</p>
+<p><span class="math display">\[W(H_1; H_1; \Omega)
+=
+\log \frac{1}{P(H_1)}
+=
+-\log P(H_1)\]</span></p>
+<p>This is the <strong>surprise</strong> or <strong>self-information</strong> (information content) of <span class="math inline">\(H_1\)</span> under its prior probability.</p>
+<p>This derivation elegantly connects I.J. Good’s <strong>weight of evidence</strong> to Claude Shannon’s <strong>surprise</strong> (self-information) by using a clever choice for the alternative hypothesis, the tautological alternative <span class="math inline">\(H_2 = \Omega\)</span>. It successfully proves that <strong>surprise is simply a special case of the weight of evidence</strong>. An intuitive way to think about this derivation is to view surprise as a measure of <strong>how much your mind has to change</strong> when an uncertain prediction becomes an absolute certainty.</p>
+<ul>
+<li><p>If <span class="math inline">\(H_1\)</span> is a likely event (i.e., <span class="math inline">\(P(H_1)\)</span> is high), then seeing it happen is not surprising (i.e., <span class="math inline">\(-\log P(H_1)\)</span> is low).</p></li>
+<li><p>If <span class="math inline">\(H_1\)</span> is an unlikely event (i.e., <span class="math inline">\(P(H_1)\)</span> is low), then seeing it happen is surprising (i.e., <span class="math inline">\(-\log P(H_1)\)</span> is high).</p></li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
