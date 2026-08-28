@@ -46,7 +46,7 @@ $$\mathcal{W}[x;p,q] = \log \frac{p(x)}{q(x)}$$
 
 - [relative entropy](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) (a.k.a. Kullback–Leibler (KL) divergence): measures a "distance" between two distributions
 
-$$\mathcal{S}[p;q] = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
+$$H[p;q] = D_{\text{KL}}(q \|p) = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
 
 - [entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)): measures the "complexity" of a distribution
 
@@ -279,13 +279,13 @@ p(\theta\mid D_1,D_2) & \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 
 ![](images/clipboard-3433517152.png){width="300"}
 
-Bags of M&Ms produced at the Cleveland and Hackettstown factories differ in their color composition and are stamped with distinct codes: bags with `CLV` in their serial no. are from Cleveland, while bags with `HKP` in their serial no. are from Hackettstown.
+Bags of M&Ms produced at the Cleveland and Hackettstown factories differ in their color composition and are stamped with distinct codes: bags with `CLV` in their serial no. are from Cleveland (OH), while bags with `HKP` in their serial no. are from Hackettstown (NJ).
 
 The color proportions vary by factory as follows:
 
 ```{r}
 d <- tribble(
-  ~Color,    ~`P(Color | CLV)`,  ~`P(Color | HKP)`,  
+  ~Color,    ~`P(Color | OH)`,  ~`P(Color | NJ)`,  
   "Orange",  0.205, 0.250, 
   "Blue",    0.207, 0.250, 
   "Green",   0.198, 0.125, 
@@ -300,7 +300,7 @@ d
 ```{r}
 p_ds <- d %>%
   pivot_longer(-c(Color), values_to = "p", names_to = "Factory") %>% 
-  mutate(color = str_to_lower(Color), Factory = fct_relevel(Factory, "P(Color | CLV)")) %>%
+  mutate(color = str_to_lower(Color), Factory = fct_relevel(Factory, "P(Color | OH)")) %>%
   arrange(color) %>% 
   gf_col(p ~ Color, fill = ~color) %>% 
   gf_facet_wrap(~ Factory, nrow = 2) +
@@ -309,16 +309,16 @@ p_ds <- d %>%
 
  
 
-If `CLV` is $H_1$ and `HKP` is $H_2$, the weight of evidence in favor of $CLV$ vs. $HKP$ is (in decibans):
+If `OH` is $H_1$ and `NJ` is $H_2$, the weight of evidence in favor of $OH$ vs. $NJ$ is (in decibans):
 
 ```{r}
-d %<>% mutate(`W(Color;CLV,HKP) [dB]` = 10*log10(`P(Color | CLV)`/`P(Color | HKP)`)) %>% select(Color, `W(Color;CLV,HKP) [dB]`)
+d %<>% mutate(`W(Color;OH,NJ) [dB]` = 10*log10(`P(Color | OH)`/`P(Color | NJ)`)) %>% select(Color, `W(Color;OH,NJ) [dB]`)
 
 d
 ```
 
 ```{r}
-p_db <- gf_col(`W(Color;CLV,HKP) [dB]` ~ Color, data = d) + ylim(c(-2.5, 2.5))
+p_db <- gf_col(`W(Color;OH,NJ) [dB]` ~ Color, data = d) + ylim(c(-2.5, 2.5))
 ```
 
  
@@ -327,11 +327,11 @@ p_db <- gf_col(`W(Color;CLV,HKP) [dB]` ~ Color, data = d) + ylim(c(-2.5, 2.5))
 p_ds / p_db
 ```
 
-On the other hand, if `HKP` is $H_1$ and `CLV` is $H_2$, the weight of evidence in favor of $HKP$ vs. $CLV$ is (in decibans):
+On the other hand, if `NJ` is $H_1$ and `OH` is $H_2$, the weight of evidence in favor of $NJ$ vs. $OH$ is (in decibans):
 
 ```{r}
 d <- tribble(
-  ~Color,    ~`P(Color | CLV)`,  ~`P(Color | HKP)`,  
+  ~Color,    ~`P(Color | OH)`,  ~`P(Color | NJ)`,  
   "Orange",  0.205, 0.250, 
   "Blue",    0.207, 0.250, 
   "Green",   0.198, 0.125, 
@@ -342,19 +342,19 @@ d <- tribble(
 
 p_ds <- d %>%
   pivot_longer(-c(Color), values_to = "p", names_to = "Factory") %>% 
-  mutate(color = str_to_lower(Color), Factory = fct_relevel(Factory, "P(Color | HKP)")) %>% 
+  mutate(color = str_to_lower(Color), Factory = fct_relevel(Factory, "P(Color | NJ)")) %>% 
   arrange(color) %>% 
   gf_col(p ~ Color, fill = ~color) %>% 
   gf_facet_wrap(~ Factory, nrow = 2) +
   scale_fill_identity()
 
-d %<>% mutate(`W(Color;HKP,CLV) [dB]` = 10*log10(`P(Color | HKP)`/`P(Color | CLV)`)) %>% select(Color, `W(Color;HKP,CLV) [dB]`)
+d %<>% mutate(`W(Color;NJ,OH) [dB]` = 10*log10(`P(Color | NJ)`/`P(Color | OH)`)) %>% select(Color, `W(Color;NJ,OH) [dB]`)
 
 d
 ```
 
 ```{r}
-p_db <- gf_col(`W(Color;HKP,CLV) [dB]` ~ Color, data = d) + ylim(c(-2.5, 2.5))
+p_db <- gf_col(`W(Color;NJ,OH) [dB]` ~ Color, data = d) + ylim(c(-2.5, 2.5))
 ```
 
  
@@ -394,11 +394,11 @@ Blue line is weight of evidence $x$ in favor of $H_1$ (red line) vs. $H_2$ (gree
 
 ## KL divergence
 
-Back to the M&Ms example, the weight of evidence in favor of $CLV$ vs. $HKP$ is (in decibans):
+Back to the M&Ms example, the weight of evidence in favor of $OH$ vs. $NJ$ is (in decibans):
 
 ```{r}
 d <- tribble(
-  ~Color,    ~`P(Color | CLV)`,  ~`P(Color | HKP)`,  
+  ~Color,    ~`P(Color | OH)`,  ~`P(Color | NJ)`,  
   "Orange",  0.205, 0.250, 
   "Blue",    0.207, 0.250, 
   "Green",   0.198, 0.125, 
@@ -406,23 +406,23 @@ d <- tribble(
   "Yellow",  0.135, 0.125, 
   "Brown",   0.124, 0.125, 
 ) %>% arrange(Color) %>%
-  mutate(`W(Color;CLV,HKP) [dB]` = 10*log10(`P(Color | CLV)`/`P(Color | HKP)`))
+  mutate(`W(Color;OH,NJ) [dB]` = 10*log10(`P(Color | OH)`/`P(Color | NJ)`))
 
 d
 ```
 
-The **Kullback–Leibler divergence** of $CLV$ vs. $HKP$ is the **expected weight of evidence** in favor of $CLV$ vs. $HKP$, assuming the bag is from $CLV$, i.e., $P(\text{Color} \mid CLV)$:
+The **Kullback–Leibler divergence** of $OH$ vs. $NJ$ is the **expected weight of evidence** in favor of $OH$ vs. $NJ$, assuming the bag is from $OH$, i.e., $P(\text{Color} \mid OH)$:
 
 ```{r}
 #| echo: true
-d %>% summarize(`DKL(CLV;HKP) [dB]` = sum(`P(Color | CLV)`*`W(Color;CLV,HKP) [dB]`))
+d %>% summarize(`DKL(OH;NJ) [dB]` = sum(`P(Color | OH)`*`W(Color;OH,NJ) [dB]`))
 ```
 
-On the other hand, Back to the M&Ms example, the weight of evidence in favor of $HKP$ vs. $CLV$ is (in decibans):
+On the other hand, Back to the M&Ms example, the weight of evidence in favor of $NJ$ vs. $OH$ is (in decibans):
 
 ```{r}
 d <- tribble(
-  ~Color,    ~`P(Color | CLV)`,  ~`P(Color | HKP)`,  
+  ~Color,    ~`P(Color | OH)`,  ~`P(Color | NJ)`,  
   "Orange",  0.205, 0.250, 
   "Blue",    0.207, 0.250, 
   "Green",   0.198, 0.125, 
@@ -430,21 +430,27 @@ d <- tribble(
   "Yellow",  0.135, 0.125, 
   "Brown",   0.124, 0.125, 
 ) %>% arrange(Color) %>%
-  mutate(`W(Color;HKP,CLV) [dB]` = 10*log10(`P(Color | HKP)`/`P(Color | CLV)`))
+  mutate(`W(Color;NJ,OH) [dB]` = 10*log10(`P(Color | NJ)`/`P(Color | OH)`))
 
 d
 ```
 
-The **Kullback–Leibler divergence** of $HKP$ vs. $CLV$ is the **expected weight of evidence** in favor of $HKP$ vs. $CLV$, assuming the bag is from $HKP$, i.e., $P(\text{Color} \mid HKP)$:
+The **Kullback–Leibler divergence** of $NJ$ vs. $OH$ is the **expected weight of evidence** in favor of $NJ$ vs. $OH$, assuming the bag is from $NJ$, i.e., $P(\text{Color} \mid NJ)$:
 
 ```{r}
 #| echo: true
-d %>% summarize(`DKL(HKP;CLV) [dB]` = sum(`P(Color | HKP)`*`W(Color;HKP,CLV) [dB]`))
+d %>% summarize(`DKL(NJ;OH) [dB]` = sum(`P(Color | NJ)`*`W(Color;NJ,OH) [dB]`))
 ```
+
+![](images/clipboard-1304461914.png)
+
+![](images/clipboard-553025974.png)
 
 In general,
 
-$$D_{KL}(p;q)
+$$H(p;q)
+=
+D_{\text{KL}}(q \| p)
 =
 \mathbb{E}_{x \sim p(x)}
 \left[
@@ -466,32 +472,12 @@ The KL divergence measures the "distance/difference" between two probability dis
 <https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9>
 
 ::: callout-note
-The KL divergence quantifies the information gained—or equivalently, the change in beliefs—when a (prior) distribution $q$ is updated to a (posterior) distribution $p$.
+The KL divergence $H(p;q)$ measures the expected information gain when updating your belief from a prior distribution $p$ to a posterior distribution $q$.
 :::
 
 ::: callout-note
 The KL divergence is ≥ 0.
 :::
-
-The KL divergence can also be decomposed into entropy and cross-entropy:
-
-$$\mathcal{S}[p;q]
-=
-\sum_x p(x) \cdot \log \frac{p(x)}{q(x)}
-=
-\sum_x p(x) \cdot [\log p(x) - \log q(x)]
-=
-\sum_x p(x) \cdot \log p(x) - \sum_x p(x) \cdot \log q(x)$$
-
-Entropy:
-
-$$H[p] = -\sum_x p(x) \log p(x)$$ Cross-entropy:
-
-$$H[p; q] = -\sum_x p(x) \log q(x)$$
-
-Therefore,
-
-$$\mathcal{S}[p;q] = H[p;q] - H[p]$$ KL divergence is simply the extra surprise/cost incurred by using distribution $q$ to approximate distribution $p$.
 
 ## Weight of evidence and surprise
 

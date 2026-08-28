@@ -205,7 +205,7 @@ window.Quarto = {
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence">relative entropy</a> (a.k.a. Kullback–Leibler (KL) divergence): measures a “distance” between two distributions</li>
 </ul>
-<p><span class="math display">\[\mathcal{S}[p;q] = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}\]</span></p>
+<p><span class="math display">\[H[p;q] = D_{\text{KL}}(q \|p) = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}\]</span></p>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">entropy</a>: measures the “complexity” of a distribution</li>
 </ul>
@@ -473,7 +473,7 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 <section id="example-mms-discrete-distributions" class="level3">
 <h3 class="anchored" data-anchor-id="example-mms-discrete-distributions">Example: M&amp;Ms (discrete distributions)</h3>
 <p><img src="images/clipboard-3433517152.png" class="img-fluid" width="300"></p>
-<p>Bags of M&amp;Ms produced at the Cleveland and Hackettstown factories differ in their color composition and are stamped with distinct codes: bags with <code>CLV</code> in their serial no. are from Cleveland, while bags with <code>HKP</code> in their serial no. are from Hackettstown.</p>
+<p>Bags of M&amp;Ms produced at the Cleveland and Hackettstown factories differ in their color composition and are stamped with distinct codes: bags with <code>CLV</code> in their serial no. are from Cleveland (OH), while bags with <code>HKP</code> in their serial no. are from Hackettstown (NJ).</p>
 <p>The color proportions vary by factory as follows:</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -482,8 +482,8 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 <thead>
 <tr class="header">
 <th style="text-align: left;">Color</th>
-<th style="text-align: right;">P(Color | CLV)</th>
-<th style="text-align: right;">P(Color | HKP)</th>
+<th style="text-align: right;">P(Color | OH)</th>
+<th style="text-align: right;">P(Color | NJ)</th>
 </tr>
 </thead>
 <tbody>
@@ -523,7 +523,7 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 </div>
 </div>
 <p>&nbsp;</p>
-<p>If <code>CLV</code> is <span class="math inline">\(H_1\)</span> and <code>HKP</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence in favor of <span class="math inline">\(CLV\)</span> vs.&nbsp;<span class="math inline">\(HKP\)</span> is (in decibans):</p>
+<p>If <code>OH</code> is <span class="math inline">\(H_1\)</span> and <code>NJ</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence in favor of <span class="math inline">\(OH\)</span> vs.&nbsp;<span class="math inline">\(NJ\)</span> is (in decibans):</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="kable-table">
@@ -531,7 +531,7 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 <thead>
 <tr class="header">
 <th style="text-align: left;">Color</th>
-<th style="text-align: right;">W(Color;CLV,HKP) [dB]</th>
+<th style="text-align: right;">W(Color;OH,NJ) [dB]</th>
 </tr>
 </thead>
 <tbody>
@@ -574,7 +574,7 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 </div>
 </div>
 </div>
-<p>On the other hand, if <code>HKP</code> is <span class="math inline">\(H_1\)</span> and <code>CLV</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence in favor of <span class="math inline">\(HKP\)</span> vs.&nbsp;<span class="math inline">\(CLV\)</span> is (in decibans):</p>
+<p>On the other hand, if <code>NJ</code> is <span class="math inline">\(H_1\)</span> and <code>OH</code> is <span class="math inline">\(H_2\)</span>, the weight of evidence in favor of <span class="math inline">\(NJ\)</span> vs.&nbsp;<span class="math inline">\(OH\)</span> is (in decibans):</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="kable-table">
@@ -582,7 +582,7 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 <thead>
 <tr class="header">
 <th style="text-align: left;">Color</th>
-<th style="text-align: right;">W(Color;HKP,CLV) [dB]</th>
+<th style="text-align: right;">W(Color;NJ,OH) [dB]</th>
 </tr>
 </thead>
 <tbody>
@@ -642,23 +642,17 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 </section>
 <section id="kl-divergence" class="level2">
 <h2 class="anchored" data-anchor-id="kl-divergence">KL divergence</h2>
-<p>Back to the M&amp;Ms example, the weight of evidence in favor of <span class="math inline">\(CLV\)</span> vs.&nbsp;<span class="math inline">\(HKP\)</span> is (in decibans):</p>
+<p>Back to the M&amp;Ms example, the weight of evidence in favor of <span class="math inline">\(OH\)</span> vs.&nbsp;<span class="math inline">\(NJ\)</span> is (in decibans):</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="kable-table">
 <table class="caption-top table table-sm table-striped small">
-<colgroup>
-<col style="width: 10%">
-<col style="width: 28%">
-<col style="width: 28%">
-<col style="width: 31%">
-</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Color</th>
-<th style="text-align: right;">P(Color | CLV)</th>
-<th style="text-align: right;">P(Color | HKP)</th>
-<th style="text-align: right;">W(Color;CLV,HKP) [dB]</th>
+<th style="text-align: right;">P(Color | OH)</th>
+<th style="text-align: right;">P(Color | NJ)</th>
+<th style="text-align: right;">W(Color;OH,NJ) [dB]</th>
 </tr>
 </thead>
 <tbody>
@@ -703,15 +697,15 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 </div>
 </div>
 </div>
-<p>The <strong>Kullback–Leibler divergence</strong> of <span class="math inline">\(CLV\)</span> vs.&nbsp;<span class="math inline">\(HKP\)</span> is the <strong>expected weight of evidence</strong> in favor of <span class="math inline">\(CLV\)</span> vs.&nbsp;<span class="math inline">\(HKP\)</span>, assuming the bag is from <span class="math inline">\(CLV\)</span>, i.e., <span class="math inline">\(P(\text{Color} \mid CLV)\)</span>:</p>
+<p>The <strong>Kullback–Leibler divergence</strong> of <span class="math inline">\(OH\)</span> vs.&nbsp;<span class="math inline">\(NJ\)</span> is the <strong>expected weight of evidence</strong> in favor of <span class="math inline">\(OH\)</span> vs.&nbsp;<span class="math inline">\(NJ\)</span>, assuming the bag is from <span class="math inline">\(OH\)</span>, i.e., <span class="math inline">\(P(\text{Color} \mid OH)\)</span>:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="st">`</span><span class="at">DKL(CLV;HKP) [dB]</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">P(Color | CLV)</span><span class="st">`</span><span class="sc">*</span><span class="st">`</span><span class="at">W(Color;CLV,HKP) [dB]</span><span class="st">`</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="st">`</span><span class="at">DKL(OH;NJ) [dB]</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">P(Color | OH)</span><span class="st">`</span><span class="sc">*</span><span class="st">`</span><span class="at">W(Color;OH,NJ) [dB]</span><span class="st">`</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="kable-table">
 <table class="caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
-<th style="text-align: right;">DKL(CLV;HKP) [dB]</th>
+<th style="text-align: right;">DKL(OH;NJ) [dB]</th>
 </tr>
 </thead>
 <tbody>
@@ -723,23 +717,17 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 </div>
 </div>
 </div>
-<p>On the other hand, Back to the M&amp;Ms example, the weight of evidence in favor of <span class="math inline">\(HKP\)</span> vs.&nbsp;<span class="math inline">\(CLV\)</span> is (in decibans):</p>
+<p>On the other hand, Back to the M&amp;Ms example, the weight of evidence in favor of <span class="math inline">\(NJ\)</span> vs.&nbsp;<span class="math inline">\(OH\)</span> is (in decibans):</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="kable-table">
 <table class="caption-top table table-sm table-striped small">
-<colgroup>
-<col style="width: 10%">
-<col style="width: 28%">
-<col style="width: 28%">
-<col style="width: 31%">
-</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Color</th>
-<th style="text-align: right;">P(Color | CLV)</th>
-<th style="text-align: right;">P(Color | HKP)</th>
-<th style="text-align: right;">W(Color;HKP,CLV) [dB]</th>
+<th style="text-align: right;">P(Color | OH)</th>
+<th style="text-align: right;">P(Color | NJ)</th>
+<th style="text-align: right;">W(Color;NJ,OH) [dB]</th>
 </tr>
 </thead>
 <tbody>
@@ -784,15 +772,15 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 </div>
 </div>
 </div>
-<p>The <strong>Kullback–Leibler divergence</strong> of <span class="math inline">\(HKP\)</span> vs.&nbsp;<span class="math inline">\(CLV\)</span> is the <strong>expected weight of evidence</strong> in favor of <span class="math inline">\(HKP\)</span> vs.&nbsp;<span class="math inline">\(CLV\)</span>, assuming the bag is from <span class="math inline">\(HKP\)</span>, i.e., <span class="math inline">\(P(\text{Color} \mid HKP)\)</span>:</p>
+<p>The <strong>Kullback–Leibler divergence</strong> of <span class="math inline">\(NJ\)</span> vs.&nbsp;<span class="math inline">\(OH\)</span> is the <strong>expected weight of evidence</strong> in favor of <span class="math inline">\(NJ\)</span> vs.&nbsp;<span class="math inline">\(OH\)</span>, assuming the bag is from <span class="math inline">\(NJ\)</span>, i.e., <span class="math inline">\(P(\text{Color} \mid NJ)\)</span>:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="st">`</span><span class="at">DKL(HKP;CLV) [dB]</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">P(Color | HKP)</span><span class="st">`</span><span class="sc">*</span><span class="st">`</span><span class="at">W(Color;HKP,CLV) [dB]</span><span class="st">`</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="st">`</span><span class="at">DKL(NJ;OH) [dB]</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">P(Color | NJ)</span><span class="st">`</span><span class="sc">*</span><span class="st">`</span><span class="at">W(Color;NJ,OH) [dB]</span><span class="st">`</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="kable-table">
 <table class="caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
-<th style="text-align: right;">DKL(HKP;CLV) [dB]</th>
+<th style="text-align: right;">DKL(NJ;OH) [dB]</th>
 </tr>
 </thead>
 <tbody>
@@ -804,8 +792,12 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 </div>
 </div>
 </div>
+<p><img src="images/clipboard-1304461914.png" class="img-fluid"></p>
+<p><img src="images/clipboard-553025974.png" class="img-fluid"></p>
 <p>In general,</p>
-<p><span class="math display">\[D_{KL}(p;q)
+<p><span class="math display">\[H(p;q)
+=
+D_{\text{KL}}(q \| p)
 =
 \mathbb{E}_{x \sim p(x)}
 \left[
@@ -851,7 +843,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The KL divergence quantifies the information gained—or equivalently, the change in beliefs—when a (prior) distribution <span class="math inline">\(q\)</span> is updated to a (posterior) distribution <span class="math inline">\(p\)</span>.</p>
+<p>The KL divergence <span class="math inline">\(H(p;q)\)</span> measures the expected information gain when updating your belief from a prior distribution <span class="math inline">\(p\)</span> to a posterior distribution <span class="math inline">\(q\)</span>.</p>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -867,19 +859,6 @@ Note
 <p>The KL divergence is ≥ 0.</p>
 </div>
 </div>
-<p>The KL divergence can also be decomposed into entropy and cross-entropy:</p>
-<p><span class="math display">\[\mathcal{S}[p;q]
-=
-\sum_x p(x) \cdot \log \frac{p(x)}{q(x)}
-=
-\sum_x p(x) \cdot [\log p(x) - \log q(x)]
-=
-\sum_x p(x) \cdot \log p(x) - \sum_x p(x) \cdot \log q(x)\]</span></p>
-<p>Entropy:</p>
-<p><span class="math display">\[H[p] = -\sum_x p(x) \log p(x)\]</span> Cross-entropy:</p>
-<p><span class="math display">\[H[p; q] = -\sum_x p(x) \log q(x)\]</span></p>
-<p>Therefore,</p>
-<p><span class="math display">\[\mathcal{S}[p;q] = H[p;q] - H[p]\]</span> KL divergence is simply the extra surprise/cost incurred by using distribution <span class="math inline">\(q\)</span> to approximate distribution <span class="math inline">\(p\)</span>.</p>
 </section>
 <section id="weight-of-evidence-and-surprise" class="level2">
 <h2 class="anchored" data-anchor-id="weight-of-evidence-and-surprise">Weight of evidence and surprise</h2>
