@@ -42,83 +42,85 @@ Fundamentally, information theory is about [measures](https://en.wikipedia.org/w
 
 - [weight of evidence](https://en.wikipedia.org/wiki/Bayes%27_theorem): measures the "importance" of data for distinguishing between two hypotheses
 
-$$\mathcal{W}[x;p,q] = \log \frac{p(x)}{q(x)}$$
+$$W(x;p\|q) \equiv \log \frac{p(x)}{q(x)}$$
 
-- [relative entropy](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) (a.k.a. Kullback–Leibler (KL) divergence): measures a "distance" between two distributions
+- [Kullback–Leibler (KL) divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) (a.k.a. **relative entropy**): measures the "discrepancy" between two distributions
 
-$$H[p;q] = D_{\text{KL}}(q \|p) = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
+$$D_{\rm KL}(p\|q) \equiv \mathbb{E}_{x \sim p(x)}[W(x;p\|q)] = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
 
-- [entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)): measures the "complexity" of a distribution
+- [entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)): measures the "uncertainty" of a distribution
 
-$$\mathcal{S}[p] = \mathcal{S}[p;u] = - \sum_x p(x) \cdot \log p(x)$$
+$$H(p) \equiv D_{\rm KL}(p\|u) = - \sum_x p(x) \cdot \log p(x)$$
 
-- [mutual information](https://en.wikipedia.org/wiki/Mutual_information): measures the "complexity" of the association between two variables
+- [mutual information](https://en.wikipedia.org/wiki/Mutual_information): measures the "dependence" between two variables
 
-$$\mathcal{I}(X;Y) = \mathcal{S}[p(x,y);p(x)p(x)] = \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}$$
+$$I(X;Y) \equiv D_{\mathrm{KL}}(p(x,y)\|p(x)p(y)) = \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}$$
 
 ## Weight of evidence
 
 In the beginning, there was Bayes' rule (joint probability/product rule factored/sliced two ways + algebra):
 
-$$P(A,B) = P(A)P(B \mid A) = P(B)P(A \mid B) = P(B, A)$$
+$$\mathbb{P}(A,B) = \mathbb{P}(A)\cdot\mathbb{P}(B \mid A) = \mathbb{P}(B)\cdot\mathbb{P}(A \mid B) = \mathbb{P}(B, A)$$
 
-$$P(B \mid A) = \frac{P(B) P(A \mid B)}{P(A)}$$
+$$\mathbb{P}(B \mid A) = \frac{\mathbb{P}(B)\cdot \mathbb{P}(A \mid B)}{\mathbb{P}(A)}$$
 
 All "frequentist vs. Bayesian, etc." controversies are rooted in the philosophical interpretation of this uncontroversial rule of probability theory when applied to statistical inference:
 
-$$P(H \mid D) = \frac{P(H) P(D \mid H)}{P(D)}$$ where:
+$$\mathbb{P}(H \mid D) = \frac{\mathbb{P}(H)\cdot \mathbb{P}(D \mid H)}{\mathbb{P}(D)}$$ where:
 
-$P(H \mid D) =$ the (posterior) probability of the hypothesis after observing the data
+$\mathbb{P}(H \mid D) =$ the (posterior) probability that the hypothesis is true after observing the data
 
-$P(H) =$ the (prior) probability of the hypothesis before observing the data
+$\mathbb{P}(H) =$ the (prior) probability of that the hypothesis is true before observing the data
 
-$P(D \mid H) =$ the probability of the observed data given the hypothesis (a.k.a. the likelihood of the hypothesis given the observed data)
+$\mathbb{P}(D \mid H) =$ the probability of the observed data given the hypothesis; viewed as a function of $H$, this is the **likelihood** of the hypothesis given the observed data.
 
-$P(D) =$ the (marginal) probability (a.k.a. evidence or marginal likelihood) of the observed data, computed by averaging over all hypotheses
+$\mathbb{P}(D) =$ the (marginal) probability (a.k.a. model evidence or marginal likelihood) of the observed data, computed by averaging over all hypotheses; it is also the prior predictive distribution
 
-For example, $P(H \mid D) = \frac{P(H) P(D \mid H)}{P(H) P(D \mid H)+ P(\lnot H) P(D \mid \lnot H)}$
+For example, if $\mathcal{H} = \{H, \lnot H \}$, then $\mathbb{P}(H \mid D) = \frac{\mathbb{P}(H) \cdot \mathbb{P}(D \mid H)}{\mathbb{P}(H) \cdot \mathbb{P}(D \mid H)+\mathbb{P}(\lnot H) \cdot \mathbb{P}(D \mid \lnot H)}$
 
-The evidence/marginal likelihood is the tricky bit... so, let's get rid of it!
+We can avoid computing the model evidence/marginal likelihood by considering only two hypotheses $H_1$ and $H_2$ and comparing them using the ratio of their posterior probabilities (posterior odds):
 
-We begin by considering just two hypotheses $H_1$ and $H_2$:
-
-$$\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \frac{P(H_1)}{P(H_2)} \frac{P(D \mid H_1)}{P(D \mid H_2)}$$
+$$\frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_2 \mid D)} = \frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)} \cdot \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)}$$
 
 where:
 
-$\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \text{the posterior odds}$
+$\frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_2 \mid D)} = \text{the posterior odds}$
 
-$\frac{P(H_1)}{P(H_2)} = \text{the prior odds}$
+$\frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)} = \text{the prior odds}$
 
-$\frac{P(D \mid H_1)}{P(D \mid H_2)} = \text{the Bayes' factor/likelihood ratio}$
+$\frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = \text{the Bayes' factor/likelihood ratio}$
 
-Then, we log both sides:
+The posterior odds (of $H_1$ over $H_2$) is the prior odds (of $H_1$ over $H_2$) multiplied by the Bayes' factor/likelihood ratio (of $H_1$ over $H_2$).
 
-$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \log \Big(\frac{P(H_1)}{P(H_2)} \frac{P(D \mid H_1)}{P(D \mid H_2)} \Big) =  \log \frac{P(H_1)}{P(H_2)} + \log \frac{P(D \mid H_1)}{P(D \mid H_2)}$$
+The Bayes' factor/likelihood ratio (of $H_1$ over $H_2$) is the multiplicative update for what my new belief should be in light of new evidence/data.
+
+It can be turned into an additive update by logging both sides:
+
+$$\log \frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_2 \mid D)} = \log \Big(\frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)} \cdot \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} \Big) =  \log \frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)} + \log \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)}$$
 
 where:
 
-$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \text{the posterior log odds}$
+$\log \frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_2 \mid D)} = \text{the posterior log odds}$
 
-$\log \frac{P(H_1)}{P(H_2)} = \text{the prior log odds}$
+$\log \frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)} = \text{the prior log odds}$
 
-$\log \frac{P(D \mid H_1)}{P(D \mid H_2)} = \text{the weight of evidence}$
+$\log \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = \text{the weight of evidence}$
 
 The posterior log odds are prior log odds + the **weight of evidence**.
 
 If you don't know what [odds](https://en.wikipedia.org/wiki/Odds) are (in the case of a single event):
 
-$$\text{Odds}(A) = \frac{P(A)}{P(\lnot A)} = \frac{P(A)}{1 - P(A)}$$
+$$\text{Odds}(A) = \frac{\mathbb{P}(A)}{\mathbb{P}(\lnot A)} = \frac{\mathbb{P}(A)}{1 - \mathbb{P}(A)}$$
 
 For example:
 
-$$P(A) = 0.5 = \frac{1}{2} \rightarrow \text{Odds}(A) = \frac{\frac{1}{2}}{\frac{1}{2}} = 1 = 1 : 1$$
+$$\mathbb{P}(A) = 0.5 = \frac{1}{2} \rightarrow \text{Odds}(A) = \frac{\frac{1}{2}}{1 - \frac{1}{2}} = \frac{\frac{1}{2}}{\frac{1}{2}} = \frac{1}{1} = 1 : 1 = 1$$
 
-$$P(A) = 0.75 = \frac{3}{4} \rightarrow \text{Odds}(A) = \frac{\frac{3}{4}}{\frac{1}{4}} = 3 = 3 : 1$$
+$$\mathbb{P}(A) = 0.75 = \frac{3}{4} \rightarrow \text{Odds}(A) = \frac{\frac{3}{4}}{1 - \frac{3}{4}} = \frac{\frac{3}{4}}{\frac{1}{4}} = \frac{3}{1} = 3 : 1 = 3$$
 
-More generally, odds are the ratio of any two probabilities, not necessarily $P(A)$ and $P(\lnot A)$, e.g., $\frac{P(H_1)}{P(H_2)}$.
+More generally, odds are the ratio of any two probabilities, not necessarily $\mathbb{P}(A)$ and $\mathbb{P}(\lnot A)$, e.g., $\frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)}$.
 
-In the words of I. J. Good and Alan Turing, the weight of evidence (WoE) is a measure of the information in observed data $D$ (or $X = x$) in favor of $H_1$ vs. $H_2$.
+In the words of I. J. Good and Alan Turing, the weight of evidence (WoE) is a measure of the information in the data $D$ (or $X = x$) in favor of $H_1$ vs. $H_2$.
 
 ![](images/clipboard-1511756704.png)
 
@@ -129,15 +131,19 @@ $$\begin{align}
 \mathbb{P}(X = x \mid Q) & \rightarrow q(x) \\
 \end{align}$$
 
-The probability that some variable $X$ takes on a value $x$ given that some model/hypothesis $P$ or $Q$ is true.
+The probability (mass/density[^1]) that some variable $X$ takes on a value $x$ given that some model/hypothesis/theory $P$ or $Q$ is true.
 
-The weight of evidence is:
+[^1]: $$\mathbb{P}(x < X < x + dx \mid P) = p(x)\;dx$$
 
-$$\mathcal{W}[x;p,q] = \log \frac{p(x)}{q(x)}$$
+    The $dx$ factor disappears when taking the ratio.
+
+The weight of evidence (also in distributional form) is:
+
+$$W(x;p\|q) \equiv \log \frac{p(x)}{q(x)}$$
 
 ### Units of weight of evidence
 
-Probability vs (logarithmic) evidence space to measure strength of belief.
+Probability vs. weight of evidence to measure strength of belief update:
 
 $\log_2 : \text{bit, shannon}$
 
@@ -149,7 +155,7 @@ $10\log_{10} : \text{deciban}$
 
 ```{r}
 tribble(
-  ~db, ~bit,  ~nat, ~odds,   ~p,
+  ~dB, ~bit,  ~nat, ~odds,   ~ℙ,
    0,  "0",   0.00, "1:1",   "50%",
    1,  "⅓",   0.23, "5:4",   "56%",
    2,  "⅔",   0.46, "π:2",   "61%",
@@ -168,7 +174,9 @@ tribble(
 )
 ```
 
-Independent observations decompose additively in (logarithmic) evidence space, as opposed to multiplicatively in probability space.
+### Weight of evidence of independent observations
+
+If $X_1, X_2, \ldots$ are independent conditional on $P$ and conditional on $Q$, then the weight of evidence decomposes additively:
 
 $$\log \frac{p(x_1, x_2, \ldots)}{q(x_1, x_2, \ldots)} = \log \frac{p(x_1)\ p(x_2)\ \ldots}{q(x_1)\ q(x_2)\ \ldots} = \log \frac{p(x_1)}{q(x_1)} + \log \frac{p(x_2)}{q(x_2)} + \ldots $$
 
@@ -176,43 +184,45 @@ $$\log \frac{p(x_1, x_2, \ldots)}{q(x_1, x_2, \ldots)} = \log \frac{p(x_1)\ p(x_
 
 ![](images/clipboard-1482521587.png)
 
-The belief-o-meter has two hypotheses, one at each end, e.g.:
+The belief-o-meter has the two hypotheses, $P$ on the left and $Q$ on the right, e.g.:
 
 ![](images/clipboard-3230710903.png)
 
-The two hypotheses, one at each end of the belief-o-meter, do not have to be exhaustive, e.g.:
-
-![](images/clipboard-553127107.png)
-
-Often one hypothesis and its complement are placed at each end of the belief-o-meter, e.g.:
+Often $Q$ is the negation/complement of $P$, e.g.:
 
 ![](images/clipboard-2419376339.png)
 
+But the two hypotheses do not have to be exhaustive, e.g.:
+
+![](images/clipboard-553127107.png)
+
 ### Example: Loaded die
 
-$H_1 : \text{die is loaded, shows 6 1/3 of the times (and 1, 2, 3, 4, or 5 2/3 of the times)}$
+$H_1 : \text{die is loaded, shows ⚅ 1/3 of the times (and ⚀, ⚁, ⚂, ⚃, or ⚄ 2/3 of the times)}$
 
-$H_2 : \text{die is not loaded, shows 6 1/6 of the times (and 1, 2, 3, 4, or 5 5/6 of the times})$
+$H_2 : \text{die is not loaded, shows ⚅ 1/6 of the times (and ⚀, ⚁, ⚂, ⚃, or ⚄ 5/6 of the times})$
 
-$D : \text{die shows 6} \implies 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{1}{3}}{\frac{1}{6}} = 10\log_{10}(2) \approx 3\ \text{dB}$
+$D : \text{die shows ⚅ } \implies W(D; H_1, H_2) = 10\log_{10}\frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = 10\log_{10}\frac{\frac{1}{3}}{\frac{1}{6}} = 10\log_{10}(2) \approx 3\ \text{dB}$
 
-$D : \text{die shows 1, 2, 3, 4, or 5} \implies 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{2}{3}}{\frac{5}{6}} = 10\log_{10}(0.8) \approx -1\ \text{dB}$
+$D : \text{die shows ⚀, ⚁, ⚂, ⚃, or ⚄ } \implies W(D; H_1, H_2) = 10\log_{10}\frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = 10\log_{10}\frac{\frac{2}{3}}{\frac{5}{6}} = 10\log_{10}(0.8) \approx -1\ \text{dB}$
 
-If we observe $\{1, 4, 6, 6\}$ then (assuming i.i.d.) the weight of the evidence is $-1 + (-1) + 3 + 3 = 4\ \text{dB}$. Thus, if our prior log odds were $0\ \text{dB}$ (i.e., $H_1$ and $H_2$ are equally likely, max entropy), then our posterior log odds are $4\ \text{dB}$ , corresponding to $16:1\ \text{odds}$ in favor of $H_1$ vs. $H_2$.
+If we observe $\{⚀, ⚃, ⚅, ⚅ \}$ then (assuming independence) the weight of the evidence is $-1 + (-1) + 3 + 3 = 4\ \text{dB}$.
+
+Thus, if our prior log odds were $0\ \text{dB}$ (i.e., $H_1$ and $H_2$ are equally likely), then our posterior log odds are $4\ \text{dB}$ , corresponding to $16:1\ \text{odds}$ in favor of $H_1$ vs. $H_2$.
 
 ### Example: Human births
 
-$H_1 : \text{human births are 50% ♂ and 50% ♀}$
+$H_1 : \text{human births are 50\% ♂ and 50\% ♀}$
 
-$H_2 : \text{human births are 51% ♂ and 49% ♀}$
+$H_2 : \text{human births are 51\% ♂ and 49\% ♀}$
 
-Laplace looked at Parisian birth records and found that between 1745 and 1770, 251,527 ♂ and 241,945 ♀ were born.
+Laplace looked at Parisian birth records and found that between 1745 and 1770, $251,527$ ♂ and $241,945$ ♀ were born (for a total of $493,472$ human births).
 
-Thus, the weight of the evidence in favor of $H_1$ vs. $H_2$ is:
+Thus, the weight of the evidence in favor of $H_1$ vs. $H_2$ (assuming independence) is:
 
 $$251,527 \cdot 10\log_{10} \frac{0.51}{0.50} + 241,945 \cdot 10\log_{10} \frac{0.49}{0.50} = 21,632 + (-21,228) = 404\ \text{dB}$$
 
-corresponding to $2.51\times 10^{40}:1\ \text{odds}$ in favor of $H_1$ vs. $H_2$ (25.1 duodecillions to one).
+corresponding to $2.51\times 10^{40}:1\ \text{odds}$ in favor of $H_1$ vs. $H_2$.
 
 ### Example: COVID test
 
@@ -248,10 +258,8 @@ $$\mathbb{P}(\text{COVID} \mid +) = \frac{1}{1 + 10^{-0.92/10}}
 
 ![](images/clipboard-3425795160.png)
 
-This example also shows how easy it is to integrate different sources of information using Bayesian updating, because "*today's posterior is tomorrow's prior*". Therefore, if the same person woke up with a fever the next day and the probability of having a fever assuming that you have COVID is 66%, then (assuming independence) simply add 3dB to yesterday's posterior odds/today's prior odds of 0.92dB to obtain a new posterior odds of 3.92 or approx. 71% probability that they have COVID.
-
 ::: callout-note
-“*today’s posterior is tomorrow’s prior*”
+Today's posterior is tomorrow's prior:
 
 $$\begin{align}
 p(\theta\mid D_1)
@@ -390,7 +398,7 @@ p_db <- d %>%
 p_ds / p_db
 ```
 
-Blue line is weight of evidence $x$ in favor of $H_1$ (red line) vs. $H_2$ (green line).
+The blue line is weight of evidence for each possible observation $x$ in favor of $H_1$ (red line) vs. $H_2$ (green line). At $x=0.5$, the two hypotheses assign equal density, so the observation of $x = 0.5$ provides **zero weight of evidence**.
 
 ## KL divergence
 
@@ -448,10 +456,8 @@ d %>% summarize(`DKL(NJ;OH) [dB]` = sum(`P(Color | NJ)`*`W(Color;NJ,OH) [dB]`))
 
 In general,
 
-$$H(p;q)
-=
-D_{\text{KL}}(q \| p)
-=
+$$D_{\rm KL}(p\|q)
+\equiv
 \mathbb{E}_{x \sim p(x)}
 \left[
 \log \frac{p(x)}{q(x)}
@@ -459,25 +465,39 @@ D_{\text{KL}}(q \| p)
 =
 \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
 
-::: callout-note
-Unlike the weight of evidence which is a function of $p$, $q$, and the observed data $x$, the KL divergence is a function of only $p$ and $q$ (since it assumes the data are drawn from either $p$ or $q$).
-:::
+The KL divergence of $p$ vs. $q$ ($D_{\rm KL}(p\|q)$) is the expected weight of evidence in favor of $P$ vs. $Q$ of an observation $x$ drawn from $p$.
+
+$D_{\rm KL}(p\|q)$ quantifies how much an observation $x$ drawn from $p$ is expected to move, on average, the "belief-o-meter" from $Q$ to $P$.
+
+$D_{\rm KL}(p\|q)$ quantifies how much information, on average, an observation $x$ drawn from the true distribution $p$ provides relative to a model $q$.
+
+$D_{\rm KL}(p\|q)$ measures the **expected excess surprisal** incurred by using $q$ when $p$ is true.
+
+The KL divergence is ≥ 0.
+
+$p$ can be zero where $q$ is not zero, but $q$ cannot be zero where $p$ is not zero!
+
+Unlike the weight of evidence, which is a function of distributions $p$ and $q$, and observation $x$, the KL divergence is a function only of distributions $p$ and $q$.
 
 ::: callout-important
-The KL divergence measures the "distance/difference" between two probability distributions, but it's not symmetric.
+The KL divergence measures the "distance" between two probability distributions, but it's not symmetric.
 :::
 
 {{< video 143326704-8361446e-721c-47e5-95e7-4e8fd20460ec.mp4 >}}
 
 <https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9>
 
-::: callout-note
-The KL divergence $H(p;q)$ measures the expected information gain when updating your belief from a prior distribution $p$ to a posterior distribution $q$.
-:::
+How many observations are needed to accumulate enough evidence to decisively favor $P$ vs. $Q$ (e.g., reaching a Bayes factor of $13\ \text{dB} \approx 20:1$, corresponding to a posterior probability of approximately $95\%$ under equal prior odds)?
 
-::: callout-note
-The KL divergence is ≥ 0.
-:::
+$$N_{\rm eff} = \frac{13\ \text{dB}}{D_{\rm KL}(p\|q)}$$
+
+For example, $\approx 15,000$ human birth records are needed to accumulate $13\ \text{dB}$ of evidence in favor of a 51:49% male:female birth rate ($H_1$) vs. a 50:50% male:female birth rate ($H_2$):
+
+$$0.51 \cdot 10\log_{10} \frac{0.51}{0.50} + 0.49 \cdot 10\log_{10} \frac{0.49}{0.50} \approx 0.51 \times (0.0860) + 0.49 \times (-0.0877) \approx 0.000869\ \text{dB/human birth}$$
+
+$$N_{\rm eff} = \frac{13\ \text{dB}}{0.000869\ \text{dB/human birth}} = 14,966\ \text{human births}$$
+
+With Laplace’s sample of $493,472$ human birth records, the accumulated evidence was $\approx 404\ \text{dB}$—far exceeding the $13\ \text{dB}$ threshold needed for statistical decisiveness.
 
 ## Weight of evidence and surprise
 
@@ -660,4 +680,8 @@ Mutual information is the relative entropy (KL divergence) of a joint distributi
 
 $$\mathcal{I}[X;Y] = \mathcal{S}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \log \frac{p(x,y)}{p(x)p(y)}$$
 
-Entropy is a measure of how easy it is to distinguish whether the two variables are associated, rather than them being independent.
+Mutual information is the expected reduction in uncertainty about $X$ obtained by observing $Y$.
+
+------------------------------------------------------------------------
+
+$$\mathbb{E}_{x \sim p(x)}[-\log q(x)] - \mathbb{E}_{x \sim p}[-\log p(x)] = H(p, q) - H(p) = D_{\rm KL}(p \parallel q)$$

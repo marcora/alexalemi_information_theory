@@ -143,6 +143,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#change-of-notation" id="toc-change-of-notation" class="nav-link" data-scroll-target="#change-of-notation">Change of notation</a></li>
   <li><a href="#units-of-weight-of-evidence" id="toc-units-of-weight-of-evidence" class="nav-link" data-scroll-target="#units-of-weight-of-evidence">Units of weight of evidence</a></li>
+  <li><a href="#weight-of-evidence-of-independent-observations" id="toc-weight-of-evidence-of-independent-observations" class="nav-link" data-scroll-target="#weight-of-evidence-of-independent-observations">Weight of evidence of independent observations</a></li>
   <li><a href="#belief-o-meter" id="toc-belief-o-meter" class="nav-link" data-scroll-target="#belief-o-meter">Belief-O-Meter</a></li>
   <li><a href="#example-loaded-die" id="toc-example-loaded-die" class="nav-link" data-scroll-target="#example-loaded-die">Example: Loaded die</a></li>
   <li><a href="#example-human-births" id="toc-example-human-births" class="nav-link" data-scroll-target="#example-human-births">Example: Human births</a></li>
@@ -201,53 +202,54 @@ window.Quarto = {
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Bayes%27_theorem">weight of evidence</a>: measures the “importance” of data for distinguishing between two hypotheses</li>
 </ul>
-<p><span class="math display">\[\mathcal{W}[x;p,q] = \log \frac{p(x)}{q(x)}\]</span></p>
+<p><span class="math display">\[W(x;p\|q) \equiv \log \frac{p(x)}{q(x)}\]</span></p>
 <ul>
-<li><a href="https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence">relative entropy</a> (a.k.a. Kullback–Leibler (KL) divergence): measures a “distance” between two distributions</li>
+<li><a href="https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence">Kullback–Leibler (KL) divergence</a> (a.k.a. <strong>relative entropy</strong>): measures the “discrepancy” between two distributions</li>
 </ul>
-<p><span class="math display">\[H[p;q] = D_{\text{KL}}(q \|p) = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}\]</span></p>
+<p><span class="math display">\[D_{\rm KL}(p\|q) \equiv \mathbb{E}_{x \sim p(x)}[W(x;p\|q)] = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}\]</span></p>
 <ul>
-<li><a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">entropy</a>: measures the “complexity” of a distribution</li>
+<li><a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">entropy</a>: measures the “uncertainty” of a distribution</li>
 </ul>
-<p><span class="math display">\[\mathcal{S}[p] = \mathcal{S}[p;u] = - \sum_x p(x) \cdot \log p(x)\]</span></p>
+<p><span class="math display">\[H(p) \equiv D_{\rm KL}(p\|u) = - \sum_x p(x) \cdot \log p(x)\]</span></p>
 <ul>
-<li><a href="https://en.wikipedia.org/wiki/Mutual_information">mutual information</a>: measures the “complexity” of the association between two variables</li>
+<li><a href="https://en.wikipedia.org/wiki/Mutual_information">mutual information</a>: measures the “dependence” between two variables</li>
 </ul>
-<p><span class="math display">\[\mathcal{I}(X;Y) = \mathcal{S}[p(x,y);p(x)p(x)] = \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}\]</span></p>
+<p><span class="math display">\[I(X;Y) \equiv D_{\mathrm{KL}}(p(x,y)\|p(x)p(y)) = \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}\]</span></p>
 </section>
 <section id="weight-of-evidence" class="level2">
 <h2 class="anchored" data-anchor-id="weight-of-evidence">Weight of evidence</h2>
 <p>In the beginning, there was Bayes’ rule (joint probability/product rule factored/sliced two ways + algebra):</p>
-<p><span class="math display">\[P(A,B) = P(A)P(B \mid A) = P(B)P(A \mid B) = P(B, A)\]</span></p>
-<p><span class="math display">\[P(B \mid A) = \frac{P(B) P(A \mid B)}{P(A)}\]</span></p>
+<p><span class="math display">\[\mathbb{P}(A,B) = \mathbb{P}(A)\cdot\mathbb{P}(B \mid A) = \mathbb{P}(B)\cdot\mathbb{P}(A \mid B) = \mathbb{P}(B, A)\]</span></p>
+<p><span class="math display">\[\mathbb{P}(B \mid A) = \frac{\mathbb{P}(B)\cdot \mathbb{P}(A \mid B)}{\mathbb{P}(A)}\]</span></p>
 <p>All “frequentist vs.&nbsp;Bayesian, etc.” controversies are rooted in the philosophical interpretation of this uncontroversial rule of probability theory when applied to statistical inference:</p>
-<p><span class="math display">\[P(H \mid D) = \frac{P(H) P(D \mid H)}{P(D)}\]</span> where:</p>
-<p><span class="math inline">\(P(H \mid D) =\)</span> the (posterior) probability of the hypothesis after observing the data</p>
-<p><span class="math inline">\(P(H) =\)</span> the (prior) probability of the hypothesis before observing the data</p>
-<p><span class="math inline">\(P(D \mid H) =\)</span> the probability of the observed data given the hypothesis (a.k.a. the likelihood of the hypothesis given the observed data)</p>
-<p><span class="math inline">\(P(D) =\)</span> the (marginal) probability (a.k.a. evidence or marginal likelihood) of the observed data, computed by averaging over all hypotheses</p>
-<p>For example, <span class="math inline">\(P(H \mid D) = \frac{P(H) P(D \mid H)}{P(H) P(D \mid H)+ P(\lnot H) P(D \mid \lnot H)}\)</span></p>
-<p>The evidence/marginal likelihood is the tricky bit… so, let’s get rid of it!</p>
-<p>We begin by considering just two hypotheses <span class="math inline">\(H_1\)</span> and <span class="math inline">\(H_2\)</span>:</p>
-<p><span class="math display">\[\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \frac{P(H_1)}{P(H_2)} \frac{P(D \mid H_1)}{P(D \mid H_2)}\]</span></p>
+<p><span class="math display">\[\mathbb{P}(H \mid D) = \frac{\mathbb{P}(H)\cdot \mathbb{P}(D \mid H)}{\mathbb{P}(D)}\]</span> where:</p>
+<p><span class="math inline">\(\mathbb{P}(H \mid D) =\)</span> the (posterior) probability that the hypothesis is true after observing the data</p>
+<p><span class="math inline">\(\mathbb{P}(H) =\)</span> the (prior) probability of that the hypothesis is true before observing the data</p>
+<p><span class="math inline">\(\mathbb{P}(D \mid H) =\)</span> the probability of the observed data given the hypothesis; viewed as a function of <span class="math inline">\(H\)</span>, this is the <strong>likelihood</strong> of the hypothesis given the observed data.</p>
+<p><span class="math inline">\(\mathbb{P}(D) =\)</span> the (marginal) probability (a.k.a. model evidence or marginal likelihood) of the observed data, computed by averaging over all hypotheses; it is also the prior predictive distribution</p>
+<p>For example, if <span class="math inline">\(\mathcal{H} = \{H, \lnot H \}\)</span>, then <span class="math inline">\(\mathbb{P}(H \mid D) = \frac{\mathbb{P}(H) \cdot \mathbb{P}(D \mid H)}{\mathbb{P}(H) \cdot \mathbb{P}(D \mid H)+\mathbb{P}(\lnot H) \cdot \mathbb{P}(D \mid \lnot H)}\)</span></p>
+<p>We can avoid computing the model evidence/marginal likelihood by considering only two hypotheses <span class="math inline">\(H_1\)</span> and <span class="math inline">\(H_2\)</span> and comparing them using the ratio of their posterior probabilities (posterior odds):</p>
+<p><span class="math display">\[\frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_2 \mid D)} = \frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)} \cdot \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)}\]</span></p>
 <p>where:</p>
-<p><span class="math inline">\(\frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \text{the posterior odds}\)</span></p>
-<p><span class="math inline">\(\frac{P(H_1)}{P(H_2)} = \text{the prior odds}\)</span></p>
-<p><span class="math inline">\(\frac{P(D \mid H_1)}{P(D \mid H_2)} = \text{the Bayes' factor/likelihood ratio}\)</span></p>
-<p>Then, we log both sides:</p>
-<p><span class="math display">\[\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \log \Big(\frac{P(H_1)}{P(H_2)} \frac{P(D \mid H_1)}{P(D \mid H_2)} \Big) =  \log \frac{P(H_1)}{P(H_2)} + \log \frac{P(D \mid H_1)}{P(D \mid H_2)}\]</span></p>
+<p><span class="math inline">\(\frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_2 \mid D)} = \text{the posterior odds}\)</span></p>
+<p><span class="math inline">\(\frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)} = \text{the prior odds}\)</span></p>
+<p><span class="math inline">\(\frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = \text{the Bayes' factor/likelihood ratio}\)</span></p>
+<p>The posterior odds (of <span class="math inline">\(H_1\)</span> over <span class="math inline">\(H_2\)</span>) is the prior odds (of <span class="math inline">\(H_1\)</span> over <span class="math inline">\(H_2\)</span>) multiplied by the Bayes’ factor/likelihood ratio (of <span class="math inline">\(H_1\)</span> over <span class="math inline">\(H_2\)</span>).</p>
+<p>The Bayes’ factor/likelihood ratio (of <span class="math inline">\(H_1\)</span> over <span class="math inline">\(H_2\)</span>) is the multiplicative update for what my new belief should be in light of new evidence/data.</p>
+<p>It can be turned into an additive update by logging both sides:</p>
+<p><span class="math display">\[\log \frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_2 \mid D)} = \log \Big(\frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)} \cdot \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} \Big) =  \log \frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)} + \log \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)}\]</span></p>
 <p>where:</p>
-<p><span class="math inline">\(\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)} = \text{the posterior log odds}\)</span></p>
-<p><span class="math inline">\(\log \frac{P(H_1)}{P(H_2)} = \text{the prior log odds}\)</span></p>
-<p><span class="math inline">\(\log \frac{P(D \mid H_1)}{P(D \mid H_2)} = \text{the weight of evidence}\)</span></p>
+<p><span class="math inline">\(\log \frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_2 \mid D)} = \text{the posterior log odds}\)</span></p>
+<p><span class="math inline">\(\log \frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)} = \text{the prior log odds}\)</span></p>
+<p><span class="math inline">\(\log \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = \text{the weight of evidence}\)</span></p>
 <p>The posterior log odds are prior log odds + the <strong>weight of evidence</strong>.</p>
 <p>If you don’t know what <a href="https://en.wikipedia.org/wiki/Odds">odds</a> are (in the case of a single event):</p>
-<p><span class="math display">\[\text{Odds}(A) = \frac{P(A)}{P(\lnot A)} = \frac{P(A)}{1 - P(A)}\]</span></p>
+<p><span class="math display">\[\text{Odds}(A) = \frac{\mathbb{P}(A)}{\mathbb{P}(\lnot A)} = \frac{\mathbb{P}(A)}{1 - \mathbb{P}(A)}\]</span></p>
 <p>For example:</p>
-<p><span class="math display">\[P(A) = 0.5 = \frac{1}{2} \rightarrow \text{Odds}(A) = \frac{\frac{1}{2}}{\frac{1}{2}} = 1 = 1 : 1\]</span></p>
-<p><span class="math display">\[P(A) = 0.75 = \frac{3}{4} \rightarrow \text{Odds}(A) = \frac{\frac{3}{4}}{\frac{1}{4}} = 3 = 3 : 1\]</span></p>
-<p>More generally, odds are the ratio of any two probabilities, not necessarily <span class="math inline">\(P(A)\)</span> and <span class="math inline">\(P(\lnot A)\)</span>, e.g., <span class="math inline">\(\frac{P(H_1)}{P(H_2)}\)</span>.</p>
-<p>In the words of I. J. Good and Alan Turing, the weight of evidence (WoE) is a measure of the information in observed data <span class="math inline">\(D\)</span> (or <span class="math inline">\(X = x\)</span>) in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>.</p>
+<p><span class="math display">\[\mathbb{P}(A) = 0.5 = \frac{1}{2} \rightarrow \text{Odds}(A) = \frac{\frac{1}{2}}{1 - \frac{1}{2}} = \frac{\frac{1}{2}}{\frac{1}{2}} = \frac{1}{1} = 1 : 1 = 1\]</span></p>
+<p><span class="math display">\[\mathbb{P}(A) = 0.75 = \frac{3}{4} \rightarrow \text{Odds}(A) = \frac{\frac{3}{4}}{1 - \frac{3}{4}} = \frac{\frac{3}{4}}{\frac{1}{4}} = \frac{3}{1} = 3 : 1 = 3\]</span></p>
+<p>More generally, odds are the ratio of any two probabilities, not necessarily <span class="math inline">\(\mathbb{P}(A)\)</span> and <span class="math inline">\(\mathbb{P}(\lnot A)\)</span>, e.g., <span class="math inline">\(\frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)}\)</span>.</p>
+<p>In the words of I. J. Good and Alan Turing, the weight of evidence (WoE) is a measure of the information in the data <span class="math inline">\(D\)</span> (or <span class="math inline">\(X = x\)</span>) in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>.</p>
 <p><img src="images/clipboard-1511756704.png" class="img-fluid"></p>
 <section id="change-of-notation" class="level3">
 <h3 class="anchored" data-anchor-id="change-of-notation">Change of notation</h3>
@@ -255,13 +257,13 @@ window.Quarto = {
 \mathbb{P}(X = x \mid P) &amp; \rightarrow p(x) \\
 \mathbb{P}(X = x \mid Q) &amp; \rightarrow q(x) \\
 \end{align}\]</span></p>
-<p>The probability that some variable <span class="math inline">\(X\)</span> takes on a value <span class="math inline">\(x\)</span> given that some model/hypothesis <span class="math inline">\(P\)</span> or <span class="math inline">\(Q\)</span> is true.</p>
-<p>The weight of evidence is:</p>
-<p><span class="math display">\[\mathcal{W}[x;p,q] = \log \frac{p(x)}{q(x)}\]</span></p>
+<p>The probability (mass/density<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>) that some variable <span class="math inline">\(X\)</span> takes on a value <span class="math inline">\(x\)</span> given that some model/hypothesis/theory <span class="math inline">\(P\)</span> or <span class="math inline">\(Q\)</span> is true.</p>
+<p>The weight of evidence (also in distributional form) is:</p>
+<p><span class="math display">\[W(x;p\|q) \equiv \log \frac{p(x)}{q(x)}\]</span></p>
 </section>
 <section id="units-of-weight-of-evidence" class="level3">
 <h3 class="anchored" data-anchor-id="units-of-weight-of-evidence">Units of weight of evidence</h3>
-<p>Probability vs (logarithmic) evidence space to measure strength of belief.</p>
+<p>Probability vs.&nbsp;weight of evidence to measure strength of belief update:</p>
 <p><span class="math inline">\(\log_2 : \text{bit, shannon}\)</span></p>
 <p><span class="math inline">\(\log_e : \text{nat}\)</span></p>
 <p><span class="math inline">\(\log_{10} : \text{dit, ban, hartley}\)</span></p>
@@ -272,11 +274,11 @@ window.Quarto = {
 <table class="caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
-<th style="text-align: right;">db</th>
+<th style="text-align: right;">dB</th>
 <th style="text-align: left;">bit</th>
 <th style="text-align: right;">nat</th>
 <th style="text-align: left;">odds</th>
-<th style="text-align: left;">p</th>
+<th style="text-align: left;">ℙ</th>
 </tr>
 </thead>
 <tbody>
@@ -390,35 +392,39 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>Independent observations decompose additively in (logarithmic) evidence space, as opposed to multiplicatively in probability space.</p>
+</section>
+<section id="weight-of-evidence-of-independent-observations" class="level3">
+<h3 class="anchored" data-anchor-id="weight-of-evidence-of-independent-observations">Weight of evidence of independent observations</h3>
+<p>If <span class="math inline">\(X_1, X_2, \ldots\)</span> are independent conditional on <span class="math inline">\(P\)</span> and conditional on <span class="math inline">\(Q\)</span>, then the weight of evidence decomposes additively:</p>
 <p><span class="math display">\[\log \frac{p(x_1, x_2, \ldots)}{q(x_1, x_2, \ldots)} = \log \frac{p(x_1)\ p(x_2)\ \ldots}{q(x_1)\ q(x_2)\ \ldots} = \log \frac{p(x_1)}{q(x_1)} + \log \frac{p(x_2)}{q(x_2)} + \ldots \]</span></p>
 </section>
 <section id="belief-o-meter" class="level3">
 <h3 class="anchored" data-anchor-id="belief-o-meter">Belief-O-Meter</h3>
 <p><img src="images/clipboard-1482521587.png" class="img-fluid"></p>
-<p>The belief-o-meter has two hypotheses, one at each end, e.g.:</p>
+<p>The belief-o-meter has the two hypotheses, <span class="math inline">\(P\)</span> on the left and <span class="math inline">\(Q\)</span> on the right, e.g.:</p>
 <p><img src="images/clipboard-3230710903.png" class="img-fluid"></p>
-<p>The two hypotheses, one at each end of the belief-o-meter, do not have to be exhaustive, e.g.:</p>
-<p><img src="images/clipboard-553127107.png" class="img-fluid"></p>
-<p>Often one hypothesis and its complement are placed at each end of the belief-o-meter, e.g.:</p>
+<p>Often <span class="math inline">\(Q\)</span> is the negation/complement of <span class="math inline">\(P\)</span>, e.g.:</p>
 <p><img src="images/clipboard-2419376339.png" class="img-fluid"></p>
+<p>But the two hypotheses do not have to be exhaustive, e.g.:</p>
+<p><img src="images/clipboard-553127107.png" class="img-fluid"></p>
 </section>
 <section id="example-loaded-die" class="level3">
 <h3 class="anchored" data-anchor-id="example-loaded-die">Example: Loaded die</h3>
-<p><span class="math inline">\(H_1 : \text{die is loaded, shows 6 1/3 of the times (and 1, 2, 3, 4, or 5 2/3 of the times)}\)</span></p>
-<p><span class="math inline">\(H_2 : \text{die is not loaded, shows 6 1/6 of the times (and 1, 2, 3, 4, or 5 5/6 of the times})\)</span></p>
-<p><span class="math inline">\(D : \text{die shows 6} \implies 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{1}{3}}{\frac{1}{6}} = 10\log_{10}(2) \approx 3\ \text{dB}\)</span></p>
-<p><span class="math inline">\(D : \text{die shows 1, 2, 3, 4, or 5} \implies 10\log_{10}\frac{P(D \mid H_1)}{P(D \mid H_2)} = 10\log_{10}\frac{\frac{2}{3}}{\frac{5}{6}} = 10\log_{10}(0.8) \approx -1\ \text{dB}\)</span></p>
-<p>If we observe <span class="math inline">\(\{1, 4, 6, 6\}\)</span> then (assuming i.i.d.) the weight of the evidence is <span class="math inline">\(-1 + (-1) + 3 + 3 = 4\ \text{dB}\)</span>. Thus, if our prior log odds were <span class="math inline">\(0\ \text{dB}\)</span> (i.e., <span class="math inline">\(H_1\)</span> and <span class="math inline">\(H_2\)</span> are equally likely, max entropy), then our posterior log odds are <span class="math inline">\(4\ \text{dB}\)</span> , corresponding to <span class="math inline">\(16:1\ \text{odds}\)</span> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>.</p>
+<p><span class="math inline">\(H_1 : \text{die is loaded, shows ⚅ 1/3 of the times (and ⚀, ⚁, ⚂, ⚃, or ⚄ 2/3 of the times)}\)</span></p>
+<p><span class="math inline">\(H_2 : \text{die is not loaded, shows ⚅ 1/6 of the times (and ⚀, ⚁, ⚂, ⚃, or ⚄ 5/6 of the times})\)</span></p>
+<p><span class="math inline">\(D : \text{die shows ⚅ } \implies W(D; H_1, H_2) = 10\log_{10}\frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = 10\log_{10}\frac{\frac{1}{3}}{\frac{1}{6}} = 10\log_{10}(2) \approx 3\ \text{dB}\)</span></p>
+<p><span class="math inline">\(D : \text{die shows ⚀, ⚁, ⚂, ⚃, or ⚄ } \implies W(D; H_1, H_2) = 10\log_{10}\frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = 10\log_{10}\frac{\frac{2}{3}}{\frac{5}{6}} = 10\log_{10}(0.8) \approx -1\ \text{dB}\)</span></p>
+<p>If we observe <span class="math inline">\(\{⚀, ⚃, ⚅, ⚅ \}\)</span> then (assuming independence) the weight of the evidence is <span class="math inline">\(-1 + (-1) + 3 + 3 = 4\ \text{dB}\)</span>.</p>
+<p>Thus, if our prior log odds were <span class="math inline">\(0\ \text{dB}\)</span> (i.e., <span class="math inline">\(H_1\)</span> and <span class="math inline">\(H_2\)</span> are equally likely), then our posterior log odds are <span class="math inline">\(4\ \text{dB}\)</span> , corresponding to <span class="math inline">\(16:1\ \text{odds}\)</span> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>.</p>
 </section>
 <section id="example-human-births" class="level3">
 <h3 class="anchored" data-anchor-id="example-human-births">Example: Human births</h3>
-<p><span class="math inline">\(H_1 : \text{human births are 50% ♂ and 50% ♀}\)</span></p>
-<p><span class="math inline">\(H_2 : \text{human births are 51% ♂ and 49% ♀}\)</span></p>
-<p>Laplace looked at Parisian birth records and found that between 1745 and 1770, 251,527 ♂ and 241,945 ♀ were born.</p>
-<p>Thus, the weight of the evidence in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span> is:</p>
+<p><span class="math inline">\(H_1 : \text{human births are 50\% ♂ and 50\% ♀}\)</span></p>
+<p><span class="math inline">\(H_2 : \text{human births are 51\% ♂ and 49\% ♀}\)</span></p>
+<p>Laplace looked at Parisian birth records and found that between 1745 and 1770, <span class="math inline">\(251,527\)</span> ♂ and <span class="math inline">\(241,945\)</span> ♀ were born (for a total of <span class="math inline">\(493,472\)</span> human births).</p>
+<p>Thus, the weight of the evidence in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span> (assuming independence) is:</p>
 <p><span class="math display">\[251,527 \cdot 10\log_{10} \frac{0.51}{0.50} + 241,945 \cdot 10\log_{10} \frac{0.49}{0.50} = 21,632 + (-21,228) = 404\ \text{dB}\]</span></p>
-<p>corresponding to <span class="math inline">\(2.51\times 10^{40}:1\ \text{odds}\)</span> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span> (25.1 duodecillions to one).</p>
+<p>corresponding to <span class="math inline">\(2.51\times 10^{40}:1\ \text{odds}\)</span> in favor of <span class="math inline">\(H_1\)</span> vs.&nbsp;<span class="math inline">\(H_2\)</span>.</p>
 </section>
 <section id="example-covid-test" class="level3">
 <h3 class="anchored" data-anchor-id="example-covid-test">Example: COVID test</h3>
@@ -439,7 +445,6 @@ window.Quarto = {
 =
 \frac{1}{1+10^{-0.092}} = 0.5528\]</span></p>
 <p><img src="images/clipboard-3425795160.png" class="img-fluid"></p>
-<p>This example also shows how easy it is to integrate different sources of information using Bayesian updating, because “<em>today’s posterior is tomorrow’s prior</em>”. Therefore, if the same person woke up with a fever the next day and the probability of having a fever assuming that you have COVID is 66%, then (assuming independence) simply add 3dB to yesterday’s posterior odds/today’s prior odds of 0.92dB to obtain a new posterior odds of 3.92 or approx. 71% probability that they have COVID.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -450,7 +455,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>“<em>today’s posterior is tomorrow’s prior</em>”</p>
+<p>Today’s posterior is tomorrow’s prior:</p>
 <p><span class="math display">\[\begin{align}
 p(\theta\mid D_1)
 &amp; \propto
@@ -637,7 +642,7 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 </div>
 </div>
 </div>
-<p>Blue line is weight of evidence <span class="math inline">\(x\)</span> in favor of <span class="math inline">\(H_1\)</span> (red line) vs.&nbsp;<span class="math inline">\(H_2\)</span> (green line).</p>
+<p>The blue line is weight of evidence for each possible observation <span class="math inline">\(x\)</span> in favor of <span class="math inline">\(H_1\)</span> (red line) vs.&nbsp;<span class="math inline">\(H_2\)</span> (green line). At <span class="math inline">\(x=0.5\)</span>, the two hypotheses assign equal density, so the observation of <span class="math inline">\(x = 0.5\)</span> provides <strong>zero weight of evidence</strong>.</p>
 </section>
 </section>
 <section id="kl-divergence" class="level2">
@@ -795,29 +800,21 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 <p><img src="images/clipboard-1304461914.png" class="img-fluid"></p>
 <p><img src="images/clipboard-553025974.png" class="img-fluid"></p>
 <p>In general,</p>
-<p><span class="math display">\[H(p;q)
-=
-D_{\text{KL}}(q \| p)
-=
+<p><span class="math display">\[D_{\rm KL}(p\|q)
+\equiv
 \mathbb{E}_{x \sim p(x)}
 \left[
 \log \frac{p(x)}{q(x)}
 \right]
 =
 \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}\]</span></p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Unlike the weight of evidence which is a function of <span class="math inline">\(p\)</span>, <span class="math inline">\(q\)</span>, and the observed data <span class="math inline">\(x\)</span>, the KL divergence is a function of only <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span> (since it assumes the data are drawn from either <span class="math inline">\(p\)</span> or <span class="math inline">\(q\)</span>).</p>
-</div>
-</div>
+<p>The KL divergence of <span class="math inline">\(p\)</span> vs.&nbsp;<span class="math inline">\(q\)</span> (<span class="math inline">\(D_{\rm KL}(p\|q)\)</span>) is the expected weight of evidence in favor of <span class="math inline">\(P\)</span> vs.&nbsp;<span class="math inline">\(Q\)</span> of an observation <span class="math inline">\(x\)</span> drawn from <span class="math inline">\(p\)</span>.</p>
+<p><span class="math inline">\(D_{\rm KL}(p\|q)\)</span> quantifies how much an observation <span class="math inline">\(x\)</span> drawn from <span class="math inline">\(p\)</span> is expected to move, on average, the “belief-o-meter” from <span class="math inline">\(Q\)</span> to <span class="math inline">\(P\)</span>.</p>
+<p><span class="math inline">\(D_{\rm KL}(p\|q)\)</span> quantifies how much information, on average, an observation <span class="math inline">\(x\)</span> drawn from the true distribution <span class="math inline">\(p\)</span> provides relative to a model <span class="math inline">\(q\)</span>.</p>
+<p><span class="math inline">\(D_{\rm KL}(p\|q)\)</span> measures the <strong>expected excess surprisal</strong> incurred by using <span class="math inline">\(q\)</span> when <span class="math inline">\(p\)</span> is true.</p>
+<p>The KL divergence is ≥ 0.</p>
+<p><span class="math inline">\(p\)</span> can be zero where <span class="math inline">\(q\)</span> is not zero, but <span class="math inline">\(q\)</span> cannot be zero where <span class="math inline">\(p\)</span> is not zero!</p>
+<p>Unlike the weight of evidence, which is a function of distributions <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>, and observation <span class="math inline">\(x\)</span>, the KL divergence is a function only of distributions <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -828,37 +825,17 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The KL divergence measures the “distance/difference” between two probability distributions, but it’s not symmetric.</p>
+<p>The KL divergence measures the “distance” between two probability distributions, but it’s not symmetric.</p>
 </div>
 </div>
 <div class="quarto-video"><video id="video_shortcode_videojs_video1" class="video-js vjs-default-skin vjs-big-play-centered vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="143326704-8361446e-721c-47e5-95e7-4e8fd20460ec.mp4"></video></div>
 <p><a href="https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9" class="uri">https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9</a></p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The KL divergence <span class="math inline">\(H(p;q)\)</span> measures the expected information gain when updating your belief from a prior distribution <span class="math inline">\(p\)</span> to a posterior distribution <span class="math inline">\(q\)</span>.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The KL divergence is ≥ 0.</p>
-</div>
-</div>
+<p>How many observations are needed to accumulate enough evidence to decisively favor <span class="math inline">\(P\)</span> vs.&nbsp;<span class="math inline">\(Q\)</span> (e.g., reaching a Bayes factor of <span class="math inline">\(13\ \text{dB} \approx 20:1\)</span>, corresponding to a posterior probability of approximately <span class="math inline">\(95\%\)</span> under equal prior odds)?</p>
+<p><span class="math display">\[N_{\rm eff} = \frac{13\ \text{dB}}{D_{\rm KL}(p\|q)}\]</span></p>
+<p>For example, <span class="math inline">\(\approx 15,000\)</span> human birth records are needed to accumulate <span class="math inline">\(13\ \text{dB}\)</span> of evidence in favor of a 51:49% male:female birth rate (<span class="math inline">\(H_1\)</span>) vs.&nbsp;a 50:50% male:female birth rate (<span class="math inline">\(H_2\)</span>):</p>
+<p><span class="math display">\[0.51 \cdot 10\log_{10} \frac{0.51}{0.50} + 0.49 \cdot 10\log_{10} \frac{0.49}{0.50} \approx 0.51 \times (0.0860) + 0.49 \times (-0.0877) \approx 0.000869\ \text{dB/human birth}\]</span></p>
+<p><span class="math display">\[N_{\rm eff} = \frac{13\ \text{dB}}{0.000869\ \text{dB/human birth}} = 14,966\ \text{human births}\]</span></p>
+<p>With Laplace’s sample of <span class="math inline">\(493,472\)</span> human birth records, the accumulated evidence was <span class="math inline">\(\approx 404\ \text{dB}\)</span>—far exceeding the <span class="math inline">\(13\ \text{dB}\)</span> threshold needed for statistical decisiveness.</p>
 </section>
 <section id="weight-of-evidence-and-surprise" class="level2">
 <h2 class="anchored" data-anchor-id="weight-of-evidence-and-surprise">Weight of evidence and surprise</h2>
@@ -1000,15 +977,24 @@ W(D; H_1; \Omega)
 <h2 class="anchored" data-anchor-id="mutual-information">Mutual information</h2>
 <p>Mutual information is the relative entropy (KL divergence) of a joint distribution and the product of its marginal distributions:</p>
 <p><span class="math display">\[\mathcal{I}[X;Y] = \mathcal{S}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \log \frac{p(x,y)}{p(x)p(y)}\]</span></p>
-<p>Entropy is a measure of how easy it is to distinguish whether the two variables are associated, rather than them being independent.</p>
+<p>Mutual information is the expected reduction in uncertainty about <span class="math inline">\(X\)</span> obtained by observing <span class="math inline">\(Y\)</span>.</p>
+<hr>
+<p><span class="math display">\[\mathbb{E}_{x \sim p(x)}[-\log q(x)] - \mathbb{E}_{x \sim p}[-\log p(x)] = H(p, q) - H(p) = D_{\rm KL}(p \parallel q)\]</span></p>
 
 </section>
+
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-shannon1948" class="csl-entry" role="listitem">
 Shannon, C. E. 1948. <span>“A Mathematical Theory of Communication.”</span> <em>Bell System Technical Journal</em> 27 (3): 379–423. <a href="https://doi.org/10.1002/j.1538-7305.1948.tb01338.x">https://doi.org/10.1002/j.1538-7305.1948.tb01338.x</a>.
 </div>
-</div></section></div></main>
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p><span class="math display">\[\mathbb{P}(x &lt; X &lt; x + dx \mid P) = p(x)\;dx\]</span></p>
+<p>The <span class="math inline">\(dx\)</span> factor disappears when taking the ratio.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
