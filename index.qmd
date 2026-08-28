@@ -253,8 +253,7 @@ This example also shows how easy it is to integrate different sources of informa
 ::: callout-note
 “*today’s posterior is tomorrow’s prior*”
 
-$$
-\begin{align}
+$$\begin{align}
 p(\theta\mid D_1)
 & \propto
 p(D_1\mid\theta) \cdot p(\theta) \\
@@ -263,8 +262,7 @@ p(\theta\mid D_1,D_2)
 & \propto
 p(D_2\mid D_1,\theta) \cdot
 p(\theta\mid D_1) \\
-\end{align}
-$$
+\end{align}$$
 
 If $D_2 \perp D_1\mid\theta$, then
 
@@ -272,11 +270,9 @@ $$p(D_2\mid D_1,\theta)=p(D_2\mid\theta)$$
 
 and
 
-$$
-\begin{align}
+$$\begin{align}
 p(\theta\mid D_1,D_2) & \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
-\end{align}
-$$
+\end{align}$$
 :::
 
 ### Example: M&Ms (discrete distributions)
@@ -396,7 +392,6 @@ p_ds / p_db
 
 Blue line is weight of evidence $x$ in favor of $H_1$ (red line) vs. $H_2$ (green line).
 
-
 ## KL divergence
 
 Back to the M&Ms example, the weight of evidence in favor of $CLV$ vs. $HKP$ is (in decibans):
@@ -420,7 +415,7 @@ The **Kullback–Leibler divergence** of $CLV$ vs. $HKP$ is the **expected weigh
 
 ```{r}
 #| echo: true
-d %>% summarize(`DKL(CLV,HKP) [dB]` = sum(`P(Color | CLV)`*`W(Color;CLV,HKP) [dB]`))
+d %>% summarize(`DKL(CLV;HKP) [dB]` = sum(`P(Color | CLV)`*`W(Color;CLV,HKP) [dB]`))
 ```
 
 On the other hand, Back to the M&Ms example, the weight of evidence in favor of $HKP$ vs. $CLV$ is (in decibans):
@@ -444,38 +439,39 @@ The **Kullback–Leibler divergence** of $HKP$ vs. $CLV$ is the **expected weigh
 
 ```{r}
 #| echo: true
-d %>% summarize(`DKL(HKP,CLV) [dB]` = sum(`P(Color | HKP)`*`W(Color;HKP,CLV) [dB]`))
+d %>% summarize(`DKL(HKP;CLV) [dB]` = sum(`P(Color | HKP)`*`W(Color;HKP,CLV) [dB]`))
 ```
-
 
 In general,
 
-$$D_{KL}(p;q) = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
-
-
-
-
-
-Let $p(x) \equiv P(D\mid H_1)$ be the true data-generating distribution and $q(x) \equiv P(D\mid H_2)$ be the other distribution.
-
-::: callout-note
-Unlike the KL divergence (which is a function of only $p$ and $q$), the weight of evidence is a function of $p$, $q$, and the observed data $D$ (or $X = x$), and it does not assume that either $p$ or $q$ is the true data-generating distribution.
-:::
-
-$$\mathcal{S}[p;q]
-=
-D_{\mathrm{KL}}(P\|Q)
+$$D_{KL}(p;q)
 =
 \mathbb{E}_{x \sim p(x)}
 \left[
 \log \frac{p(x)}{q(x)}
 \right]
 =
-\Big\langle
-\log \frac{p(x)}{q(x)}
-\Big\rangle_p
-=
 \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
+
+::: callout-note
+Unlike the weight of evidence which is a function of $p$, $q$, and the observed data $x$, the KL divergence is a function of only $p$ and $q$ (since it assumes the data are drawn from either $p$ or $q$).
+:::
+
+::: callout-important
+The KL divergence measures the "distance/difference" between two probability distributions, but it's not symmetric.
+:::
+
+{{< video 143326704-8361446e-721c-47e5-95e7-4e8fd20460ec.mp4 >}}
+
+<https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9>
+
+::: callout-note
+The KL divergence quantifies the information gained—or equivalently, the change in beliefs—when a (prior) distribution $q$ is updated to a (posterior) distribution $p$.
+:::
+
+::: callout-note
+The KL divergence is ≥ 0.
+:::
 
 The KL divergence can also be decomposed into entropy and cross-entropy:
 
@@ -496,49 +492,6 @@ $$H[p; q] = -\sum_x p(x) \log q(x)$$
 Therefore,
 
 $$\mathcal{S}[p;q] = H[p;q] - H[p]$$ KL divergence is simply the extra surprise/cost incurred by using distribution $q$ to approximate distribution $p$.
-
-------------------------------------------------------------------------
-
-Back to the M&Ms example, if `HKP` is $H_1$ and `CLV` is $H_2$, the weight of evidence is:
-
-```{r}
-d <- tribble(
-  ~Color,   ~HKP,  ~CLV,
-  "Orange", 0.250, 0.205,
-  "Blue",   0.250, 0.207,
-  "Green",  0.125, 0.198,
-  "Red",    0.125, 0.131,
-  "Yellow", 0.125, 0.135,
-  "Brown",  0.125, 0.124
-) %>% mutate(dB = 10*log10(HKP/CLV))
-
-d
-```
-
-and the KL divergence is:
-
-```{r}
-#| echo: true
-d %>% summarize(S = sum(HKP*dB)) %$% S
-```
-
-$\mathcal{S}[\text{HKP};\text{CLV}] = 0.1078\ \text{dB}$
-
-::: callout-important
-The KL divergence measures the "distance/difference" between two probability distributions, but it's not symmetric.
-:::
-
-{{< video 143326704-8361446e-721c-47e5-95e7-4e8fd20460ec.mp4 >}}
-
-<https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9>
-
-::: callout-note
-The KL divergence quantifies the information gained—or equivalently, the change in beliefs—when a (prior) distribution $q$ is updated to a (posterior) distribution $p$.
-:::
-
-::: callout-note
-The KL divergence is ≥ 0.
-:::
 
 ## Weight of evidence and surprise
 
@@ -652,7 +605,6 @@ This derivation elegantly connects I.J. Good’s **weight of evidence** to Claud
 ```{r}
 gf_function(\(x) - log2(x), xlim = c(0.001,0.999)) %>% gf_labs(x = "P", y = "S = -log2(P)") + scale_y_continuous(breaks = seq(0, 10, by = 1))
 ```
-
 
 ## A principle for learning: cross-entropy minimization
 
