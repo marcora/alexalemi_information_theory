@@ -487,11 +487,11 @@ The KL divergence measures the "distance" between two probability distributions,
 
 <https://gist.github.com/ariseff/cbcfd58d05abe7ec388bb4bbc9914ad9>
 
-How many observations are needed to accumulate enough evidence to decisively favor $P$ vs. $Q$ (e.g., reaching a Bayes factor of $13\ \text{dB} \approx 20:1$, corresponding to a posterior probability of approximately $95\%$ under equal prior odds)?
+How many observations are needed to accumulate enough evidence to decisively favor $P$ vs. $Q$ (e.g., reaching a Bayes factor of $13\ \text{dB} \approx 20:1$, corresponding to a posterior probability of approximately $95\%$ under equal prior odds) assuming $P$ is true?
 
 $$N_{\rm eff} = \frac{13\ \text{dB}}{D_{\rm KL}(p\|q)}$$
 
-For example, $\approx 15,000$ human birth records are needed to accumulate $13\ \text{dB}$ of evidence in favor of a 51:49% male:female birth rate ($H_1$) vs. a 50:50% male:female birth rate ($H_2$):
+For example, $\approx 15,000$ human birth records are needed to accumulate $13\ \text{dB}$ of evidence in favor of a 51:49% male:female birth rate ($H_1$) vs. a 50:50% male:female birth rate ($H_2$) assuming $H_1$ is true:
 
 $$0.51 \cdot 10\log_{10} \frac{0.51}{0.50} + 0.49 \cdot 10\log_{10} \frac{0.49}{0.50} \approx 0.51 \times (0.0860) + 0.49 \times (-0.0877) \approx 0.000869\ \text{dB/human birth}$$
 
