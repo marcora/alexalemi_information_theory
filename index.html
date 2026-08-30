@@ -158,6 +158,7 @@ window.Quarto = {
   <li><a href="#entropy-1" id="toc-entropy-1" class="nav-link" data-scroll-target="#entropy-1">Entropy</a></li>
   <li><a href="#mutual-information" id="toc-mutual-information" class="nav-link" data-scroll-target="#mutual-information">Mutual information</a></li>
   <li><a href="#a-principle-for-learning-cross-entropy-minimization" id="toc-a-principle-for-learning-cross-entropy-minimization" class="nav-link" data-scroll-target="#a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</a></li>
+  <li><a href="#variational-autoencoders" id="toc-variational-autoencoders" class="nav-link" data-scroll-target="#variational-autoencoders">Variational autoencoders</a></li>
   </ul>
 </nav>
 </div>
@@ -958,6 +959,7 @@ W(D; H_1\| \Omega)
 <p><img src="images/clipboard-3031667535.png" class="img-fluid"></p>
 <p>See cards and biased cards examples, bits/sample interpretation of entropy, and <a href="https://en.wikipedia.org/wiki/Asymptotic_equipartition_property">asymptotic equipartition property</a> in <a href="https://youtu.be/hwZU-O0_12g">original lecture</a>.</p>
 <p><img src="images/clipboard-243200852.png" class="img-fluid"></p>
+<p><span class="math display">\[\mathbb{E}_{x \sim p(x)}[-\log q(x)] - \mathbb{E}_{x \sim p}[-\log p(x)] = H(p, q) - H(p) = D_{\rm KL}(p \parallel q)\]</span></p>
 </section>
 <section id="entropy-1" class="level2">
 <h2 class="anchored" data-anchor-id="entropy-1">Entropy</h2>
@@ -987,7 +989,7 @@ D_{\rm KL}(p \| u)
 <p><span class="math display">\[D_{\rm KL}(p\|u) = - H(p) + \log N = \log N - H(p)\]</span></p>
 <p>or</p>
 <p><span class="math display">\[H(p) = \log N - D_{\rm KL}(p \| u)\]</span></p>
-<p>The entropy of continuous variables/distributions is silly; it depends on the <a href="https://en.wikipedia.org/wiki/Unit_of_measurement">unit of measurement</a> and can be negative! To compare the entropy of continuous variables/distributions the range of the continuous uniform distribution used as reference must be the same.</p>
+<p>The <a href="https://en.wikipedia.org/wiki/Differential_entropy">entropy of continuous variables/distributions</a> is silly; it depends on the <a href="https://en.wikipedia.org/wiki/Unit_of_measurement">unit of measurement</a> and can be negative! When comparing the entropy of different continuous distributions <span class="math inline">\(p(x)\)</span>, the range of the uniform distribution <span class="math inline">\(u(x)\)</span> used as reference must be specified.</p>
 <p><img src="images/clipboard-2350691381.png" class="img-fluid"></p>
 <p>Entropy is a measure of ignorance.</p>
 <p>Entropy is a measure of how un-uniform a distribution is, i.e., how easy it is to distinguish it from a uniform distribution.</p>
@@ -995,13 +997,27 @@ D_{\rm KL}(p \| u)
 </section>
 <section id="mutual-information" class="level2">
 <h2 class="anchored" data-anchor-id="mutual-information">Mutual information</h2>
+<p><img src="images/clipboard-4226918501.png" class="img-fluid"></p>
 <p>Mutual information is the relative entropy (KL divergence) of a joint distribution and the product of its marginal distributions:</p>
 <p><span class="math display">\[I(X;Y) = D_{\rm KL}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \log \frac{p(x,y)}{p(x)p(y)}\]</span></p>
-<p>Mutual information is the expected reduction in uncertainty about <span class="math inline">\(X\)</span> obtained by observing <span class="math inline">\(Y\)</span>.</p>
-<hr>
+<p>Mutual information is the expected reduction of uncertainty in <span class="math inline">\(X\)</span> after observing <span class="math inline">\(Y\)</span> (and viceversa).</p>
+<p><img src="images/clipboard-235079049.png" class="img-fluid"></p>
+<p><span class="math display">\[I(X;Y) = H(X) - H(X \mid Y)\]</span></p>
+<p><img src="images/clipboard-3518195514.png" class="img-fluid"></p>
+<p><img src="images/clipboard-194056102.png" class="img-fluid"></p>
+<p><img src="images/clipboard-906127880.png" class="img-fluid"></p>
+<p><span class="math display">\[\begin{aligned}
+I(X;Y)
+&amp;= H(X) - H(X\mid Y) \\
+&amp;= H(Y) - H(Y\mid X) \\
+&amp;= H(X) + H(Y) - H(X,Y) \\
+&amp;= H(X,Y) - H(X\mid Y) - H(Y\mid X).
+\end{aligned}\]</span></p>
 </section>
 <section id="a-principle-for-learning-cross-entropy-minimization" class="level2">
 <h2 class="anchored" data-anchor-id="a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</h2>
+<p><img src="images/clipboard-1864346876.png" class="img-fluid"></p>
+<p><img src="images/clipboard-2342139949.png" class="img-fluid"></p>
 <p>Minimize the “distance/difference” (relative entropy/KL divergence) between the real world <span class="math inline">\(p(x)\)</span> and a model of the world <span class="math inline">\(q(x)\)</span>:</p>
 <p><span class="math display">\[\min_q \mathcal{S}[\text{p};\text{q}] = \min_q \sum_x p(x) \cdot \log\frac{p(x)}{q(x)} = \min_q (\mathcal{H}[p;q] - \mathcal{H}[p])\]</span></p>
 <p>which (since entropy does not depend on <span class="math inline">\(q\)</span>) is equivalent to minimizing the <strong>cross-entropy</strong>:</p>
@@ -1017,8 +1033,12 @@ D_{\rm KL}(p \| u)
 =
 - \frac{1}{n} \sum_i \log q(x_i)\]</span></p>
 <p>minimizing this <strong>empirical cross-entropy</strong> is equivalent to maximizing the likelihood of the observed data.</p>
-<hr>
-<p><span class="math display">\[\mathbb{E}_{x \sim p(x)}[-\log q(x)] - \mathbb{E}_{x \sim p}[-\log p(x)] = H(p, q) - H(p) = D_{\rm KL}(p \parallel q)\]</span></p>
+</section>
+<section id="variational-autoencoders" class="level2">
+<h2 class="anchored" data-anchor-id="variational-autoencoders">Variational autoencoders</h2>
+<p><img src="images/clipboard-3547103393.png" class="img-fluid"></p>
+<p><img src="images/clipboard-342460127.png" class="img-fluid"></p>
+<p><img src="images/clipboard-3881686786.png" class="img-fluid"></p>
 
 </section>
 

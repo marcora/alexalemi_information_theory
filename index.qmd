@@ -661,6 +661,8 @@ See cards and biased cards examples, bits/sample interpretation of entropy, and 
 
 ![](images/clipboard-243200852.png)
 
+$$\mathbb{E}_{x \sim p(x)}[-\log q(x)] - \mathbb{E}_{x \sim p}[-\log p(x)] = H(p, q) - H(p) = D_{\rm KL}(p \parallel q)$$
+
 ## Entropy
 
 The uniform distribution is special and therefore the relative entropy (KL divergence) of distribution $p(x)$ of variable $X$ with respect to its uniform distribution is special.
@@ -699,7 +701,7 @@ or
 
 $$H(p) = \log N - D_{\rm KL}(p \| u)$$
 
-The entropy of continuous variables/distributions is silly; it depends on the [unit of measurement](https://en.wikipedia.org/wiki/Unit_of_measurement) and can be negative! To compare the entropy of continuous variables/distributions the range of the continuous uniform distribution used as reference must be the same.
+The [entropy of continuous variables/distributions](https://en.wikipedia.org/wiki/Differential_entropy) is silly; it depends on the [unit of measurement](https://en.wikipedia.org/wiki/Unit_of_measurement) and can be negative! When comparing the entropy of different continuous distributions $p(x)$, the range of the uniform distribution $u(x)$ used as reference must be specified.
 
 ![](images/clipboard-2350691381.png)
 
@@ -711,15 +713,37 @@ $$D_{\rm KL}(p \| u) = \log N - H(p)$$
 
 ## Mutual information
 
+![](images/clipboard-4226918501.png)
+
 Mutual information is the relative entropy (KL divergence) of a joint distribution and the product of its marginal distributions:
 
 $$I(X;Y) = D_{\rm KL}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \log \frac{p(x,y)}{p(x)p(y)}$$
 
-Mutual information is the expected reduction in uncertainty about $X$ obtained by observing $Y$.
+Mutual information is the expected reduction of uncertainty in $X$ after observing $Y$ (and viceversa).
 
-------------------------------------------------------------------------
+![](images/clipboard-235079049.png)
+
+$$I(X;Y) = H(X) - H(X \mid Y)$$
+
+![](images/clipboard-3518195514.png)
+
+![](images/clipboard-194056102.png)
+
+![](images/clipboard-906127880.png)
+
+$$\begin{aligned}
+I(X;Y)
+&= H(X) - H(X\mid Y) \\
+&= H(Y) - H(Y\mid X) \\
+&= H(X) + H(Y) - H(X,Y) \\
+&= H(X,Y) - H(X\mid Y) - H(Y\mid X).
+\end{aligned}$$
 
 ## A principle for learning: cross-entropy minimization
+
+![](images/clipboard-1864346876.png)
+
+![](images/clipboard-2342139949.png)
 
 Minimize the "distance/difference" (relative entropy/KL divergence) between the real world $p(x)$ and a model of the world $q(x)$:
 
@@ -745,6 +769,10 @@ $$\mathcal{H}[\hat p;q]
 
 minimizing this **empirical cross-entropy** is equivalent to maximizing the likelihood of the observed data.
 
-------------------------------------------------------------------------
+## Variational autoencoders
 
-$$\mathbb{E}_{x \sim p(x)}[-\log q(x)] - \mathbb{E}_{x \sim p}[-\log p(x)] = H(p, q) - H(p) = D_{\rm KL}(p \parallel q)$$
+![](images/clipboard-3547103393.png)
+
+![](images/clipboard-342460127.png)
+
+![](images/clipboard-3881686786.png)
