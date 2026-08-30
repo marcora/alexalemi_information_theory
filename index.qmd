@@ -38,9 +38,11 @@ Notes from lectures of intro course on information theory for machine learning b
 
 Here, we develop information theory from probability theory rather than in the original context of communication (see [curated list of books](https://franknielsen.github.io/Books/CuratedBookLists.html) by [Frank Nielsen](https://franknielsen.github.io/more.html)).
 
+![](images/clipboard-2073580554.png)
+
 Fundamentally, information theory is about [measures](https://en.wikipedia.org/wiki/Information_theory_and_measure_theory):
 
-- [weight of evidence](https://en.wikipedia.org/wiki/Bayes%27_theorem): measures the "importance" of data for distinguishing between two hypotheses
+- [Weight of evidence](https://en.wikipedia.org/wiki/Bayes%27_theorem): measures the "importance" of data for distinguishing between two hypotheses
 
 $$W(x;p\|q) \equiv \log \frac{p(x)}{q(x)}$$
 
@@ -48,13 +50,13 @@ $$W(x;p\|q) \equiv \log \frac{p(x)}{q(x)}$$
 
 $$D_{\rm KL}(p\|q) \equiv \mathbb{E}_{x \sim p(x)}[W(x;p\|q)] = \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
 
-- [entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)): measures the "uncertainty" of a distribution
+- [Entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)): measures the "uncertainty" of a distribution
 
 $$H(p) \equiv D_{\rm KL}(p\|u) = - \sum_x p(x) \cdot \log p(x)$$
 
-- [mutual information](https://en.wikipedia.org/wiki/Mutual_information): measures the "dependence" between two variables
+- [Mutual information](https://en.wikipedia.org/wiki/Mutual_information): measures the "dependence" between two variables
 
-$$I(X;Y) \equiv D_{\mathrm{KL}}(p(x,y)\|p(x)p(y)) = \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}$$
+$$I(X,Y) \equiv D_{\mathrm{KL}}(p(x,y)\|p(x)p(y)) = \sum_{x, y} p(x,y) \cdot \log \frac{p(x,y)}{p(x) p(y)}$$
 
 ## Weight of evidence
 
@@ -124,26 +126,19 @@ In the words of I. J. Good and Alan Turing, the weight of evidence (WoE) is a me
 
 ![](images/clipboard-1511756704.png)
 
-### Change of notation
+In other words, the weight of evidence of observation $x$ in favor of $H_1$ vs. $H_2$, measures the change in your belief (on the log-odds scale) in favor of $H_1$ vs. $H_2$ after observing $x$:
 
-$$\begin{align}
-\mathbb{P}(X = x \mid P) & \rightarrow p(x) \\
-\mathbb{P}(X = x \mid Q) & \rightarrow q(x) \\
-\end{align}$$
-
-The probability (mass/density[^1]) that some variable $X$ takes on a value $x$ given that some model/hypothesis/theory $P$ or $Q$ is true.
-
-[^1]: $$\mathbb{P}(x < X < x + dx \mid P) = p(x)\;dx$$
-
-    The $dx$ factor disappears when taking the ratio.
-
-The weight of evidence (also in distributional form) is:
-
-$$W(x;p\|q) \equiv \log \frac{p(x)}{q(x)}$$
+$$W(x;H_1\|H_2)
+=
+\underbrace{\log\frac{\mathbb{P}(H_1\mid x)}{\mathbb{P}(H_2\mid x)}}_{\text{your belief after observing }x}
+-
+\underbrace{\log\frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)}}_{\text{your belief before observing }x}
+=
+\log\frac{\mathbb{P}(x\mid H_1)}{\mathbb{P}(x\mid H_2)}$$
 
 ### Units of weight of evidence
 
-Probability vs. weight of evidence to measure strength of belief update:
+Weight of evidence of observation $x$ in favor of $H_1$ vs. $H_2$ is magnitude of belief update in favor of $H_1$ vs. $H_2$ after observing $x$.
 
 $\log_2 : \text{bit, shannon}$
 
@@ -174,6 +169,23 @@ tribble(
 )
 ```
 
+### Change of notation
+
+$$\begin{align}
+\mathbb{P}(X = x \mid P) & \rightarrow p(x) \\
+\mathbb{P}(X = x \mid Q) & \rightarrow q(x) \\
+\end{align}$$
+
+The probability (mass/density[^1]) that some variable $X$ takes on a value $x$ given that some model/hypothesis/theory $P$ or $Q$ is true.
+
+[^1]: $$\mathbb{P}(x < X < x + dx \mid P) = p(x)\;dx$$
+
+    The $dx$ factor disappears when taking the ratio.
+
+The weight of evidence (also in distributional form) is:
+
+$$W(x;p\|q) \equiv \log \frac{p(x)}{q(x)}$$
+
 ### Weight of evidence of independent observations
 
 If $X_1, X_2, \ldots$ are independent conditional on $P$ and conditional on $Q$, then the weight of evidence decomposes additively:
@@ -184,17 +196,13 @@ $$\log \frac{p(x_1, x_2, \ldots)}{q(x_1, x_2, \ldots)} = \log \frac{p(x_1)\ p(x_
 
 ![](images/clipboard-1482521587.png)
 
-The belief-o-meter has the two hypotheses, $P$ on the left and $Q$ on the right, e.g.:
+The belief-o-meter has the two hypotheses, $P$ on the left and $Q$ on the right.
 
-![](images/clipboard-3230710903.png)
-
-Often $Q$ is the negation/complement of $P$, e.g.:
-
-![](images/clipboard-2419376339.png)
-
-But the two hypotheses do not have to be exhaustive, e.g.:
+For example:
 
 ![](images/clipboard-553127107.png)
+
+Note that $P$ and $Q$ don't have to be exhaustive.
 
 ### Example: Loaded die
 
@@ -202,9 +210,9 @@ $H_1 : \text{die is loaded, shows ⚅ 1/3 of the times (and ⚀, ⚁, ⚂, ⚃, 
 
 $H_2 : \text{die is not loaded, shows ⚅ 1/6 of the times (and ⚀, ⚁, ⚂, ⚃, or ⚄ 5/6 of the times})$
 
-$D : \text{die shows ⚅ } \implies W(D; H_1, H_2) = 10\log_{10}\frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = 10\log_{10}\frac{\frac{1}{3}}{\frac{1}{6}} = 10\log_{10}(2) \approx 3\ \text{dB}$
+$D : \text{die shows ⚅ } \implies W(D; H_1\|H_2) = 10\log_{10}\frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = 10\log_{10}\frac{\frac{1}{3}}{\frac{1}{6}} = 10\log_{10}(2) \approx 3\ \text{dB}$
 
-$D : \text{die shows ⚀, ⚁, ⚂, ⚃, or ⚄ } \implies W(D; H_1, H_2) = 10\log_{10}\frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = 10\log_{10}\frac{\frac{2}{3}}{\frac{5}{6}} = 10\log_{10}(0.8) \approx -1\ \text{dB}$
+$D : \text{die shows ⚀, ⚁, ⚂, ⚃, or ⚄ } \implies W(D; H_1\|H_2) = 10\log_{10}\frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)} = 10\log_{10}\frac{\frac{2}{3}}{\frac{5}{6}} = 10\log_{10}(0.8) \approx -1\ \text{dB}$
 
 If we observe $\{⚀, ⚃, ⚅, ⚅ \}$ then (assuming independence) the weight of the evidence is $-1 + (-1) + 3 + 3 = 4\ \text{dB}$.
 
@@ -232,19 +240,19 @@ $H_2 : \text{you don't have COVID}$
 
 Typical sensitivity of a COVID test:
 
-$$P(+ \mid \text{COVID}) = 0.94$$
+$$\mathbb{P}(+ \mid \text{COVID}) = 0.94$$
 
 Typical specificity of a COVID test:
 
-$$P(- \mid \lnot\text{COVID}) = 0.96$$
+$$\mathbb{P}(- \mid \lnot\text{COVID}) = 0.96$$
 
 Assuming 5% prevalence of COVID, i.e., $\mathbb{P}{(\text{COVID})} = 0.05$:
 
 $$10\log_{10}\frac{0.05}{0.95} \approx 10\log_{10}(0.0526) = -12.79$$
 
-$D : + \implies 10\log_{10}\frac{P(+ \mid \text{COVID})}{P(+ \mid \lnot \text{COVID})} = 10\log_{10}\frac{0.94}{0.04} = 10\log_{10}(23.5) = 13.71\ \text{dB}$
+$D : + \implies 10\log_{10}\frac{\mathbb{P}(+ \mid \text{COVID})}{\mathbb{P}(+ \mid \lnot \text{COVID})} = 10\log_{10}\frac{0.94}{0.04} = 10\log_{10}(23.5) = 13.71\ \text{dB}$
 
-$D : - \implies 10\log_{10}\frac{P(- \mid \text{COVID})}{P(- \mid \lnot \text{COVID})} = 10\log_{10}\frac{0.06}{0.96} = 10\log_{10}(0.0625) = -12.04\ \text{dB}$
+$D : - \implies 10\log_{10}\frac{\mathbb{P}(- \mid \text{COVID})}{\mathbb{P}(- \mid \lnot \text{COVID})} = 10\log_{10}\frac{0.06}{0.96} = 10\log_{10}(0.0625) = -12.04\ \text{dB}$
 
 So, if a person drawn at random from a population with 5% prevalence tests positive for COVID, they are approx. 55% likely to have COVID:
 
@@ -288,6 +296,8 @@ p(\theta\mid D_1,D_2) & \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 ![](images/clipboard-3433517152.png){width="300"}
 
 Bags of M&Ms produced at the Cleveland and Hackettstown factories differ in their color composition and are stamped with distinct codes: bags with `CLV` in their serial no. are from Cleveland (OH), while bags with `HKP` in their serial no. are from Hackettstown (NJ).
+
+<https://qz.com/918008/the-color-distribution-of-mms-as-determined-by-a-phd-in-statistics>
 
 The color proportions vary by factory as follows:
 
@@ -443,7 +453,7 @@ d <- tribble(
 d
 ```
 
-The **Kullback–Leibler divergence** of $NJ$ vs. $OH$ is the **expected weight of evidence** in favor of $NJ$ vs. $OH$, assuming the bag is from $NJ$, i.e., $P(\text{Color} \mid NJ)$:
+The **Kullback–Leibler divergence** of $NJ$ vs. $OH$ is the **expected weight of evidence** in favor of $NJ$ vs. $OH$, assuming the bag is from $NJ$, i.e., $\mathbb{P}(\text{Color} \mid NJ)$:
 
 ```{r}
 #| echo: true
@@ -465,19 +475,21 @@ $$D_{\rm KL}(p\|q)
 =
 \sum_x p(x) \cdot \log \frac{p(x)}{q(x)}$$
 
-The KL divergence of $p$ vs. $q$ ($D_{\rm KL}(p\|q)$) is the expected weight of evidence in favor of $P$ vs. $Q$ of an observation $x$ drawn from $p$.
+- The KL divergence of $p$ vs. $q$ is the expected weight of evidence in favor of $P$ vs. $Q$ of an observation $x$ drawn from $p$.
 
-$D_{\rm KL}(p\|q)$ quantifies how much an observation $x$ drawn from $p$ is expected to move, on average, the "belief-o-meter" from $Q$ to $P$.
+- The KL divergence of $p$ vs. $q$ is the expected magnitude of belief update (on the log-odds scale) in favor of $P$ vs. $Q$ after observing an outcome drawn from $p$.
 
-$D_{\rm KL}(p\|q)$ quantifies how much information, on average, an observation $x$ drawn from the true distribution $p$ provides relative to a model $q$.
+- The KL divergence of $p$ vs. $q$ quantifies how far, on average, an observation drawn from $p$ is expected to move the “belief-o-meter” in favor of $P$ vs. $Q$.
 
-$D_{\rm KL}(p\|q)$ measures the **expected excess surprisal** incurred by using $q$ when $p$ is true.
+- The KL divergence of $p$ vs. $q$ quantifies how much information, on average, an observation $x$ drawn from $p$ provides in favor of $P$ relative to $Q$.
 
-The KL divergence is ≥ 0.
+- When $p$ is the "true" data-generating distribution, the KL divergence of $p$ vs. $q$ measures the expected excess surprisal incurred by using model $q$ rather than $p$.
 
-$p$ can be zero where $q$ is not zero, but $q$ cannot be zero where $p$ is not zero!
+Individual observations drawn from $p$ can provide evidence in favor of either $P$ or $Q$, but on average they provide evidence in favor of P; consequently, KL divergence is nonnegative.
 
-Unlike the weight of evidence, which is a function of distributions $p$ and $q$, and observation $x$, the KL divergence is a function only of distributions $p$ and $q$.
+For the KL divergence to be finite, $q$ cannot assign zero probability where $p$ assigns positive probability. If it does, the KL divergence is infinite.
+
+Unlike weight of evidence, which depends on $p$, $q$, and a particular observation $x$, KL divergence depends only on the two distributions $p$ and $q$.
 
 ::: callout-important
 The KL divergence measures the "distance" between two probability distributions, but it's not symmetric.
@@ -501,49 +513,60 @@ With Laplace’s sample of $493,472$ human birth records, the accumulated eviden
 
 ## Weight of evidence and surprise
 
+If $H_2$ is exhaustive, for example:
+
 ![](images/clipboard-4176444107.png)
 
+![](images/clipboard-1748583538.png)
+
+![](images/clipboard-2386095180.png)
+
+![](images/clipboard-1210928143.png)
+
+![](images/clipboard-1648741110.png)
+
+![](images/clipboard-1734325348.png)
+
 $$\begin{align}
-H_1 &= ⚀ \\
+H_1 &=  ⚀ \\
 H_2 &= \{ ⚀, ⚁, ⚂, ⚃, ⚄, ⚅ \} = \Omega \\
 \end{align}$$
 
-$$\begin{align}
-P(H_2) & = P(\Omega) = 1 \\
-P(H_2 \mid D) & = P(\Omega \mid D) = 1 \\
-\end{align}$$
+$$\mathbb{P}(H_2 \mid D) = 1 = \mathbb{P}(H_2)$$
 
-$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+$$\log \frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_2 \mid D)}
 =
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
+\log \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)}
 +
-\log \frac{P(H_1)}{P(H_2)}$$
+\log \frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)}$$
 
-$$\log \frac{P(H_1 \mid D)}{1}
+$$\log \frac{\mathbb{P}(H_1 \mid D)}{1}
 =
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
+\log \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)}
 +
-\log \frac{P(H_1)}{1}$$
+\log \frac{\mathbb{P}(H_1)}{1}$$
 
-$$\log P(H_1 \mid D)
+$$\log \mathbb{P}(H_1 \mid D)
 =
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
+\log \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)}
 +
-\log P(H_1)$$
+\log \mathbb{P}(H_1)$$
 
-$$\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
+$$\log \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)}
 =
-\log P(H_1 \mid D) - \log P(H_1)
+\log \mathbb{P}(H_1 \mid D) - \log \mathbb{P}(H_1)
 =
-\log \frac{P(H_1 \mid D)}{P(H_1)}$$
+\log \frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_1)}$$
 
-$$\mathcal{W}[D;H_1;\Theta] = \log \frac{P(H_1 \mid D)}{P(H_1)}$$
+$$W(D;H_1\|H_2) = \log \frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_1)}$$
 
-Let $D = H_1$,
+$$W(D;H_1\|\Omega) = \log \frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_1)}$$
 
-$$P(H_1 \mid D) = P(H_1 \mid H_1) = 1$$
+Let $D = ⚀ = H_1$,
 
-$$\mathcal{W}[H_1;H_1;\Theta] = \log \frac{1}{P(H_1)} = - \log P(H_1)$$
+$$\mathbb{P}(H_1 \mid D) = \mathbb{P}(H_1 \mid H_1) = 1$$
+
+$$W(H_1;H_1\|\Omega) = \log \frac{1}{\mathbb{P}(H_1)} = - \log \mathbb{P}(H_1)$$
 
 Shannon's surprisal (or self-information) = information gained when observing an event occur amongst an exhaustive set of events.
 
@@ -552,65 +575,149 @@ H_1 : X = x \\
 H_2 : x \in \mathcal{X} \\
 \end{align}$$
 
-$$I(x) = \log \frac{1}{p(x)} = - \log p(x)$$
+$$S(x) = \log \frac{1}{p(x)} = - \log p(x)$$
 
-## Weight of evidence and surprise/self-information
+## Weight of evidence and surprise
 
-Let $H_1$ and $H_2$ be two competing hypotheses, and let $D$ be observed data.
+Let $H_1$ and $H_2$ be two hypotheses, and let $D$ be observed data.
 
 The posterior log-odds can be written as:
 
-$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+$$\log \frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_2 \mid D)}
 =
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}
+\log \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)}
 +
-\log \frac{P(H_1)}{P(H_2)}$$
+\log \frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)}$$
 
 The first term on the right-hand side is the **weight of evidence** in favor of $H_1$ vs. $H_2$:
 
-$$W(D; H_1; H_2)
+$$W(D; H_1\|H_2)
 =
-\log \frac{P(D \mid H_1)}{P(D \mid H_2)}$$
+\log \frac{\mathbb{P}(D \mid H_1)}{\mathbb{P}(D \mid H_2)}$$
 
 So in general,
 
-$$\log \frac{P(H_1 \mid D)}{P(H_2 \mid D)}
+$$\log \frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_2 \mid D)}
 =
-W(D; H_1; H_2)
+W(D; H_1\|H_2)
 +
-\log \frac{P(H_1)}{P(H_2)}$$
+\log \frac{\mathbb{P}(H_1)}{\mathbb{P}(H_2)}$$
 
-Now take the special case where $H_2 = \Omega$, the exhaustive hypothesis, so that $P(H_2) = P(\Omega)=1$ and $P(H_2 \mid D) = P(\Omega \mid D)=1$. Then
+Now take the special case where $H_2 = \Omega$, the exhaustive hypothesis, so that $\mathbb{P}(H_2) = \mathbb{P}(\Omega)=1$ and $\mathbb{P}(H_2 \mid D) = \mathbb{P}(\Omega \mid D)=1$. Then
 
-$$\log P(H_1 \mid D)
+$$\log \mathbb{P}(H_1 \mid D)
 =
-W(D; H_1; \Omega)
+W(D; H_1\| \Omega)
 +
-\log P(H_1)$$
+\log \mathbb{P}(H_1)$$
 
 Rearranging gives
 
-$$W(D; H_1; \Omega) = \log \frac{P(H_1 \mid D)}{P(H_1)}$$
+$$W(D; H_1\| \Omega) = \log \frac{\mathbb{P}(H_1 \mid D)}{\mathbb{P}(H_1)}$$
 
-Now take the special case where $D = H_1$, so that $P(H_1 \mid D) = P(H_1 \mid H_1) = 1$. Then
+Now take the special case where $D = H_1$, so that $\mathbb{P}(H_1 \mid D) = \mathbb{P}(H_1 \mid H_1) = 1$. Then
 
-$$W(H_1; H_1; \Omega)
+$$W(H_1; H_1\| \Omega)
 =
-\log \frac{1}{P(H_1)}
+\log \frac{1}{\mathbb{P}(H_1)}
 =
--\log P(H_1)$$
+-\log \mathbb{P}(H_1)$$
 
-This is the **surprise** or **self-information** (information content) of $H_1$ under its prior probability.
+This is the **surprise** or **self-information** (information content) of observing $H_1$.
 
-This derivation elegantly connects I.J. Good’s **weight of evidence** to Claude Shannon’s **surprise** (self-information) by using a clever choice for the alternative hypothesis, the tautological alternative $H_2 = \Omega$. It successfully proves that **surprise is simply a special case of the weight of evidence**. An intuitive way to think about this derivation is to view surprise as a measure of **how much your mind has to change** when an uncertain prediction becomes an absolute certainty.
+This derivation elegantly connects I.J. Good’s **weight of evidence** to Claude Shannon’s **surprise** (self-information) by using a clever choice for the alternative hypothesis, the tautological alternative $H_2 = \Omega$. It successfully proves that **surprise is simply a special case of the weight of evidence**. An intuitive way to think about this derivation is to view surprise as a measure of **how much your belief has to change** when an uncertain prediction becomes an absolute certainty.
 
-- If $H_1$ is a likely event (i.e., $P(H_1)$ is high), then seeing it happen is not surprising (i.e., $-\log P(H_1)$ is low).
+- If $H_1$ is a likely event (i.e., $\mathbb{P}(H_1)$ is high), then seeing it happen is not surprising (i.e., $-\log \mathbb{P}(H_1)$ is low).
 
-- If $H_1$ is an unlikely event (i.e., $P(H_1)$ is low), then seeing it happen is surprising (i.e., $-\log P(H_1)$ is high).
+- If $H_1$ is an unlikely event (i.e., $\mathbb{P}(H_1)$ is low), then seeing it happen is surprising (i.e., $-\log \mathbb{P}(H_1)$ is high).
 
 ```{r}
 gf_function(\(x) - log2(x), xlim = c(0.001,0.999)) %>% gf_labs(x = "P", y = "S = -log2(P)") + scale_y_continuous(breaks = seq(0, 10, by = 1))
 ```
+
+## Entropy
+
+Entropy is expected "surprise":
+
+![](images/clipboard-4173852817.png)
+
+Alternatively, entropy is relative entropy/KL divergence with respect to a uniform distribution.
+
+relative entropy (KL divergence) of distribution $p(x)$ of discrete variable $X$ with respect to the uniform distribution
+
+For example, for discrete variable $X$ with uniform distribution $\implies u(x_i) = \frac{1}{N}$:
+
+![](images/clipboard-1413860173.png)
+
+![](images/clipboard-4282247898.png)
+
+![](images/clipboard-2605355026.png)
+
+![](images/clipboard-3905936517.png)
+
+![](images/clipboard-3031667535.png)
+
+See cards and biased cards examples, bits/sample interpretation of entropy, and [asymptotic equipartition property](https://en.wikipedia.org/wiki/Asymptotic_equipartition_property) in [original lecture](https://youtu.be/hwZU-O0_12g).
+
+![](images/clipboard-243200852.png)
+
+## Entropy
+
+The uniform distribution is special and therefore the relative entropy (KL divergence) of distribution $p(x)$ of variable $X$ with respect to its uniform distribution is special.
+
+If variable $X$ is discrete, its uniform distribution $u(x)$ is:
+
+$$u(x) = \frac{1}{|\mathcal{X}|} = \frac{1}{N}$$
+
+**Entropy** is the relative entropy (KL divergence) of a distribution with respect to its uniform distribution:
+
+$$\begin{align}
+D_{\rm KL}(p \| u) 
+&=
+\sum_x p(x) \cdot \log \frac{p(x)}{u(x)} \\
+&=
+\sum_x p(x) \log \frac{p(x)}{1/N} \\
+&=
+\sum_x p(x) \log \big( p(x) \cdot N \big) \\
+&=
+\sum_x p(x) \big[ \log p(x) + \log N \big] \\
+&=
+\sum_x p(x) \log p(x) + \sum_x p(x) \log N \\
+&=
+\sum_x p(x) \log p(x) + \log N \cdot \sum_x p(x) \\
+&=
+\sum_x p(x) \log p(x) + \log N \\
+\end{align}$$
+
+$$H(p) = - \sum_x p(x) \log p(x)$$
+
+Therefore,
+
+$$D_{\rm KL}(p\|u) = - H(p) + \log N = \log N - H(p)$$
+
+or
+
+$$H(p) = \log N - D_{\rm KL}(p \| u)$$
+
+The entropy of continuous variables/distributions is silly; it depends on the [unit of measurement](https://en.wikipedia.org/wiki/Unit_of_measurement) and can be negative! To compare the entropy of continuous variables/distributions the range of the continuous uniform distribution used as reference must be the same.
+
+![](images/clipboard-2350691381.png)
+
+Entropy is a measure of ignorance.
+
+Entropy is a measure of how un-uniform a distribution is, i.e., how easy it is to distinguish it from a uniform distribution.
+
+$$D_{\rm KL}(p \| u) = \log N - H(p)$$
+
+## Mutual information
+
+Mutual information is the relative entropy (KL divergence) of a joint distribution and the product of its marginal distributions:
+
+$$I(X;Y) = D_{\rm KL}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \log \frac{p(x,y)}{p(x)p(y)}$$
+
+Mutual information is the expected reduction in uncertainty about $X$ obtained by observing $Y$.
+
+------------------------------------------------------------------------
 
 ## A principle for learning: cross-entropy minimization
 
@@ -637,50 +744,6 @@ $$\mathcal{H}[\hat p;q]
 - \frac{1}{n} \sum_i \log q(x_i)$$
 
 minimizing this **empirical cross-entropy** is equivalent to maximizing the likelihood of the observed data.
-
-## Entropy
-
-The uniform distribution is special (i.e., is the maximum entropy distribution) and therefore the relative entropy (KL divergence) of a distribution with respect to the uniform distribution is special.
-
-$$u(x) = \frac{1}{N}$$
-
-**Entropy** is the relative entropy (KL divergence) of a distribution with respect to the uniform distribution (i.e., the maximum entropy distribution):
-
-$$\mathcal{S}[p; u]
-=
-\sum_x p(x) \cdot \log \frac{p(x)}{u(x)}
-=
-\sum_x p(x) \log \frac{p(x)}{1/N}
-=
-\sum_x p(x) \log \big( p(x) \cdot N \big)
-=
-\sum_x p(x) \big[ \log p(x) + \log N \big]
-=
-\sum_x p(x) \log p(x) + \sum_x p(x) \log N
-=
-\sum_x p(x) \log p(x) + \log N \cdot \sum_x p(x)
-=
-\sum_x p(x) \log p(x) + \log N$$
-
-$\mathcal{S}[p;u]$ is the "distance" between the distribution $u$ with maximum entropy ($\log N$) and the distribution $p$.
-
-Therefore, the entropy of $p$ ($H[p]$) is:
-
-$$\mathcal{H}[p] = \log N - \mathcal{S}[p; u] = - \sum_x p(x) \log p(x)$$
-
-Entropy is a measure of ignorance.
-
-Entropy is a measure of how un-uniform a distribution is, i.e., how easy it is to distinguish it from a uniform distribution.
-
-$$\mathcal{S}[p; u] = \log N - H[p]$$
-
-## Mutual information
-
-Mutual information is the relative entropy (KL divergence) of a joint distribution and the product of its marginal distributions:
-
-$$\mathcal{I}[X;Y] = \mathcal{S}[p(x,y);p(x)p(y)] = \sum_{x,y} p(x, y) \cdot \log \frac{p(x,y)}{p(x)p(y)}$$
-
-Mutual information is the expected reduction in uncertainty about $X$ obtained by observing $Y$.
 
 ------------------------------------------------------------------------
 
