@@ -291,6 +291,14 @@ p(\theta\mid D_1,D_2) & \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 \end{align}$$
 :::
 
+### Example: Personally Identifiable Information (PII)
+
+PII is any data that can trace an identity back to a specific person.
+
+It's estimated that 87% of the U.S. population can be identified using just three pieces of PII: gender, zip code, and birth date.
+
+![](images/clipboard-3398965662.png)
+
 ### Example: M&Ms (discrete distributions)
 
 ![](images/clipboard-3433517152.png){width="300"}
@@ -739,7 +747,37 @@ I(X;Y)
 &= H(X,Y) - H(X\mid Y) - H(Y\mid X).
 \end{aligned}$$
 
+## Data processing inequality
+
+![](images/clipboard-1269470071.png)
+
+For a Markov chain, where $X$ is transformed into $Z$ and in turn $Z$ is transformed into $Y$, the [data processing inequality](https://en.wikipedia.org/wiki/Data_processing_inequality) states that:
+
+$$I(X;Y) \le I(X;Z)$$
+
+For example, for a deterministic transformation $Y=f(Z)$, the data processing inequality states that:
+
+$$I(X;f(Z))\leq I(X;Z)$$ Information is preserved or lost, but can not be increased, under data processing.
+
+![](images/clipboard-779117259.png)
+
+![](images/clipboard-494569131.png)
+
+## Signal and noise
+
+![](images/clipboard-3196650230.png)
+
+Signal (e.g., label information = what digit is the image of?) is, in this example, \~1% of total information.
+
+Our task as machine learners is to separate the "signal" (e.g., label information = what digit is the image of?) from the "noise" (information not relevant to our question).
+
+![](images/clipboard-1660565837.png)
+
+![](images/clipboard-822947537.png)
+
 ## A principle for learning: cross-entropy minimization
+
+For a single variable $X$:
 
 ![](images/clipboard-1864346876.png)
 
@@ -771,8 +809,16 @@ minimizing this **empirical cross-entropy** is equivalent to maximizing the like
 
 ## Variational autoencoders
 
+For two variables $X$ and $Z$:
+
 ![](images/clipboard-3547103393.png)
 
 ![](images/clipboard-342460127.png)
 
 ![](images/clipboard-3881686786.png)
+
+![](images/clipboard-2614077701.png)
+
+![](images/clipboard-3677442909.png)
+
+![](images/clipboard-3915295146.png)

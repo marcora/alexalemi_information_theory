@@ -148,6 +148,7 @@ window.Quarto = {
   <li><a href="#example-loaded-die" id="toc-example-loaded-die" class="nav-link" data-scroll-target="#example-loaded-die">Example: Loaded die</a></li>
   <li><a href="#example-human-births" id="toc-example-human-births" class="nav-link" data-scroll-target="#example-human-births">Example: Human births</a></li>
   <li><a href="#example-covid-test" id="toc-example-covid-test" class="nav-link" data-scroll-target="#example-covid-test">Example: COVID test</a></li>
+  <li><a href="#example-personally-identifiable-information-pii" id="toc-example-personally-identifiable-information-pii" class="nav-link" data-scroll-target="#example-personally-identifiable-information-pii">Example: Personally Identifiable Information (PII)</a></li>
   <li><a href="#example-mms-discrete-distributions" id="toc-example-mms-discrete-distributions" class="nav-link" data-scroll-target="#example-mms-discrete-distributions">Example: M&amp;Ms (discrete distributions)</a></li>
   <li><a href="#example-two-gaussian-likelihoods-continuous-distributions" id="toc-example-two-gaussian-likelihoods-continuous-distributions" class="nav-link" data-scroll-target="#example-two-gaussian-likelihoods-continuous-distributions">Example: Two Gaussian likelihoods (continuous distributions)</a></li>
   </ul></li>
@@ -157,6 +158,8 @@ window.Quarto = {
   <li><a href="#entropy" id="toc-entropy" class="nav-link" data-scroll-target="#entropy">Entropy</a></li>
   <li><a href="#entropy-1" id="toc-entropy-1" class="nav-link" data-scroll-target="#entropy-1">Entropy</a></li>
   <li><a href="#mutual-information" id="toc-mutual-information" class="nav-link" data-scroll-target="#mutual-information">Mutual information</a></li>
+  <li><a href="#data-processing-inequality" id="toc-data-processing-inequality" class="nav-link" data-scroll-target="#data-processing-inequality">Data processing inequality</a></li>
+  <li><a href="#signal-and-noise" id="toc-signal-and-noise" class="nav-link" data-scroll-target="#signal-and-noise">Signal and noise</a></li>
   <li><a href="#a-principle-for-learning-cross-entropy-minimization" id="toc-a-principle-for-learning-cross-entropy-minimization" class="nav-link" data-scroll-target="#a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</a></li>
   <li><a href="#variational-autoencoders" id="toc-variational-autoencoders" class="nav-link" data-scroll-target="#variational-autoencoders">Variational autoencoders</a></li>
   </ul>
@@ -483,6 +486,12 @@ p(\theta\mid D_1,D_2) &amp; \propto p(D_2\mid\theta) \cdot p(\theta\mid D_1)
 \end{align}\]</span></p>
 </div>
 </div>
+</section>
+<section id="example-personally-identifiable-information-pii" class="level3">
+<h3 class="anchored" data-anchor-id="example-personally-identifiable-information-pii">Example: Personally Identifiable Information (PII)</h3>
+<p>PII is any data that can trace an identity back to a specific person.</p>
+<p>It’s estimated that 87% of the U.S. population can be identified using just three pieces of PII: gender, zip code, and birth date.</p>
+<p><img src="images/clipboard-3398965662.png" class="img-fluid"></p>
 </section>
 <section id="example-mms-discrete-distributions" class="level3">
 <h3 class="anchored" data-anchor-id="example-mms-discrete-distributions">Example: M&amp;Ms (discrete distributions)</h3>
@@ -1014,8 +1023,27 @@ I(X;Y)
 &amp;= H(X,Y) - H(X\mid Y) - H(Y\mid X).
 \end{aligned}\]</span></p>
 </section>
+<section id="data-processing-inequality" class="level2">
+<h2 class="anchored" data-anchor-id="data-processing-inequality">Data processing inequality</h2>
+<p><img src="images/clipboard-1269470071.png" class="img-fluid"></p>
+<p>For a Markov chain, where <span class="math inline">\(X\)</span> is transformed into <span class="math inline">\(Z\)</span> and in turn <span class="math inline">\(Z\)</span> is transformed into <span class="math inline">\(Y\)</span>, the <a href="https://en.wikipedia.org/wiki/Data_processing_inequality">data processing inequality</a> states that:</p>
+<p><span class="math display">\[I(X;Y) \le I(X;Z)\]</span></p>
+<p>For example, for a deterministic transformation <span class="math inline">\(Y=f(Z)\)</span>, the data processing inequality states that:</p>
+<p><span class="math display">\[I(X;f(Z))\leq I(X;Z)\]</span> Information is preserved or lost, but can not be increased, under data processing.</p>
+<p><img src="images/clipboard-779117259.png" class="img-fluid"></p>
+<p><img src="images/clipboard-494569131.png" class="img-fluid"></p>
+</section>
+<section id="signal-and-noise" class="level2">
+<h2 class="anchored" data-anchor-id="signal-and-noise">Signal and noise</h2>
+<p><img src="images/clipboard-3196650230.png" class="img-fluid"></p>
+<p>Signal (e.g., label information = what digit is the image of?) is, in this example, ~1% of total information.</p>
+<p>Our task as machine learners is to separate the “signal” (e.g., label information = what digit is the image of?) from the “noise” (information not relevant to our question).</p>
+<p><img src="images/clipboard-1660565837.png" class="img-fluid"></p>
+<p><img src="images/clipboard-822947537.png" class="img-fluid"></p>
+</section>
 <section id="a-principle-for-learning-cross-entropy-minimization" class="level2">
 <h2 class="anchored" data-anchor-id="a-principle-for-learning-cross-entropy-minimization">A principle for learning: cross-entropy minimization</h2>
+<p>For a single variable <span class="math inline">\(X\)</span>:</p>
 <p><img src="images/clipboard-1864346876.png" class="img-fluid"></p>
 <p><img src="images/clipboard-2342139949.png" class="img-fluid"></p>
 <p>Minimize the “distance/difference” (relative entropy/KL divergence) between the real world <span class="math inline">\(p(x)\)</span> and a model of the world <span class="math inline">\(q(x)\)</span>:</p>
@@ -1036,9 +1064,13 @@ I(X;Y)
 </section>
 <section id="variational-autoencoders" class="level2">
 <h2 class="anchored" data-anchor-id="variational-autoencoders">Variational autoencoders</h2>
+<p>For two variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Z\)</span>:</p>
 <p><img src="images/clipboard-3547103393.png" class="img-fluid"></p>
 <p><img src="images/clipboard-342460127.png" class="img-fluid"></p>
 <p><img src="images/clipboard-3881686786.png" class="img-fluid"></p>
+<p><img src="images/clipboard-2614077701.png" class="img-fluid"></p>
+<p><img src="images/clipboard-3677442909.png" class="img-fluid"></p>
+<p><img src="images/clipboard-3915295146.png" class="img-fluid"></p>
 
 </section>
 
