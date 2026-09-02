@@ -199,6 +199,7 @@ window.Quarto = {
 <li><p><a href="https://drive.google.com/file/d/1VdFc41xtayn6YY-ZsHlbOBSCEabmNRXs/view?usp=sharing">[problem set]</a></p></li>
 <li><p><a href="https://drive.google.com/file/d/1jPUhUS5T2rgyx5Dlt74g4_MwX8vrBi2I/view?usp=sharing">[solutions]</a></p></li>
 </ul>
+<p>See also <span class="citation" data-cites="tishby2000">Tishby et al. (<a href="#ref-tishby2000" role="doc-biblioref">2000</a>)</span> and <a href="https://youtu.be/Yu72TBHlnTI">this</a> YouTube video.</p>
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
 <p><a href="https://en.wikipedia.org/wiki/Information_theory">Information theory</a> is a <a href="https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication">recent invention</a> by <a href="https://en.wikipedia.org/wiki/Claude_Shannon">Claude Shannon</a>, who was primarily concerned with communication <span class="citation" data-cites="shannon1948">(<a href="#ref-shannon1948" role="doc-biblioref">Shannon 1948</a>)</span>. We have to thank him for basically all things digital!</p>
@@ -1029,7 +1030,7 @@ I(X;Y)
 <p>For a Markov chain, where <span class="math inline">\(X\)</span> is transformed into <span class="math inline">\(Z\)</span> and in turn <span class="math inline">\(Z\)</span> is transformed into <span class="math inline">\(Y\)</span>, the <a href="https://en.wikipedia.org/wiki/Data_processing_inequality">data processing inequality</a> states that:</p>
 <p><span class="math display">\[I(X;Y) \le I(X;Z)\]</span></p>
 <p>For example, for a deterministic transformation <span class="math inline">\(Y=f(Z)\)</span>, the data processing inequality states that:</p>
-<p><span class="math display">\[I(X;f(Z))\leq I(X;Z)\]</span> Information is preserved or lost, but can not be increased, under data processing.</p>
+<p><span class="math display">\[I(X;f(Z))\leq I(X;Z)\]</span> Information is either preserved or lost, never increased, under data processing.</p>
 <p><img src="images/clipboard-779117259.png" class="img-fluid"></p>
 <p><img src="images/clipboard-494569131.png" class="img-fluid"></p>
 </section>
@@ -1078,6 +1079,9 @@ I(X;Y)
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-shannon1948" class="csl-entry" role="listitem">
 Shannon, C. E. 1948. <span>“A Mathematical Theory of Communication.”</span> <em>Bell System Technical Journal</em> 27 (3): 379–423. <a href="https://doi.org/10.1002/j.1538-7305.1948.tb01338.x">https://doi.org/10.1002/j.1538-7305.1948.tb01338.x</a>.
+</div>
+<div id="ref-tishby2000" class="csl-entry" role="listitem">
+Tishby, Naftali, Fernando C. Pereira, and William Bialek. 2000. <em>The Information Bottleneck Method</em>. <a href="https://doi.org/10.48550/ARXIV.PHYSICS/0004057">https://doi.org/10.48550/ARXIV.PHYSICS/0004057</a>.
 </div>
 </div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 

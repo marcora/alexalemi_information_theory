@@ -1,0 +1,161 @@
+---
+title: "The Classical Duality: From Least Action to Empirical Distribution Shapes"
+subtitle: "A Simplified Parametric Guide for Non-Physics Graduate Students"
+author: "Physics and Data Science Variational Seminar"
+format: 
+  html:
+    toc: true
+    theme: cosmo
+---
+
+## 1. Introduction: Two Views of a Single Path
+
+How does nature decide the path of an object moving through space and time? 
+
+1. **The Newtonian View (Local):** Nature looks at an object frame-by-frame, calculating net vector forces at every microscopic slice of time ($F = ma$).
+2. **The Lagrangian View (Global):** Nature evaluates the *entire flight history all at once*, selecting the path that minimizes a foundational scalar cost metric called **Action ($S$)**.
+
+In this notebook, we look at both frameworks using simple geometric constraints. In Part 1, we find a deterministic trajectory using 1D optimization over a quadratic path family. In Part 2, we simulate an empirical ensemble of noisy paths (a stochastic process) and extract the underlying probabilistic distribution shape directly from the data.
+
+---
+
+## 2. Part 1: Deterministic Paths via Least Action
+
+In a vacuum, a missile's trajectory can be solved by tracking its Kinetic Energy ($T$) and Potential Energy ($V$). The difference between these two scalar values is the **Lagrangian ($L = T - V$)**.
+
+The **Total Action ($S$)** is the accumulation of this balance over the entire timeline:
+
+$$S = \int_{0}^{t_{max}} (T - V) \, dt$$
+
+According to Hamilton's Principle, nature selects the path where this Action integral is at a minimum. We assume the missile must start at $y(0)=0$ and land at $y(2)=0$. We restrict all possible paths to a quadratic family controlled by a single shape parameter $k$:
+
+$$y(t) = k \cdot t(2 - t)$$
+
+### R Implementation: 1D Action Minimization
+
+We let R's simple `optimize()` function search for the exact value of $k$ that minimizes the total Action cost.
+
+```{r deterministic-action}
+set.seed(42)
+
+# 1. Physics Parameters
+m <- 1.0     # Missile mass (kg)
+g <- 9.81    # Gravity (m/s^2)
+t_max <- 2   # Total flight time (seconds)
+vx <- 10     # Fixed horizontal velocity (travels 20m in 2 seconds)
+
+# 2. Action Cost Function
+calculate_action <- function(k) {
+  dt <- 0.001
+  t <- seq(0, t_max, by = dt)
+  
+  # Parametric path shape controlled by k
+  y <- k * t * (t_max - t)
+  vy <- k * (t_max - 2 * t)
+  
+  # Energies
+  T_eng <- 0.5 * m * (vx^2 + vy^2)
+  V_eng <- m * g * y
+  L <- T_eng - V_eng
+  
+  return(sum(L * dt))
+}
+
+# 3. Optimize the single scalar 'k'
+opt_res <- optimize(f = calculate_action, interval = c(-20, 20))
+best_k  <- opt_res$minimum
+
+# 4. Generate comparison curves
+t_plot   <- seq(0, t_max, by = 0.01)
+y_action <- best_k * t_plot * (t_max - t_plot)
+
+# Exact analytical Newtonian path (F = ma)
+v0y      <- 0.5 * g * t_max
+y_newton <- (v0y * t_plot) - (0.5 * g * t_plot^2)
+
+# 5. Plot Comparison
+plot(t_plot, y_action, type = "l", col = "blue", lwd = 5,
+     xlab = "Time (seconds)", ylab = "Altitude (meters)",
+     main = "Deterministic Trajectory Convergence (1D Optimization)")
+lines(t_plot, y_newton, col = "orange", lty = 2, lwd = 2)
+grid()
+legend("topright", legend = c("Minimized Action Path", "Newtonian Kinematics"),
+       col = c("blue", "orange"), lty = c(1, 2), lwd = c(5, 2))
+```
+
+---
+
+## 3. Part 2: Probabilistic Paths via Empirical Simulation
+
+When an environment is chaotic or filled with molecular collisions, paths are no longer deterministic. Instead of searching for a single line, we look at an ensemble of paths. 
+
+Rather than running abstract path integrals, we will explicitly simulate a synthetic empirical dataset of $N = 200$ individual trajectories. Each trajectory represents a particle drifting from $x=0$ to $x=10$ across $t \in [0,1]$, subjected to normal random fluctuations that are geometrically pinned to zero at the boundaries by a quadratic curve profile:
+
+$$\sigma(t) = \alpha \cdot \sqrt{t(1 - t)}$$
+
+We will then compute the empirical mean and standard deviation across our simulated data rows to visualize the underlying probabilistic distribution.
+
+### R Implementation: Generating and Analyzing the Empirical Sample
+
+```{r empirical-simulation, fig.width=8, fig.height=5}
+# 1. Grid and Simulation Parameters
+t_grid    <- seq(0, 1, by = 0.02)
+N_steps   <- length(t_grid)
+N_samples <- 200
+alpha_true <- 2.5  # Fixed scale for the normal noise bubble
+
+# Initialize a data matrix: Rows = Time Steps, Columns = Individual Trajectories
+empirical_data <- matrix(NA, nrow = N_steps, ncol = N_samples)
+
+# 2. Generate the paths using a baseline straight line + normal noise bounded by a quadratic profile
+for(j in 1:N_samples) {
+  # Baseline expected trajectory: a straight line from 0 to 10
+  mu_base <- 0 + (10 - 0) * t_grid
+  
+  # Quadratic noise envelope: guarantees variance is 0 at t=0 and t=1
+  noise_envelope <- alpha_true * sqrt(t_grid * (1 - t_grid))
+  
+  # Add independent normal random noise at each time step
+  random_noise <- rnorm(N_steps, mean = 0, sd = 1)
+  
+  empirical_data[, j] <- mu_base + (noise_envelope * random_noise)
+}
+
+# 3. Extract the Empirical Parameters directly from the Data Matrix rows
+empirical_mean <- apply(empirical_data, 1, mean)
+empirical_sd   <- apply(empirical_data, 1, sd)
+
+# 4. Render the Full Distribution Plot
+# First, plot the raw noisy trajectories as thin, semi-transparent background lines
+plot(t_grid, empirical_data[, 1], type = "l", col = rgb(0,0,0,0.04), ylim = c(-3, 13),
+     xlab = "Time (t)", ylab = "Position (x)",
+     main = "Probabilistic Path Distribution from Empirical Simulation")
+
+for(j in 2:N_samples) {
+  lines(t_grid, empirical_data[, j], col = rgb(0,0,0,0.03))
+}
+
+# Overlay the extracted 95% empirical confidence intervals (Mean +/- 1.96 * SD)
+lines(t_grid, empirical_mean + 1.96 * empirical_sd, col = "darkgreen", lty = 2, lwd = 2)
+lines(t_grid, empirical_mean - 1.96 * empirical_sd, col = "darkgreen", lty = 2, lwd = 2)
+
+# Shade the probability distribution bubble
+polygon(c(t_grid, rev(t_grid)), 
+        c(empirical_mean + 1.96 * empirical_sd, rev(empirical_mean - 1.96 * empirical_sd)),
+        col = rgb(0, 0.5, 0, 0.08), border = NA)
+
+# Overlay the expected mean path
+lines(t_grid, empirical_mean, col = "blue", lwd = 4)
+
+grid()
+abline(h = 10, col = "darkgreen", lty = 3) # Target line indicator
+legend("topleft", legend = c("Raw Path Samples", "Empirical Mean (μ)", "95% Observed Distribution Area"),
+       col = c("gray", "blue", "darkgreen"), lty = c(1, 1, 2), lwd = c(1, 4, 2))
+```
+
+---
+
+## 4. Seminar Summary
+
+*   **Deterministic vs. Stochastic Mechanics:** Part 1 demonstrates how a single unique trajectory natively drops out of global energy minimization equations. Part 2 illustrates how real-world datasets preserve a structured variance envelope despite being composed of entirely chaotic, random variations.
+*   **The Geometry of Uncertainty:** By structuring our synthetic data noise with a quadratic boundary constraint, students see that uncertainty does not have to grow infinitely over time. When endpoints are locked, a stochastic distribution naturally blooms into an elliptical profile.

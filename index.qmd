@@ -32,6 +32,8 @@ Notes from lectures of intro course on information theory for machine learning b
 
 - [\[solutions\]](https://drive.google.com/file/d/1jPUhUS5T2rgyx5Dlt74g4_MwX8vrBi2I/view?usp=sharing)
 
+See also @tishby2000 and [this](https://youtu.be/Yu72TBHlnTI) YouTube video.
+
 ## Introduction
 
 [Information theory](https://en.wikipedia.org/wiki/Information_theory) is a [recent invention](https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication) by [Claude Shannon](https://en.wikipedia.org/wiki/Claude_Shannon), who was primarily concerned with communication [@shannon1948]. We have to thank him for basically all things digital!
@@ -757,7 +759,7 @@ $$I(X;Y) \le I(X;Z)$$
 
 For example, for a deterministic transformation $Y=f(Z)$, the data processing inequality states that:
 
-$$I(X;f(Z))\leq I(X;Z)$$ Information is preserved or lost, but can not be increased, under data processing.
+$$I(X;f(Z))\leq I(X;Z)$$ Information is either preserved or lost, never increased, under data processing.
 
 ![](images/clipboard-779117259.png)
 
