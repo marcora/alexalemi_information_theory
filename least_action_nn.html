@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Physics and Data Science Variational Seminar">
 
-<title>The Classical Duality: From Least Action to Empirical Distribution Shapes</title>
+<title>Teaching AI the laws of physics via the principle of least action</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -117,16 +116,15 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#introduction-two-views-of-a-single-path" id="toc-introduction-two-views-of-a-single-path" class="nav-link active" data-scroll-target="#introduction-two-views-of-a-single-path">1. Introduction: Two Views of a Single Path</a></li>
-  <li><a href="#part-1-deterministic-paths-via-least-action" id="toc-part-1-deterministic-paths-via-least-action" class="nav-link" data-scroll-target="#part-1-deterministic-paths-via-least-action">2. Part 1: Deterministic Paths via Least Action</a>
+  <li><a href="#introduction-two-ways-to-look-at-a-missile-launch" id="toc-introduction-two-ways-to-look-at-a-missile-launch" class="nav-link active" data-scroll-target="#introduction-two-ways-to-look-at-a-missile-launch">Introduction: two ways to look at a missile launch</a></li>
+  <li><a href="#defining-the-cost-of-a-trajectory" id="toc-defining-the-cost-of-a-trajectory" class="nav-link" data-scroll-target="#defining-the-cost-of-a-trajectory">Defining the “cost” of a trajectory</a></li>
+  <li><a href="#fit-neural-network-to-find-the-path-of-least-action" id="toc-fit-neural-network-to-find-the-path-of-least-action" class="nav-link" data-scroll-target="#fit-neural-network-to-find-the-path-of-least-action">Fit neural network to find “the path of least action”</a>
   <ul class="collapse">
-  <li><a href="#r-implementation-1d-action-minimization" id="toc-r-implementation-1d-action-minimization" class="nav-link" data-scroll-target="#r-implementation-1d-action-minimization">R Implementation: 1D Action Minimization</a></li>
+  <li><a href="#setup-network-and-loss-function" id="toc-setup-network-and-loss-function" class="nav-link" data-scroll-target="#setup-network-and-loss-function">Setup network and loss function</a></li>
+  <li><a href="#train-network" id="toc-train-network" class="nav-link" data-scroll-target="#train-network">Train network</a></li>
   </ul></li>
-  <li><a href="#part-2-probabilistic-paths-via-empirical-simulation" id="toc-part-2-probabilistic-paths-via-empirical-simulation" class="nav-link" data-scroll-target="#part-2-probabilistic-paths-via-empirical-simulation">3. Part 2: Probabilistic Paths via Empirical Simulation</a>
-  <ul class="collapse">
-  <li><a href="#r-implementation-generating-and-analyzing-the-empirical-sample" id="toc-r-implementation-generating-and-analyzing-the-empirical-sample" class="nav-link" data-scroll-target="#r-implementation-generating-and-analyzing-the-empirical-sample">R Implementation: Generating and Analyzing the Empirical Sample</a></li>
-  </ul></li>
-  <li><a href="#seminar-summary" id="toc-seminar-summary" class="nav-link" data-scroll-target="#seminar-summary">4. Seminar Summary</a></li>
+  <li><a href="#compare-with-trajectory-calculated-using-newtonian-mechanics" id="toc-compare-with-trajectory-calculated-using-newtonian-mechanics" class="nav-link" data-scroll-target="#compare-with-trajectory-calculated-using-newtonian-mechanics">Compare with trajectory calculated using Newtonian mechanics</a></li>
+  <li><a href="#takeaways-for-data-scientists" id="toc-takeaways-for-data-scientists" class="nav-link" data-scroll-target="#takeaways-for-data-scientists">Takeaways for data scientists</a></li>
   </ul>
 </nav>
 </div>
@@ -134,20 +132,13 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">The Classical Duality: From Least Action to Empirical Distribution Shapes</h1>
-<p class="subtitle lead">A Simplified Parametric Guide for Non-Physics Graduate Students</p>
+<h1 class="title">Teaching AI the laws of physics via the principle of least action</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Physics and Data Science Variational Seminar </p>
-          </div>
-  </div>
     
   
     
@@ -158,161 +149,151 @@ window.Quarto = {
 </header>
 
 
-<section id="introduction-two-views-of-a-single-path" class="level2">
-<h2 class="anchored" data-anchor-id="introduction-two-views-of-a-single-path">1. Introduction: Two Views of a Single Path</h2>
-<p>How does nature decide the path of an object moving through space and time?</p>
+<section id="introduction-two-ways-to-look-at-a-missile-launch" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-two-ways-to-look-at-a-missile-launch">Introduction: two ways to look at a missile launch</h2>
+<p>Imagine a missile launched into the air. How does nature decide exactly what path it will take before it hits the ground?</p>
 <ol type="1">
-<li><strong>The Newtonian View (Local):</strong> Nature looks at an object frame-by-frame, calculating net vector forces at every microscopic slice of time (<span class="math inline">\(F = ma\)</span>).</li>
-<li><strong>The Lagrangian View (Global):</strong> Nature evaluates the <em>entire flight history all at once</em>, selecting the path that minimizes a foundational scalar cost metric called <strong>Action (<span class="math inline">\(S\)</span>)</strong>.</li>
+<li><strong>The Newtonian Approach (Local):</strong> Nature looks at the missile frame-by-frame. At every single microsecond, it calculates the forces acting on it (<span class="math inline">\(F = ma\)</span>) and pushes it to its next position.</li>
+<li><strong>The Lagrangian Approach (Global):</strong> Nature looks at the <em>entire flight history all at once</em>. It looks at the starting point, the ending point, and chooses the path that minimizes a physical “cost function” called <strong>Action</strong>.</li>
 </ol>
-<p>In this notebook, we look at both frameworks using simple geometric constraints. In Part 1, we find a deterministic trajectory using 1D optimization over a quadratic path family. In Part 2, we simulate an empirical ensemble of noisy paths (a stochastic process) and extract the underlying probabilistic distribution shape directly from the data.</p>
-<hr>
+<p>In this notebook, we are going to build a <strong>Neural Network</strong> that knows absolutely zero physics. It doesn’t know what a parabola is, and it doesn’t know Newton’s equations. We will force it to search through an infinite space of possible curves, using optimization to discover the exact path of a missile by minimizing its Action cost.</p>
 </section>
-<section id="part-1-deterministic-paths-via-least-action" class="level2">
-<h2 class="anchored" data-anchor-id="part-1-deterministic-paths-via-least-action">2. Part 1: Deterministic Paths via Least Action</h2>
-<p>In a vacuum, a missile’s trajectory can be solved by tracking its Kinetic Energy (<span class="math inline">\(T\)</span>) and Potential Energy (<span class="math inline">\(V\)</span>). The difference between these two scalar values is the <strong>Lagrangian (<span class="math inline">\(L = T - V\)</span>)</strong>.</p>
-<p>The <strong>Total Action (<span class="math inline">\(S\)</span>)</strong> is the accumulation of this balance over the entire timeline:</p>
-<p><span class="math display">\[S = \int_{0}^{t_{max}} (T - V) \, dt\]</span></p>
-<p>According to Hamilton’s Principle, nature selects the path where this Action integral is at a minimum. We assume the missile must start at <span class="math inline">\(y(0)=0\)</span> and land at <span class="math inline">\(y(2)=0\)</span>. We restrict all possible paths to a quadratic family controlled by a single shape parameter <span class="math inline">\(k\)</span>:</p>
-<p><span class="math display">\[y(t) = k \cdot t(2 - t)\]</span></p>
-<section id="r-implementation-1d-action-minimization" class="level3">
-<h3 class="anchored" data-anchor-id="r-implementation-1d-action-minimization">R Implementation: 1D Action Minimization</h3>
-<p>We let R’s simple <code>optimize()</code> function search for the exact value of <span class="math inline">\(k\)</span> that minimizes the total Action cost.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Physics Parameters</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fl">1.0</span>     <span class="co"># Missile mass (kg)</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fl">9.81</span>    <span class="co"># Gravity (m/s^2)</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>t_max <span class="ot">&lt;-</span> <span class="dv">2</span>   <span class="co"># Total flight time (seconds)</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>vx <span class="ot">&lt;-</span> <span class="dv">10</span>     <span class="co"># Fixed horizontal velocity (travels 20m in 2 seconds)</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Action Cost Function</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>calculate_action <span class="ot">&lt;-</span> <span class="cf">function</span>(k) {</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  dt <span class="ot">&lt;-</span> <span class="fl">0.001</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, t_max, <span class="at">by =</span> dt)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Parametric path shape controlled by k</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> k <span class="sc">*</span> t <span class="sc">*</span> (t_max <span class="sc">-</span> t)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  vy <span class="ot">&lt;-</span> k <span class="sc">*</span> (t_max <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> t)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Energies</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  T_eng <span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="sc">*</span> m <span class="sc">*</span> (vx<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> vy<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  V_eng <span class="ot">&lt;-</span> m <span class="sc">*</span> g <span class="sc">*</span> y</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  L <span class="ot">&lt;-</span> T_eng <span class="sc">-</span> V_eng</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">sum</span>(L <span class="sc">*</span> dt))</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Optimize the single scalar 'k'</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>opt_res <span class="ot">&lt;-</span> <span class="fu">optimize</span>(<span class="at">f =</span> calculate_action, <span class="at">interval =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">20</span>, <span class="dv">20</span>))</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>best_k  <span class="ot">&lt;-</span> opt_res<span class="sc">$</span>minimum</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Generate comparison curves</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>t_plot   <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, t_max, <span class="at">by =</span> <span class="fl">0.01</span>)</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>y_action <span class="ot">&lt;-</span> best_k <span class="sc">*</span> t_plot <span class="sc">*</span> (t_max <span class="sc">-</span> t_plot)</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Exact analytical Newtonian path (F = ma)</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>v0y      <span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="sc">*</span> g <span class="sc">*</span> t_max</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>y_newton <span class="ot">&lt;-</span> (v0y <span class="sc">*</span> t_plot) <span class="sc">-</span> (<span class="fl">0.5</span> <span class="sc">*</span> g <span class="sc">*</span> t_plot<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Plot Comparison</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(t_plot, y_action, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">lwd =</span> <span class="dv">5</span>,</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Time (seconds)"</span>, <span class="at">ylab =</span> <span class="st">"Altitude (meters)"</span>,</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Deterministic Trajectory Convergence (1D Optimization)"</span>)</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(t_plot, y_newton, <span class="at">col =</span> <span class="st">"orange"</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Minimized Action Path"</span>, <span class="st">"Newtonian Kinematics"</span>),</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"blue"</span>, <span class="st">"orange"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="least_action_nn_files/figure-html/deterministic-action-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<hr>
-</section>
-</section>
-<section id="part-2-probabilistic-paths-via-empirical-simulation" class="level2">
-<h2 class="anchored" data-anchor-id="part-2-probabilistic-paths-via-empirical-simulation">3. Part 2: Probabilistic Paths via Empirical Simulation</h2>
-<p>When an environment is chaotic or filled with molecular collisions, paths are no longer deterministic. Instead of searching for a single line, we look at an ensemble of paths.</p>
-<p>Rather than running abstract path integrals, we will explicitly simulate a synthetic empirical dataset of <span class="math inline">\(N = 200\)</span> individual trajectories. Each trajectory represents a particle drifting from <span class="math inline">\(x=0\)</span> to <span class="math inline">\(x=10\)</span> across <span class="math inline">\(t \in [0,1]\)</span>, subjected to normal random fluctuations that are geometrically pinned to zero at the boundaries by a quadratic curve profile:</p>
-<p><span class="math display">\[\sigma(t) = \alpha \cdot \sqrt{t(1 - t)}\]</span></p>
-<p>We will then compute the empirical mean and standard deviation across our simulated data rows to visualize the underlying probabilistic distribution.</p>
-<section id="r-implementation-generating-and-analyzing-the-empirical-sample" class="level3">
-<h3 class="anchored" data-anchor-id="r-implementation-generating-and-analyzing-the-empirical-sample">R Implementation: Generating and Analyzing the Empirical Sample</h3>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Grid and Simulation Parameters</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>t_grid    <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">by =</span> <span class="fl">0.02</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>N_steps   <span class="ot">&lt;-</span> <span class="fu">length</span>(t_grid)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>N_samples <span class="ot">&lt;-</span> <span class="dv">200</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>alpha_true <span class="ot">&lt;-</span> <span class="fl">2.5</span>  <span class="co"># Fixed scale for the normal noise bubble</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize a data matrix: Rows = Time Steps, Columns = Individual Trajectories</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>empirical_data <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> N_steps, <span class="at">ncol =</span> N_samples)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Generate the paths using a baseline straight line + normal noise bounded by a quadratic profile</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N_samples) {</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Baseline expected trajectory: a straight line from 0 to 10</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  mu_base <span class="ot">&lt;-</span> <span class="dv">0</span> <span class="sc">+</span> (<span class="dv">10</span> <span class="sc">-</span> <span class="dv">0</span>) <span class="sc">*</span> t_grid</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Quadratic noise envelope: guarantees variance is 0 at t=0 and t=1</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  noise_envelope <span class="ot">&lt;-</span> alpha_true <span class="sc">*</span> <span class="fu">sqrt</span>(t_grid <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> t_grid))</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add independent normal random noise at each time step</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  random_noise <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N_steps, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>)</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  empirical_data[, j] <span class="ot">&lt;-</span> mu_base <span class="sc">+</span> (noise_envelope <span class="sc">*</span> random_noise)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Extract the Empirical Parameters directly from the Data Matrix rows</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>empirical_mean <span class="ot">&lt;-</span> <span class="fu">apply</span>(empirical_data, <span class="dv">1</span>, mean)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>empirical_sd   <span class="ot">&lt;-</span> <span class="fu">apply</span>(empirical_data, <span class="dv">1</span>, sd)</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Render the Full Distribution Plot</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co"># First, plot the raw noisy trajectories as thin, semi-transparent background lines</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(t_grid, empirical_data[, <span class="dv">1</span>], <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">col =</span> <span class="fu">rgb</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="fl">0.04</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">13</span>),</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Time (t)"</span>, <span class="at">ylab =</span> <span class="st">"Position (x)"</span>,</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Probabilistic Path Distribution from Empirical Simulation"</span>)</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>N_samples) {</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(t_grid, empirical_data[, j], <span class="at">col =</span> <span class="fu">rgb</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="fl">0.03</span>))</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Overlay the extracted 95% empirical confidence intervals (Mean +/- 1.96 * SD)</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(t_grid, empirical_mean <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> empirical_sd, <span class="at">col =</span> <span class="st">"darkgreen"</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(t_grid, empirical_mean <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> empirical_sd, <span class="at">col =</span> <span class="st">"darkgreen"</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Shade the probability distribution bubble</span></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon</span>(<span class="fu">c</span>(t_grid, <span class="fu">rev</span>(t_grid)), </span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(empirical_mean <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> empirical_sd, <span class="fu">rev</span>(empirical_mean <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> empirical_sd)),</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">rgb</span>(<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">0</span>, <span class="fl">0.08</span>), <span class="at">border =</span> <span class="cn">NA</span>)</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Overlay the expected mean path</span></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(t_grid, empirical_mean, <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">lwd =</span> <span class="dv">4</span>)</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">10</span>, <span class="at">col =</span> <span class="st">"darkgreen"</span>, <span class="at">lty =</span> <span class="dv">3</span>) <span class="co"># Target line indicator</span></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Raw Path Samples"</span>, <span class="st">"Empirical Mean (μ)"</span>, <span class="st">"95% Observed Distribution Area"</span>),</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"gray"</span>, <span class="st">"blue"</span>, <span class="st">"darkgreen"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>), <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="least_action_nn_files/figure-html/empirical-simulation-1.png" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-</div>
-<hr>
-</section>
-</section>
-<section id="seminar-summary" class="level2">
-<h2 class="anchored" data-anchor-id="seminar-summary">4. Seminar Summary</h2>
+<section id="defining-the-cost-of-a-trajectory" class="level2">
+<h2 class="anchored" data-anchor-id="defining-the-cost-of-a-trajectory">Defining the “cost” of a trajectory</h2>
+<p>In physics, the cost function at any given moment is called the <strong>Lagrangian (</strong><span class="math inline">\(L\)</span>). It is simply the difference between Kinetic Energy (<span class="math inline">\(T\)</span>) and Potential Energy (<span class="math inline">\(V\)</span>):</p>
+<p><span class="math display">\[L = T - V\]</span></p>
+<p>For a missile of mass <span class="math inline">\(m\)</span> under standard gravity <span class="math inline">\(g\)</span>:</p>
 <ul>
-<li><strong>Deterministic vs.&nbsp;Stochastic Mechanics:</strong> Part 1 demonstrates how a single unique trajectory natively drops out of global energy minimization equations. Part 2 illustrates how real-world datasets preserve a structured variance envelope despite being composed of entirely chaotic, random variations.</li>
-<li><strong>The Geometry of Uncertainty:</strong> By structuring our synthetic data noise with a quadratic boundary constraint, students see that uncertainty does not have to grow infinitely over time. When endpoints are locked, a stochastic distribution naturally blooms into an elliptical profile.</li>
+<li><p><strong>Kinetic Energy (Motion Cost):</strong> <span class="math inline">\(T = \frac{1}{2}m(v_x^2 + v_y^2)\)</span></p></li>
+<li><p><strong>Potential Energy (Height Cost):</strong> <span class="math inline">\(V = mgy\)</span></p></li>
+</ul>
+<p>The <strong>Total Action (</strong><span class="math inline">\(S\)</span>) is the sum of this cost across the entire flight time. Nature always picks the path where <span class="math inline">\(S\)</span> is minimized:</p>
+<p><span class="math display">\[S = \int_{0}^{t_{max}} (T - V) \, dt\]</span></p>
+<p>If our Neural Network guesses a path that is too wavy, the velocity spikes, making <span class="math inline">\(T\)</span> huge, and the Action explodes. If it guesses a path that is a flat line, it misses out on the potential energy deductions from <span class="math inline">\(V\)</span>. The perfect balance is a parabola.</p>
+</section>
+<section id="fit-neural-network-to-find-the-path-of-least-action" class="level2">
+<h2 class="anchored" data-anchor-id="fit-neural-network-to-find-the-path-of-least-action">Fit neural network to find “the path of least action”</h2>
+<p>We will write a tiny neural network from scratch using base R.</p>
+<ul>
+<li><strong>Input (</strong><span class="math inline">\(t\)</span>): A specific time.</li>
+<li><strong>Output (</strong><span class="math inline">\(y\)</span>): The predicted altitude of the missile at that time.</li>
+<li><strong>Loss Function:</strong> The Total Action (<span class="math inline">\(S\)</span>) + a massive penalty if the network fails to start at <span class="math inline">\(y=0\)</span> or land at <span class="math inline">\(y=0\)</span>.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize random seed for reproducibility</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Physical Constants</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fl">1.0</span>     <span class="co"># Missile mass (kg)</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fl">9.81</span>    <span class="co"># Gravity (m/s^2)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>t_max <span class="ot">&lt;-</span> <span class="dv">2</span>   <span class="co"># Total flight time limit (seconds)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>vx <span class="ot">&lt;-</span> <span class="dv">10</span>     <span class="co"># Fixed horizontal speed (travels 20m in 2 seconds)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="setup-network-and-loss-function" class="level3">
+<h3 class="anchored" data-anchor-id="setup-network-and-loss-function">Setup network and loss function</h3>
+<p>The code below constructs the forward pass of the network and sets up the calculus loop that approximates the Action integral.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. A Simple Multi-Layer Perceptron Function</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1 Input (time) -&gt; 5 Hidden Neurons (with smooth tanh curve) -&gt; 1 Output (position y)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>neural_network_path <span class="ot">&lt;-</span> <span class="cf">function</span>(t, weights) {</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  w1 <span class="ot">&lt;-</span> weights[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  b1 <span class="ot">&lt;-</span> weights[<span class="dv">6</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  w2 <span class="ot">&lt;-</span> weights[<span class="dv">11</span><span class="sc">:</span><span class="dv">15</span>]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  b2 <span class="ot">&lt;-</span> weights[<span class="dv">16</span>]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Forward pass math: activation = tanh(t * w1 + b1)</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  hidden <span class="ot">&lt;-</span> <span class="fu">tanh</span>(t <span class="sc">%*%</span> <span class="fu">t</span>(w1) <span class="sc">+</span> <span class="fu">matrix</span>(b1, <span class="at">nrow=</span><span class="fu">length</span>(t), <span class="at">ncol=</span><span class="dv">5</span>, <span class="at">byrow=</span><span class="cn">TRUE</span>))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> hidden <span class="sc">%*%</span> w2 <span class="sc">+</span> b2</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">as.vector</span>(y))</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. The Custom Physics Loss Function</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>nn_loss_function <span class="ot">&lt;-</span> <span class="cf">function</span>(weights) {</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  dt <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  t_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, t_max, <span class="at">by =</span> dt)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get NN predicted positions across the timeline</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">neural_network_path</span>(t_grid, weights)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate velocity (dy/dt) using numerical finite differences</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  vy <span class="ot">&lt;-</span> <span class="fu">diff</span>(y) <span class="sc">/</span> dt</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  y_trimmed <span class="ot">&lt;-</span> y[<span class="sc">-</span><span class="fu">length</span>(y)]</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Energy equations</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  T_eng <span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="sc">*</span> m <span class="sc">*</span> (vx<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> vy<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  V_eng <span class="ot">&lt;-</span> m <span class="sc">*</span> g <span class="sc">*</span> y_trimmed</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  L <span class="ot">&lt;-</span> T_eng <span class="sc">-</span> V_eng</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Total Action (S) via Riemann sum approximation</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  action_S <span class="ot">&lt;-</span> <span class="fu">sum</span>(L <span class="sc">*</span> dt)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Boundary Constraints: The network MUST start and end at ground level (y = 0)</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  y_start <span class="ot">&lt;-</span> <span class="fu">neural_network_path</span>(<span class="dv">0</span>, weights)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  y_end   <span class="ot">&lt;-</span> <span class="fu">neural_network_path</span>(t_max, weights)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  boundary_penalty <span class="ot">&lt;-</span> <span class="dv">10000</span> <span class="sc">*</span> (y_start<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> y_end<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(action_S <span class="sc">+</span> boundary_penalty)</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="train-network" class="level3">
+<h3 class="anchored" data-anchor-id="train-network">Train network</h3>
+<p>Now, we feed a set of random weights into the network. It will look like a chaotic scribble. Then, we let R’s optimizer adjust those weights to minimize the Action cost.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Initialize Network Weights Randomly</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>initial_weights <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">16</span>, <span class="at">min =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">max =</span> <span class="fl">0.5</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Optimize the Weights using Gradient Descent (BFGS algorithm)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>nn_optimization <span class="ot">&lt;-</span> <span class="fu">optim</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">par =</span> initial_weights, </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">fn =</span> nn_loss_function, </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"BFGS"</span>, </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">maxit =</span> <span class="dv">2000</span>, <span class="at">reltol =</span> <span class="fl">1e-8</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>trained_weights <span class="ot">&lt;-</span> nn_optimization<span class="sc">$</span>par</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="compare-with-trajectory-calculated-using-newtonian-mechanics" class="level2">
+<h2 class="anchored" data-anchor-id="compare-with-trajectory-calculated-using-newtonian-mechanics">Compare with trajectory calculated using Newtonian mechanics</h2>
+<p>To see if this variational deep-learning approach actually works, let’s overlay the Neural Network’s self-discovered path against the exact calculus path calculated using Newtonian mechanics (<span class="math inline">\(y(t) = v_{0y}t - \frac{1}{2}gt^2\)</span>).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Generate Paths for the Final Graph</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>t_plot <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, t_max, <span class="at">by =</span> <span class="fl">0.01</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Paths generated by our trained AI</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>y_nn <span class="ot">&lt;-</span> <span class="fu">neural_network_path</span>(t_plot, trained_weights)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Paths derived from textbook physics</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>v0y <span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="sc">*</span> g <span class="sc">*</span> t_max</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>y_true <span class="ot">&lt;-</span> (v0y <span class="sc">*</span> t_plot) <span class="sc">-</span> (<span class="fl">0.5</span> <span class="sc">*</span> g <span class="sc">*</span> t_plot<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. Render Plot</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(t_plot, y_true, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">col =</span> <span class="st">"orange"</span>, <span class="at">lwd =</span> <span class="dv">6</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Time (seconds)"</span>, <span class="at">ylab =</span> <span class="st">"Altitude (meters)"</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"AI Self-Discovery of Projectile Motion via Least Action"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(t_plot, y_nn, <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Exact Newtonian Path"</span>, <span class="st">"Neural Network Learned Path"</span>),</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"orange"</span>, <span class="st">"blue"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="least_action_nn_files/figure-html/plotting-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="takeaways-for-data-scientists" class="level2">
+<h2 class="anchored" data-anchor-id="takeaways-for-data-scientists">Takeaways for data scientists</h2>
+<p>What just happened here?</p>
+<ul>
+<li><strong>No physics equations were harmed:</strong> We never gave the network the equation of a parabola (<span class="math inline">\(t^2\)</span>). We never gave it an acceleration formula.</li>
+<li><strong>Emergent behavior:</strong> The network discovered a perfect parabola purely because <em>any other shape would cost more energy</em>.</li>
+<li><strong>Why this matters:</strong> This is the underlying concept behind <strong>Physics-Informed Neural Networks (PINNs)</strong>. When physical systems (like fluid dynamics, climate modeling, or quantum mechanics) become too complex to solve using Newton’s step-by-step vector equations, we can turn the problem into a global geometry search using neural networks.</li>
 </ul>
 </section>
 

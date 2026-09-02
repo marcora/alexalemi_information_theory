@@ -1,161 +1,155 @@
 ---
-title: "The Classical Duality: From Least Action to Empirical Distribution Shapes"
-subtitle: "A Simplified Parametric Guide for Non-Physics Graduate Students"
-author: "Physics and Data Science Variational Seminar"
+title: "Teaching AI the laws of physics via the principle of least action"
 format: 
   html:
     toc: true
     theme: cosmo
 ---
 
-## 1. Introduction: Two Views of a Single Path
+## Introduction: two ways to look at a missile launch
 
-How does nature decide the path of an object moving through space and time? 
+Imagine a missile launched into the air. How does nature decide exactly what path it will take before it hits the ground?
 
-1. **The Newtonian View (Local):** Nature looks at an object frame-by-frame, calculating net vector forces at every microscopic slice of time ($F = ma$).
-2. **The Lagrangian View (Global):** Nature evaluates the *entire flight history all at once*, selecting the path that minimizes a foundational scalar cost metric called **Action ($S$)**.
+1.  **The Newtonian Approach (Local):** Nature looks at the missile frame-by-frame. At every single microsecond, it calculates the forces acting on it ($F = ma$) and pushes it to its next position.
+2.  **The Lagrangian Approach (Global):** Nature looks at the *entire flight history all at once*. It looks at the starting point, the ending point, and chooses the path that minimizes a physical "cost function" called **Action**.
 
-In this notebook, we look at both frameworks using simple geometric constraints. In Part 1, we find a deterministic trajectory using 1D optimization over a quadratic path family. In Part 2, we simulate an empirical ensemble of noisy paths (a stochastic process) and extract the underlying probabilistic distribution shape directly from the data.
+In this notebook, we are going to build a **Neural Network** that knows absolutely zero physics. It doesn't know what a parabola is, and it doesn't know Newton's equations. We will force it to search through an infinite space of possible curves, using optimization to discover the exact path of a missile by minimizing its Action cost.
 
----
+## Defining the "cost" of a trajectory
 
-## 2. Part 1: Deterministic Paths via Least Action
+In physics, the cost function at any given moment is called the **Lagrangian (**$L$). It is simply the difference between Kinetic Energy ($T$) and Potential Energy ($V$):
 
-In a vacuum, a missile's trajectory can be solved by tracking its Kinetic Energy ($T$) and Potential Energy ($V$). The difference between these two scalar values is the **Lagrangian ($L = T - V$)**.
+$$L = T - V$$
 
-The **Total Action ($S$)** is the accumulation of this balance over the entire timeline:
+For a missile of mass $m$ under standard gravity $g$:
+
+- **Kinetic Energy (Motion Cost):** $T = \frac{1}{2}m(v_x^2 + v_y^2)$
+
+- **Potential Energy (Height Cost):** $V = mgy$
+
+The **Total Action (**$S$) is the sum of this cost across the entire flight time. Nature always picks the path where $S$ is minimized:
 
 $$S = \int_{0}^{t_{max}} (T - V) \, dt$$
 
-According to Hamilton's Principle, nature selects the path where this Action integral is at a minimum. We assume the missile must start at $y(0)=0$ and land at $y(2)=0$. We restrict all possible paths to a quadratic family controlled by a single shape parameter $k$:
+If our Neural Network guesses a path that is too wavy, the velocity spikes, making $T$ huge, and the Action explodes. If it guesses a path that is a flat line, it misses out on the potential energy deductions from $V$. The perfect balance is a parabola.
 
-$$y(t) = k \cdot t(2 - t)$$
+## Fit neural network to find "the path of least action"
 
-### R Implementation: 1D Action Minimization
+We will write a tiny neural network from scratch using base R.
 
-We let R's simple `optimize()` function search for the exact value of $k$ that minimizes the total Action cost.
+- **Input (**$t$): A specific time.
+- **Output (**$y$): The predicted altitude of the missile at that time.
+- **Loss Function:** The Total Action ($S$) + a massive penalty if the network fails to start at $y=0$ or land at $y=0$.
 
-```{r deterministic-action}
+```{r setup}
+# Initialize random seed for reproducibility
 set.seed(42)
 
-# 1. Physics Parameters
+# 1. Physical Constants
 m <- 1.0     # Missile mass (kg)
 g <- 9.81    # Gravity (m/s^2)
-t_max <- 2   # Total flight time (seconds)
-vx <- 10     # Fixed horizontal velocity (travels 20m in 2 seconds)
+t_max <- 2   # Total flight time limit (seconds)
+vx <- 10     # Fixed horizontal speed (travels 20m in 2 seconds)
+```
 
-# 2. Action Cost Function
-calculate_action <- function(k) {
-  dt <- 0.001
-  t <- seq(0, t_max, by = dt)
+### Setup network and loss function
+
+The code below constructs the forward pass of the network and sets up the calculus loop that approximates the Action integral.
+
+```{r nn-engine}
+# 2. A Simple Multi-Layer Perceptron Function
+# 1 Input (time) -> 5 Hidden Neurons (with smooth tanh curve) -> 1 Output (position y)
+neural_network_path <- function(t, weights) {
+  w1 <- weights[1:5]
+  b1 <- weights[6:10]
+  w2 <- weights[11:15]
+  b2 <- weights[16]
   
-  # Parametric path shape controlled by k
-  y <- k * t * (t_max - t)
-  vy <- k * (t_max - 2 * t)
+  # Forward pass math: activation = tanh(t * w1 + b1)
+  hidden <- tanh(t %*% t(w1) + matrix(b1, nrow=length(t), ncol=5, byrow=TRUE))
+  y <- hidden %*% w2 + b2
+  return(as.vector(y))
+}
+
+# 3. The Custom Physics Loss Function
+nn_loss_function <- function(weights) {
+  dt <- 0.01
+  t_grid <- seq(0, t_max, by = dt)
   
-  # Energies
+  # Get NN predicted positions across the timeline
+  y <- neural_network_path(t_grid, weights)
+  
+  # Calculate velocity (dy/dt) using numerical finite differences
+  vy <- diff(y) / dt
+  y_trimmed <- y[-length(y)]
+  
+  # Energy equations
   T_eng <- 0.5 * m * (vx^2 + vy^2)
-  V_eng <- m * g * y
+  V_eng <- m * g * y_trimmed
   L <- T_eng - V_eng
   
-  return(sum(L * dt))
+  # Total Action (S) via Riemann sum approximation
+  action_S <- sum(L * dt)
+  
+  # Boundary Constraints: The network MUST start and end at ground level (y = 0)
+  y_start <- neural_network_path(0, weights)
+  y_end   <- neural_network_path(t_max, weights)
+  boundary_penalty <- 10000 * (y_start^2 + y_end^2)
+  
+  return(action_S + boundary_penalty)
 }
+```
 
-# 3. Optimize the single scalar 'k'
-opt_res <- optimize(f = calculate_action, interval = c(-20, 20))
-best_k  <- opt_res$minimum
+### Train network
 
-# 4. Generate comparison curves
-t_plot   <- seq(0, t_max, by = 0.01)
-y_action <- best_k * t_plot * (t_max - t_plot)
+Now, we feed a set of random weights into the network. It will look like a chaotic scribble. Then, we let R's optimizer adjust those weights to minimize the Action cost.
 
-# Exact analytical Newtonian path (F = ma)
-v0y      <- 0.5 * g * t_max
-y_newton <- (v0y * t_plot) - (0.5 * g * t_plot^2)
+```{r training}
+# 4. Initialize Network Weights Randomly
+initial_weights <- runif(16, min = -0.5, max = 0.5)
 
-# 5. Plot Comparison
-plot(t_plot, y_action, type = "l", col = "blue", lwd = 5,
+# 5. Optimize the Weights using Gradient Descent (BFGS algorithm)
+nn_optimization <- optim(
+  par = initial_weights, 
+  fn = nn_loss_function, 
+  method = "BFGS", 
+  control = list(maxit = 2000, reltol = 1e-8)
+)
+
+trained_weights <- nn_optimization$par
+```
+
+## Compare with trajectory calculated using Newtonian mechanics
+
+To see if this variational deep-learning approach actually works, let's overlay the Neural Network's self-discovered path against the exact calculus path calculated using Newtonian mechanics ($y(t) = v_{0y}t - \frac{1}{2}gt^2$).
+
+```{r plotting, fig.width=8, fig.height=5}
+# 6. Generate Paths for the Final Graph
+t_plot <- seq(0, t_max, by = 0.01)
+
+# Paths generated by our trained AI
+y_nn <- neural_network_path(t_plot, trained_weights)
+
+# Paths derived from textbook physics
+v0y <- 0.5 * g * t_max
+y_true <- (v0y * t_plot) - (0.5 * g * t_plot^2)
+
+# 7. Render Plot
+plot(t_plot, y_true, type = "l", col = "orange", lwd = 6,
      xlab = "Time (seconds)", ylab = "Altitude (meters)",
-     main = "Deterministic Trajectory Convergence (1D Optimization)")
-lines(t_plot, y_newton, col = "orange", lty = 2, lwd = 2)
+     main = "AI Self-Discovery of Projectile Motion via Least Action")
+lines(t_plot, y_nn, col = "blue", lwd = 2, lty = 2)
 grid()
-legend("topright", legend = c("Minimized Action Path", "Newtonian Kinematics"),
-       col = c("blue", "orange"), lty = c(1, 2), lwd = c(5, 2))
+legend("topright", legend = c("Exact Newtonian Path", "Neural Network Learned Path"),
+       col = c("orange", "blue"), lty = c(1, 2), lwd = c(6, 2))
 ```
 
----
+------------------------------------------------------------------------
 
-## 3. Part 2: Probabilistic Paths via Empirical Simulation
+## Takeaways for data scientists
 
-When an environment is chaotic or filled with molecular collisions, paths are no longer deterministic. Instead of searching for a single line, we look at an ensemble of paths. 
+What just happened here?
 
-Rather than running abstract path integrals, we will explicitly simulate a synthetic empirical dataset of $N = 200$ individual trajectories. Each trajectory represents a particle drifting from $x=0$ to $x=10$ across $t \in [0,1]$, subjected to normal random fluctuations that are geometrically pinned to zero at the boundaries by a quadratic curve profile:
-
-$$\sigma(t) = \alpha \cdot \sqrt{t(1 - t)}$$
-
-We will then compute the empirical mean and standard deviation across our simulated data rows to visualize the underlying probabilistic distribution.
-
-### R Implementation: Generating and Analyzing the Empirical Sample
-
-```{r empirical-simulation, fig.width=8, fig.height=5}
-# 1. Grid and Simulation Parameters
-t_grid    <- seq(0, 1, by = 0.02)
-N_steps   <- length(t_grid)
-N_samples <- 200
-alpha_true <- 2.5  # Fixed scale for the normal noise bubble
-
-# Initialize a data matrix: Rows = Time Steps, Columns = Individual Trajectories
-empirical_data <- matrix(NA, nrow = N_steps, ncol = N_samples)
-
-# 2. Generate the paths using a baseline straight line + normal noise bounded by a quadratic profile
-for(j in 1:N_samples) {
-  # Baseline expected trajectory: a straight line from 0 to 10
-  mu_base <- 0 + (10 - 0) * t_grid
-  
-  # Quadratic noise envelope: guarantees variance is 0 at t=0 and t=1
-  noise_envelope <- alpha_true * sqrt(t_grid * (1 - t_grid))
-  
-  # Add independent normal random noise at each time step
-  random_noise <- rnorm(N_steps, mean = 0, sd = 1)
-  
-  empirical_data[, j] <- mu_base + (noise_envelope * random_noise)
-}
-
-# 3. Extract the Empirical Parameters directly from the Data Matrix rows
-empirical_mean <- apply(empirical_data, 1, mean)
-empirical_sd   <- apply(empirical_data, 1, sd)
-
-# 4. Render the Full Distribution Plot
-# First, plot the raw noisy trajectories as thin, semi-transparent background lines
-plot(t_grid, empirical_data[, 1], type = "l", col = rgb(0,0,0,0.04), ylim = c(-3, 13),
-     xlab = "Time (t)", ylab = "Position (x)",
-     main = "Probabilistic Path Distribution from Empirical Simulation")
-
-for(j in 2:N_samples) {
-  lines(t_grid, empirical_data[, j], col = rgb(0,0,0,0.03))
-}
-
-# Overlay the extracted 95% empirical confidence intervals (Mean +/- 1.96 * SD)
-lines(t_grid, empirical_mean + 1.96 * empirical_sd, col = "darkgreen", lty = 2, lwd = 2)
-lines(t_grid, empirical_mean - 1.96 * empirical_sd, col = "darkgreen", lty = 2, lwd = 2)
-
-# Shade the probability distribution bubble
-polygon(c(t_grid, rev(t_grid)), 
-        c(empirical_mean + 1.96 * empirical_sd, rev(empirical_mean - 1.96 * empirical_sd)),
-        col = rgb(0, 0.5, 0, 0.08), border = NA)
-
-# Overlay the expected mean path
-lines(t_grid, empirical_mean, col = "blue", lwd = 4)
-
-grid()
-abline(h = 10, col = "darkgreen", lty = 3) # Target line indicator
-legend("topleft", legend = c("Raw Path Samples", "Empirical Mean (μ)", "95% Observed Distribution Area"),
-       col = c("gray", "blue", "darkgreen"), lty = c(1, 1, 2), lwd = c(1, 4, 2))
-```
-
----
-
-## 4. Seminar Summary
-
-*   **Deterministic vs. Stochastic Mechanics:** Part 1 demonstrates how a single unique trajectory natively drops out of global energy minimization equations. Part 2 illustrates how real-world datasets preserve a structured variance envelope despite being composed of entirely chaotic, random variations.
-*   **The Geometry of Uncertainty:** By structuring our synthetic data noise with a quadratic boundary constraint, students see that uncertainty does not have to grow infinitely over time. When endpoints are locked, a stochastic distribution naturally blooms into an elliptical profile.
+- **No physics equations were harmed:** We never gave the network the equation of a parabola ($t^2$). We never gave it an acceleration formula.
+- **Emergent behavior:** The network discovered a perfect parabola purely because *any other shape would cost more energy*.
+- **Why this matters:** This is the underlying concept behind **Physics-Informed Neural Networks (PINNs)**. When physical systems (like fluid dynamics, climate modeling, or quantum mechanics) become too complex to solve using Newton's step-by-step vector equations, we can turn the problem into a global geometry search using neural networks.
