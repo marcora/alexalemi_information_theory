@@ -153,10 +153,10 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="introduction-two-ways-to-look-at-a-missile-launch">Introduction: two ways to look at a missile launch</h2>
 <p>Imagine a missile launched into the air. How does nature decide exactly what path it will take before it hits the ground?</p>
 <ol type="1">
-<li><strong>The Newtonian Approach (Local):</strong> Nature looks at the missile frame-by-frame. At every single microsecond, it calculates the forces acting on it (<span class="math inline">\(F = ma\)</span>) and pushes it to its next position.</li>
-<li><strong>The Lagrangian Approach (Global):</strong> Nature looks at the <em>entire flight history all at once</em>. It looks at the starting point, the ending point, and chooses the path that minimizes a physical “cost function” called <strong>Action</strong>.</li>
+<li><strong>The Newtonian approach (local):</strong> Nature looks at the missile frame-by-frame. At every single microsecond, it calculates the forces acting on it (<span class="math inline">\(F = ma\)</span>) and pushes it to its next position.</li>
+<li><strong>The Lagrangian approach (global):</strong> Nature looks at the <em>entire flight history all at once</em>. It looks at the starting point, the ending point, and chooses the path that minimizes a physical “cost function” called <strong>Action</strong>.</li>
 </ol>
-<p>In this notebook, we are going to build a <strong>Neural Network</strong> that knows absolutely zero physics. It doesn’t know what a parabola is, and it doesn’t know Newton’s equations. We will force it to search through an infinite space of possible curves, using optimization to discover the exact path of a missile by minimizing its Action cost.</p>
+<p>In this notebook, we are going to build a <strong>neural network</strong> that knows absolutely zero physics. It doesn’t know what a parabola is, and it doesn’t know Newton’s equations. We will force it to search through an infinite space of possible curves, using optimization to discover the exact path of a missile by minimizing its Action cost.</p>
 </section>
 <section id="defining-the-cost-of-a-trajectory" class="level2">
 <h2 class="anchored" data-anchor-id="defining-the-cost-of-a-trajectory">Defining the “cost” of a trajectory</h2>

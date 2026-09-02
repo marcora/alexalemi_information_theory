@@ -10,10 +10,10 @@ format:
 
 Imagine a missile launched into the air. How does nature decide exactly what path it will take before it hits the ground?
 
-1.  **The Newtonian Approach (Local):** Nature looks at the missile frame-by-frame. At every single microsecond, it calculates the forces acting on it ($F = ma$) and pushes it to its next position.
-2.  **The Lagrangian Approach (Global):** Nature looks at the *entire flight history all at once*. It looks at the starting point, the ending point, and chooses the path that minimizes a physical "cost function" called **Action**.
+1.  **The Newtonian approach (local):** Nature looks at the missile frame-by-frame. At every single microsecond, it calculates the forces acting on it ($F = ma$) and pushes it to its next position.
+2.  **The Lagrangian approach (global):** Nature looks at the *entire flight history all at once*. It looks at the starting point, the ending point, and chooses the path that minimizes a physical "cost function" called **Action**.
 
-In this notebook, we are going to build a **Neural Network** that knows absolutely zero physics. It doesn't know what a parabola is, and it doesn't know Newton's equations. We will force it to search through an infinite space of possible curves, using optimization to discover the exact path of a missile by minimizing its Action cost.
+In this notebook, we are going to build a **neural network** that knows absolutely zero physics. It doesn't know what a parabola is, and it doesn't know Newton's equations. We will force it to search through an infinite space of possible curves, using optimization to discover the exact path of a missile by minimizing its Action cost.
 
 ## Defining the "cost" of a trajectory
 
