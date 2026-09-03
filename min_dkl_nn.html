@@ -137,12 +137,15 @@ window.Quarto = {
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggformula)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">666</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="sources" class="level2">
 <h2 class="anchored" data-anchor-id="sources">Sources</h2>
-<p>https://youtu.be/JGDAZ4joUX8</p>
-<p>https://doi.org/10.48550/arXiv.2011.08711</p>
+<ul>
+<li><p><a href="https://youtu.be/JGDAZ4joUX8" class="uri">https://youtu.be/JGDAZ4joUX8</a></p></li>
+<li><p><a href="https://youtu.be/OAHsR02dUc0" class="uri">https://youtu.be/OAHsR02dUc0</a></p></li>
+<li><p><a href="https://doi.org/10.48550/arXiv.2011.08711" class="uri">https://doi.org/10.48550/arXiv.2011.08711</a></p></li>
+</ul>
 </section>
 <section id="simulating-the-true-data-generating-process" class="level2">
 <h2 class="anchored" data-anchor-id="simulating-the-true-data-generating-process">Simulating the True Data Generating Process</h2>
@@ -151,7 +154,7 @@ window.Quarto = {
 <p>Note that the variance is <span class="math inline">\(\sigma^2 = 0.09\)</span>, which corresponds to a standard deviation of <span class="math inline">\(\sigma = \sqrt{0.09} = 0.3\)</span>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of samples</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">300</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">30</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># True DGP parameters</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sim_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
@@ -174,7 +177,7 @@ window.Quarto = {
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="fu">gf_point</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sim_data, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">|&gt;</span></span>
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower <span class="sc">+</span> upper <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">fill =</span> <span class="st">"peachpuff"</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_true <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_labs</span>(</span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"True Data Distribution &amp; Sampled Observations"</span>,</span>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
@@ -304,15 +307,15 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Linear</td>
-<td style="text-align: right;">0.2006</td>
+<td style="text-align: right;">0.3405</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Cubic</td>
-<td style="text-align: right;">0.0024</td>
+<td style="text-align: right;">0.0841</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Deg9</td>
-<td style="text-align: right;">0.0196</td>
+<td style="text-align: right;">0.2550</td>
 </tr>
 </tbody>
 </table>
