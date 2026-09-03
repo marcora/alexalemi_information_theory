@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>KL Divergence Minimization as a General Principle of Statistical Learning</title>
+<title>KL divergence minimization as a general principle of statistical learning</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -61,7 +61,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="min_dkl_nn_files/libs/clipboard/clipboard.min.js"></script>
@@ -74,7 +93,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="min_dkl_nn_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="min_dkl_nn_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="min_dkl_nn_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="min_dkl_nn_files/libs/bootstrap/bootstrap-917079515d91bccb85b543faf8aa8bb6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="min_dkl_nn_files/libs/bootstrap/bootstrap-c2e55264ed47ce3b2e0326a2269f9400.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
@@ -118,13 +137,13 @@ window.Quarto = {
   <ul>
   <li><a href="#overview-and-learning-objectives" id="toc-overview-and-learning-objectives" class="nav-link active" data-scroll-target="#overview-and-learning-objectives">Overview and learning objectives</a></li>
   <li><a href="#sources-and-further-reading" id="toc-sources-and-further-reading" class="nav-link" data-scroll-target="#sources-and-further-reading">Sources and further reading</a></li>
+  <li><a href="#setup-environment" id="toc-setup-environment" class="nav-link" data-scroll-target="#setup-environment">Setup environment</a></li>
   <li><a href="#the-true-data-generating-process-dgp" id="toc-the-true-data-generating-process-dgp" class="nav-link" data-scroll-target="#the-true-data-generating-process-dgp">The true data-generating process (DGP)</a></li>
   <li><a href="#theory-learning-via-data-space-kl-divergence-minimization" id="toc-theory-learning-via-data-space-kl-divergence-minimization" class="nav-link" data-scroll-target="#theory-learning-via-data-space-kl-divergence-minimization">Theory: learning via data-space KL divergence minimization</a>
   <ul class="collapse">
   <li><a href="#deriving-mean-squared-error-mse-from-the-gaussian-log-likelihood" id="toc-deriving-mean-squared-error-mse-from-the-gaussian-log-likelihood" class="nav-link" data-scroll-target="#deriving-mean-squared-error-mse-from-the-gaussian-log-likelihood">Deriving mean squared error (MSE) from the Gaussian log-likelihood</a></li>
   </ul></li>
   <li><a href="#polynomial-hypotheses-and-the-capacity-dilemma" id="toc-polynomial-hypotheses-and-the-capacity-dilemma" class="nav-link" data-scroll-target="#polynomial-hypotheses-and-the-capacity-dilemma">Polynomial hypotheses and the capacity dilemma</a></li>
-  <li><a href="#analytical-evaluation-of-generalization-kl-divergence" id="toc-analytical-evaluation-of-generalization-kl-divergence" class="nav-link" data-scroll-target="#analytical-evaluation-of-generalization-kl-divergence">Analytical evaluation of generalization KL divergence</a></li>
   <li><a href="#neural-networks-via-mle-high-capacity-meets-empirical-risk" id="toc-neural-networks-via-mle-high-capacity-meets-empirical-risk" class="nav-link" data-scroll-target="#neural-networks-via-mle-high-capacity-meets-empirical-risk">Neural networks via MLE: high capacity meets empirical risk</a></li>
   <li><a href="#bayesian-learning-parameter-space-kl-divergence-minimization" id="toc-bayesian-learning-parameter-space-kl-divergence-minimization" class="nav-link" data-scroll-target="#bayesian-learning-parameter-space-kl-divergence-minimization">Bayesian learning: parameter-space KL divergence minimization</a>
   <ul class="collapse">
@@ -135,6 +154,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#summary-of-principles" id="toc-summary-of-principles" class="nav-link" data-scroll-target="#summary-of-principles">Summary of principles</a></li>
   </ul></li>
+  <li><a href="#print-environment" id="toc-print-environment" class="nav-link" data-scroll-target="#print-environment">Print environment</a></li>
   </ul>
 </nav>
 </div>
@@ -142,8 +162,8 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">KL Divergence Minimization as a General Principle of Statistical Learning</h1>
-<p class="subtitle lead">From Maximum Likelihood to Bayesian Deep Learning</p>
+<h1 class="title">KL divergence minimization as a general principle of statistical learning</h1>
+<p class="subtitle lead">From maximum likelihood to Bayesian deep learning</p>
 </div>
 
 
@@ -162,7 +182,7 @@ window.Quarto = {
 
 <section id="overview-and-learning-objectives" class="level2">
 <h2 class="anchored" data-anchor-id="overview-and-learning-objectives">Overview and learning objectives</h2>
-<p>Most statistical and machine learning methods are introduced through disparate lenses: Ordinary Least Squares minimizes squared residuals, Maximum Likelihood maximizes sample probability density, and Bayesian inference updates prior beliefs via Bayes’ rule.</p>
+<p>Most statistical and machine learning methods are introduced through disparate lenses: Ordinary Least Squares (OLS) minimizes squared residuals, Maximum Likelihood Estimation (MLE) maximizes sample probability density, and Bayesian inference updates prior beliefs via Bayes’ rule.</p>
 <p>This notebook demonstrates that <strong>Kullback-Leibler (KL) divergence minimization serves as a unifying foundational principle across all these paradigms</strong>:</p>
 <ol type="1">
 <li><strong>Maximum Likelihood Estimation (MLE)</strong> minimizes the <em>forward KL divergence in data space</em> between the true distribution and the model family.</li>
@@ -173,67 +193,64 @@ window.Quarto = {
 <section id="sources-and-further-reading" class="level2">
 <h2 class="anchored" data-anchor-id="sources-and-further-reading">Sources and further reading</h2>
 <ul>
-<li><a href="https://youtu.be/JGDAZ4joUX8">VIB is Half Bayes</a> <a href="https://doi.org/10.48550/arXiv.2011.08711">VIB is Half Bayes (arXiv:2011.08711)</a></li>
+<li><a href="https://blog.alexalemi.com/kl-is-all-you-need.html">KL is All You Need</a></li>
+<li><a href="https://youtu.be/JGDAZ4joUX8">VIB is Half Bayes</a> <span class="citation" data-cites="alemi2020">(<a href="#ref-alemi2020" role="doc-biblioref">Alemi et al. 2020</a>)</span></li>
 <li><a href="https://youtu.be/OAHsR02dUc0">A Tale of Two Worlds: The Variational Approach to Machine Learning</a></li>
 </ul>
+</section>
+<section id="setup-environment" class="level2">
+<h2 class="anchored" data-anchor-id="setup-environment">Setup environment</h2>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggformula)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(torch)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Set seeds for reproducibility across R and libtorch</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">666</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">torch_manual_seed</span>(<span class="dv">666</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>())</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">666</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">torch_manual_seed</span>(<span class="dv">666</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="the-true-data-generating-process-dgp" class="level2">
 <h2 class="anchored" data-anchor-id="the-true-data-generating-process-dgp">The true data-generating process (DGP)</h2>
-<p>We define a known synthetic ground-truth environment <span class="math inline">\(p^*(x, y) = p^*(y \mid x) p^*(x)\)</span>:</p>
-<p><span class="math display">\[X \sim \text{Uniform}(-5, 5)\]</span> <span class="math display">\[Y \mid X \sim \text{Normal}\left(\mu^*(X) = \frac{X^3}{100}, \; \sigma^{*2} = 0.09\right)\]</span></p>
-<p>The true conditional standard deviation is <span class="math inline">\(\sigma^* = \sqrt{0.09} = 0.3\)</span>. We sample a small dataset of <span class="math inline">\(n = 30\)</span> observations to illustrate how different learning principles behave in the low-data / high-capacity regime.</p>
+<p>We define a known synthetic ground-truth distribution <span class="math inline">\(p^*(x, y) = p^*(y \mid x) p^*(x)\)</span>:</p>
+<p><span class="math display">\[X \sim \text{Uniform}(-5, 5)\]</span> <span class="math display">\[Y \mid X \sim \text{Normal}\left(\mu^*(X) = \frac{X^3}{100}, \; \sigma^* = 0.3\right)\]</span></p>
+<p>We sample a small dataset of <span class="math inline">\(n = 30\)</span> observations to illustrate how different learning principles behave in the low-data / high-capacity regime.</p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample size</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">30</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># True DGP parameters</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sigma_sq_true <span class="ot">&lt;-</span> <span class="fl">0.09</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>sigma_true    <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(sigma_sq_true)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulated training sample</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>sim_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">runif</span>(n, <span class="at">min =</span> <span class="sc">-</span><span class="dv">5</span>, <span class="at">max =</span> <span class="dv">5</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_true =</span> (x<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="dv">100</span>,</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> mu_true, <span class="at">sd =</span> sigma_true)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Dense evaluation grid for the ground truth</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>true_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">300</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_true =</span> (x<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="dv">100</span>,</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">lower =</span> mu_true <span class="sc">-</span> sigma_true,</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">upper =</span> mu_true <span class="sc">+</span> sigma_true</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize DGP</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="fu">gf_point</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sim_data, <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">"gray20"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower <span class="sc">+</span> upper <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">fill =</span> <span class="st">"peachpuff"</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_true <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_labs</span>(</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"True Data Distribution &amp; Sampled Observations (n = 30)"</span>,</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Dashed orange line: true mean function; Peach envelope: true ±1 SD"</span>,</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_theme</span>(<span class="fu">theme_minimal</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sigma_true <span class="ot">&lt;-</span> <span class="fl">0.3</span>; sigma_sq_true <span class="ot">&lt;-</span> sigma_true<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulated training sample</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>sim_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">runif</span>(n, <span class="at">min =</span> <span class="sc">-</span><span class="dv">5</span>, <span class="at">max =</span> <span class="dv">5</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_true =</span> (x<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="dv">100</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> mu_true, <span class="at">sd =</span> sigma_true)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Dense evaluation grid for the ground truth</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>true_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">300</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_true =</span> (x<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="dv">100</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">lower =</span> mu_true <span class="sc">-</span> sigma_true,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">upper =</span> mu_true <span class="sc">+</span> sigma_true</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize DGP</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="fu">gf_point</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sim_data, <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">"gray20"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower <span class="sc">+</span> upper <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">fill =</span> <span class="st">"peachpuff"</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_true <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_labs</span>(</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"True Data Distribution &amp; Sampled Observations (n = 30)"</span>,</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Dashed orange line: true mean function; Peach envelope: true ±1 SD"</span>,</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -249,7 +266,7 @@ window.Quarto = {
 <p>The <strong>Kullback-Leibler (KL) divergence</strong> from our candidate model <span class="math inline">\(q_\theta\)</span> to the true distribution <span class="math inline">\(p^*\)</span> measures information lost when approximating <span class="math inline">\(p^*\)</span> with <span class="math inline">\(q_\theta\)</span>:</p>
 <p><span class="math display">\[D_{\text{KL}}(p^* \parallel q_\theta) = \int \int p^*(x, y) \log \frac{p^*(x, y)}{q_\theta(x, y)} \, dy \, dx\]</span></p>
 <p>Expanding the logarithm:</p>
-<p><span class="math display">\[D_{\text{KL}}(p^* \parallel q_\theta) = \underbrace{\mathbb{E}_{p^*}\left[\log p^*(X, Y)\right]}_{\text{Constant with respect to } \theta} - \mathbb{E}_{p^*}\left[\log q_\theta(Y \mid X)\right]\]</span></p>
+<p><span class="math display">\[D_{\text{KL}}(p^* \parallel q_\theta) = \underbrace{\mathbb{E}_{p^*}\left[\log p^*(X, Y)\right]}_{\text{Constant with respect to } \theta} -\ \mathbb{E}_{p^*} \left[\log q_\theta(Y \mid X)\right]\]</span></p>
 <p>Because the entropy of the real world <span class="math inline">\(\mathbb{E}_{p^*}[\log p^*(X, Y)]\)</span> is invariant to our model parameters <span class="math inline">\(\theta\)</span>, minimizing KL divergence directly simplifies to:</p>
 <p><span class="math display">\[\arg\min_\theta D_{\text{KL}}(p^* \parallel q_\theta) = \arg\max_\theta \mathbb{E}_{p^*}\left[\log q_\theta(Y \mid X)\right]\]</span></p>
 <p>Under an observed finite sample <span class="math inline">\((x_i, y_i)_{i=1}^n \sim p^*\)</span>, the empirical sample mean approximates the population expectation:</p>
@@ -280,8 +297,6 @@ window.Quarto = {
 <li><strong>Degree 9 Polynomial (Overparameterized / High Variance):</strong> <span class="math inline">\(f(x) = \sum_{k=0}^9 \beta_k x^k\)</span></li>
 </ol>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mod_linear <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sim_data)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>mod_cubic  <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="dv">3</span>, <span class="at">raw =</span> <span class="cn">TRUE</span>), <span class="at">data =</span> sim_data)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>mod_deg9   <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="dv">9</span>, <span class="at">raw =</span> <span class="cn">TRUE</span>), <span class="at">data =</span> sim_data)</span>
@@ -308,9 +323,7 @@ window.Quarto = {
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Higher capacity models minimize sample empirical risk at the cost of divergence from p*"</span>,</span>
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_theme</span>(<span class="fu">theme_minimal</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -319,16 +332,11 @@ window.Quarto = {
 </div>
 </div>
 </div>
-</section>
-<section id="analytical-evaluation-of-generalization-kl-divergence" class="level2">
-<h2 class="anchored" data-anchor-id="analytical-evaluation-of-generalization-kl-divergence">Analytical evaluation of generalization KL divergence</h2>
 <p>To quantify model quality, we compute the true population KL divergence on test inputs <span class="math inline">\(X \sim \text{Uniform}(-5, 5)\)</span>.</p>
 <p>For two Gaussians <span class="math inline">\(p^*(Y \mid x) = \mathcal{N}(\mu^*(x), \sigma^{*2})\)</span> and <span class="math inline">\(q(Y \mid x) = \mathcal{N}(\hat{\mu}(x), \hat{\sigma}^2)\)</span>, the conditional KL divergence (in nats) is:</p>
 <p><span class="math display">\[D_{\text{KL}}(p^*(\cdot \mid x) \parallel q(\cdot \mid x)) = \log\frac{\hat{\sigma}}{\sigma^*} + \frac{\sigma^{*2} + (\mu^*(x) - \hat{\mu}(x))^2}{2\hat{\sigma}^2} - \frac{1}{2}\]</span></p>
-<p>Dividing by <span class="math inline">\(\log(2)\)</span> yields the divergence in <strong>bits</strong>.</p>
+<p>Dividing by <span class="math inline">\(\log(2)\)</span> yields the KL divergence in <strong>bits</strong>.</p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dense test sample</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">runif</span>(<span class="dv">20000</span>, <span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>),</span>
@@ -361,7 +369,6 @@ window.Quarto = {
 <span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"Model"</span>, <span class="at">values_to =</span> <span class="st">"Expected_KL_Bits"</span>)</span>
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(poly_results, <span class="at">digits =</span> <span class="dv">4</span>, <span class="at">caption =</span> <span class="st">"Expected KL Divergence from True DGP in Bits (Lower is Better)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Expected KL Divergence from True DGP in Bits (Lower is Better)</caption>
@@ -392,15 +399,13 @@ window.Quarto = {
 <section id="neural-networks-via-mle-high-capacity-meets-empirical-risk" class="level2">
 <h2 class="anchored" data-anchor-id="neural-networks-via-mle-high-capacity-meets-empirical-risk">Neural networks via MLE: high capacity meets empirical risk</h2>
 <p>A deep neural network parameterized by <span class="math inline">\(\theta\)</span> acts as a universal function approximator. We fit a Multi-Layer Perceptron (MLP) using the same homoscedastic likelihood:</p>
-<p><span class="math display">\[Y \mid X \sim \text{Normal}\left(\mu = f(X; \theta), \; \hat{\sigma}^2\right)\]</span></p>
+<p><span class="math display">\[Y \mid X \sim \text{Normal}\left(\hat{\mu} = f(X; \theta), \; \hat{\sigma}^2\right)\]</span></p>
 <ul>
 <li><strong>Architecture:</strong> <span class="math inline">\(1 \to 32 \to 32 \to 1\)</span> (~1,150 parameters)</li>
 <li><strong>Activations:</strong> Continuously Differentiable Exponential Linear Units (<code>CELU</code>)</li>
 <li><strong>Loss:</strong> Mean Squared Error (MSE), directly minimizing empirical data-space KL divergence.</li>
 </ul>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define Homoscedastic MLP Architecture</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>MLP <span class="ot">&lt;-</span> <span class="fu">nn_module</span>(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"MLP"</span>,</span>
@@ -443,11 +448,8 @@ window.Quarto = {
 <span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  residuals <span class="ot">&lt;-</span> y_train <span class="sc">-</span> <span class="fu">mle_model</span>(x_train)</span>
 <span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  sigma_hat_mle <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">torch_sqrt</span>(<span class="fu">torch_mean</span>(residuals<span class="sc">^</span><span class="dv">2</span>)))</span>
 <span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 </div>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict on an extended evaluation grid x in [-6, 6] to observe extrapolation</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>eval_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>, <span class="at">length.out =</span> <span class="dv">400</span>))</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>x_test_tensor <span class="ot">&lt;-</span> <span class="fu">torch_tensor</span>(<span class="fu">matrix</span>(eval_grid<span class="sc">$</span>x, <span class="at">ncol =</span> <span class="dv">1</span>), <span class="at">dtype =</span> <span class="fu">torch_float</span>())</span>
@@ -485,9 +487,7 @@ window.Quarto = {
 <span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">"Mean conditional KL divergence: "</span>, mle_kl_bits, <span class="st">" bits (Estimated sigma: "</span>, <span class="fu">round</span>(sigma_hat_mle, <span class="dv">3</span>), <span class="st">")"</span>),</span>
 <span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
 <span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_theme</span>(<span class="fu">theme_minimal</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -512,8 +512,6 @@ window.Quarto = {
 <p>We specify an isotropic prior <span class="math inline">\(p(\theta) = \mathcal{N}(0, \sigma_0^2 I)\)</span> and a mean-field Gaussian variational posterior <span class="math inline">\(q_\phi(w) = \mathcal{N}(\mu_w, \sigma_w^2)\)</span> where <span class="math inline">\(\sigma_w = 10^{-4} + \text{softplus}(\rho_w)\)</span>.</p>
 <p>Weights are sampled differentiably via: <span class="math display">\[w = \mu_w + \sigma_w \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)\]</span></p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Variational Bayesian Linear Layer</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>bnn_linear <span class="ot">&lt;-</span> <span class="fu">nn_module</span>(</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"bnn_linear"</span>,</span>
@@ -596,7 +594,6 @@ window.Quarto = {
 <span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>  loss<span class="sc">$</span><span class="fu">backward</span>()</span>
 <span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>  bnn_optimizer<span class="sc">$</span><span class="fu">step</span>()</span>
 <span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 </div>
 </section>
 <section id="predictive-epistemic-and-aleatoric-uncertainty" class="level3">
@@ -604,8 +601,6 @@ window.Quarto = {
 <p>Under the Bayesian model, generating predictions entails drawing <span class="math inline">\(S\)</span> posterior parameter samples <span class="math inline">\(\theta^{(s)} \sim q_\phi(\theta)\)</span>.</p>
 <p>The total predictive variance decomposes into: <span class="math display">\[\sigma^2_{\text{pred}}(x) = \underbrace{\text{Var}_{\theta}\left[f(x; \theta)\right]}_{\text{Epistemic (Model Uncertainty)}} + \underbrace{\sigma^{*2}}_{\text{Aleatoric (Noise)}}\]</span></p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw Monte Carlo predictions from the variational posterior</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>num_mc_samples <span class="ot">&lt;-</span> <span class="dv">100</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>mc_preds <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> <span class="fu">nrow</span>(eval_grid), <span class="at">ncol =</span> num_mc_samples)</span>
@@ -648,9 +643,7 @@ window.Quarto = {
 <span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">"Mean conditional KL divergence: "</span>, bnn_kl_bits, <span class="st">" bits (Total predictive uncertainty: epistemic + aleatoric)"</span>),</span>
 <span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
 <span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_theme</span>(<span class="fu">theme_minimal</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -659,14 +652,11 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>Notice how the Bayesian network’s uncertainty band naturally flares outward for <span class="math inline">\(|x| &gt; 5\)</span> where data is absent, accurately communicating epistemic uncertainty rather than making overconfident assertions.</p>
 </section>
 </section>
 <section id="synthesis-the-hierarchy-of-kl-divergence-minimization" class="level2">
 <h2 class="anchored" data-anchor-id="synthesis-the-hierarchy-of-kl-divergence-minimization">Synthesis: the hierarchy of KL divergence minimization</h2>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>all_results <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Paradigm =</span> <span class="fu">c</span>(</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Linear Regression (OLS)"</span>,</span>
@@ -692,7 +682,6 @@ window.Quarto = {
 <span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(all_results, <span class="at">digits =</span> <span class="dv">4</span>, <span class="at">caption =</span> <span class="st">"Summary: KL Divergence Across Statistical Learning Paradigms"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Summary: KL Divergence Across Statistical Learning Paradigms</caption>
@@ -772,8 +761,70 @@ window.Quarto = {
 </table>
 </section>
 </section>
+<section id="print-environment" class="level2">
+<h2 class="anchored" data-anchor-id="print-environment">Print environment</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>xfun<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.6.1 (2026-06-24)
+Platform: aarch64-apple-darwin23
+Running under: macOS Tahoe 26.6.2
 
-</main>
+Locale: en_US.UTF-8 / en_US.UTF-8 / en_US.UTF-8 / C / en_US.UTF-8 / en_US.UTF-8
+
+Package version:
+  askpass_1.2.1           backports_1.5.1         base64enc_0.1.6        
+  bit_4.6.0               bit64_4.8.2             blob_1.3.0             
+  broom_1.0.13            bslib_0.12.0            cachem_1.1.0           
+  callr_3.8.0             cellranger_1.1.0        cli_3.6.6              
+  clipr_0.8.1             compiler_4.6.1          conflicted_1.2.0       
+  coro_1.1.0              cpp11_0.5.5             crayon_1.5.3           
+  curl_8.0.0              data.table_1.18.6.1     DBI_1.3.0              
+  dbplyr_2.6.0            desc_1.4.3              digest_0.6.39          
+  dplyr_1.2.1             dtplyr_1.3.3            evaluate_1.0.5         
+  farver_2.1.2            fastmap_1.2.0           fontawesome_0.5.3      
+  fontBitstreamVera_0.1.1 fontLiberation_0.1.0    fontquiver_0.2.1       
+  forcats_1.0.1           fs_2.1.0                gargle_1.6.1           
+  gdtools_0.5.1           generics_0.1.4          ggformula_1.0.1        
+  ggiraph_0.9.6           ggplot2_4.0.3           ggridges_0.5.7         
+  glue_1.8.1              googledrive_2.1.2       googlesheets4_1.1.2    
+  graphics_4.6.1          grDevices_4.6.1         grid_4.6.1             
+  gtable_0.3.6            haven_2.5.5             highr_0.12             
+  hms_1.1.4               htmltools_0.5.9         htmlwidgets_1.6.4      
+  httr_1.4.8              ids_1.0.1               isoband_0.3.0          
+  jquerylib_0.1.4         jsonlite_2.0.0          knitr_1.51             
+  labeling_0.4.3          labelled_2.16.0         lifecycle_1.0.5        
+  lubridate_1.9.5         magrittr_2.0.5          MASS_7.3-66            
+  memoise_2.0.1           methods_4.6.1           mime_0.13              
+  modelr_0.1.11           mosaicCore_0.9.5        openssl_2.4.2          
+  otel_0.2.0              pillar_1.11.1           pkgconfig_2.0.3        
+  prettyunits_1.2.0       processx_3.9.0          progress_1.2.3         
+  ps_1.9.3                purrr_1.2.2             R6_2.6.1               
+  ragg_1.5.2              rappdirs_0.3.4          RColorBrewer_1.1-3     
+  Rcpp_1.1.2              readr_2.2.0             readxl_1.5.0           
+  rematch_2.0.0           rematch2_2.1.2          reprex_2.1.1           
+  rlang_1.3.0             rmarkdown_2.31          rstudioapi_0.19.0      
+  rvest_1.0.5             S7_0.2.2                safetensors_0.3.0      
+  sass_0.4.10             scales_1.4.0            selectr_0.5.1          
+  stats_4.6.1             stringi_1.8.9           stringr_1.6.0          
+  sys_3.4.3               systemfonts_1.3.2       textshaping_1.0.5      
+  tibble_3.3.1            tidyr_1.3.2             tidyselect_1.2.1       
+  tidyverse_2.0.0         timechange_0.4.0        tinytex_0.60           
+  tools_4.6.1             torch_0.17.0            tzdb_0.5.0             
+  utf8_1.2.6              utils_4.6.1             uuid_1.2.2             
+  vctrs_0.7.3             viridisLite_0.4.3       vroom_1.7.1            
+  withr_3.0.3             xfun_0.60               xml2_1.5.2             
+  yaml_2.3.12            </code></pre>
+</div>
+</div>
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-alemi2020" class="csl-entry" role="listitem">
+Alemi, Alexander A, Warren R Morningstar, Ben Poole, Ian Fischer, and Joshua V Dillon. 2020. <em>VIB Is Half Bayes</em>. <a href="https://doi.org/10.48550/ARXIV.2011.08711">https://doi.org/10.48550/ARXIV.2011.08711</a>.
+</div>
+</div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

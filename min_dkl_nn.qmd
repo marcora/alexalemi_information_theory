@@ -1,19 +1,19 @@
 ---
-title: "KL Divergence Minimization as a General Principle of Statistical Learning"
-subtitle: "From Maximum Likelihood to Bayesian Deep Learning"
-format:
+title: "KL divergence minimization as a general principle of statistical learning"
+subtitle: "From maximum likelihood to Bayesian deep learning"
+format: 
   html:
     toc: true
-    toc-depth: 3
-    code-fold: show
+    theme: cosmo
 execute:
   warning: false
   message: false
+bibliography: references.bib
 ---
 
 ## Overview and learning objectives
 
-Most statistical and machine learning methods are introduced through disparate lenses: Ordinary Least Squares minimizes squared residuals, Maximum Likelihood maximizes sample probability density, and Bayesian inference updates prior beliefs via Bayes' rule.
+Most statistical and machine learning methods are introduced through disparate lenses: Ordinary Least Squares (OLS) minimizes squared residuals, Maximum Likelihood Estimation (MLE) maximizes sample probability density, and Bayesian inference updates prior beliefs via Bayes' rule.
 
 This notebook demonstrates that **Kullback-Leibler (KL) divergence minimization serves as a unifying foundational principle across all these paradigms**:
 
@@ -23,8 +23,11 @@ This notebook demonstrates that **Kullback-Leibler (KL) divergence minimization 
 
 ## Sources and further reading
 
-- [VIB is Half Bayes](https://youtu.be/JGDAZ4joUX8) [VIB is Half Bayes (arXiv:2011.08711)](https://doi.org/10.48550/arXiv.2011.08711)
+- [KL is All You Need](https://blog.alexalemi.com/kl-is-all-you-need.html)
+- [VIB is Half Bayes](https://youtu.be/JGDAZ4joUX8) [@alemi2020]
 - [A Tale of Two Worlds: The Variational Approach to Machine Learning](https://youtu.be/OAHsR02dUc0)
+
+## Setup environment
 
 ```{r}
 #| label: setup
@@ -32,18 +35,19 @@ library(tidyverse)
 library(ggformula)
 library(torch)
 
-# Set seeds for reproducibility across R and libtorch
+theme_set(theme_minimal())
+
 set.seed(666)
 torch_manual_seed(666)
 ```
 
 ## The true data-generating process (DGP)
 
-We define a known synthetic ground-truth environment $p^*(x, y) = p^*(y \mid x) p^*(x)$:
+We define a known synthetic ground-truth distribution $p^*(x, y) = p^*(y \mid x) p^*(x)$:
 
-$$X \sim \text{Uniform}(-5, 5)$$ $$Y \mid X \sim \text{Normal}\left(\mu^*(X) = \frac{X^3}{100}, \; \sigma^{*2} = 0.09\right)$$
+$$X \sim \text{Uniform}(-5, 5)$$ $$Y \mid X \sim \text{Normal}\left(\mu^*(X) = \frac{X^3}{100}, \; \sigma^* = 0.3\right)$$
 
-The true conditional standard deviation is $\sigma^* = \sqrt{0.09} = 0.3$. We sample a small dataset of $n = 30$ observations to illustrate how different learning principles behave in the low-data / high-capacity regime.
+We sample a small dataset of $n = 30$ observations to illustrate how different learning principles behave in the low-data / high-capacity regime.
 
 ```{r}
 #| label: simulate-data
@@ -51,8 +55,7 @@ The true conditional standard deviation is $\sigma^* = \sqrt{0.09} = 0.3$. We sa
 n <- 30
 
 # True DGP parameters
-sigma_sq_true <- 0.09
-sigma_true    <- sqrt(sigma_sq_true)
+sigma_true <- 0.3; sigma_sq_true <- sigma_true^2
 
 # Simulated training sample
 sim_data <- tibble(
@@ -81,8 +84,7 @@ gf_point(y ~ x, data = sim_data, alpha = 0.6, size = 2, color = "gray20") |>
     subtitle = "Dashed orange line: true mean function; Peach envelope: true ±1 SD",
     x = "X",
     y = "Y"
-  ) |>
-  gf_theme(theme_minimal())
+  )
 ```
 
 ## Theory: learning via data-space KL divergence minimization
@@ -95,7 +97,7 @@ $$D_{\text{KL}}(p^* \parallel q_\theta) = \int \int p^*(x, y) \log \frac{p^*(x, 
 
 Expanding the logarithm:
 
-$$D_{\text{KL}}(p^* \parallel q_\theta) = \underbrace{\mathbb{E}_{p^*}\left[\log p^*(X, Y)\right]}_{\text{Constant with respect to } \theta} - \mathbb{E}_{p^*}\left[\log q_\theta(Y \mid X)\right]$$
+$$D_{\text{KL}}(p^* \parallel q_\theta) = \underbrace{\mathbb{E}_{p^*}\left[\log p^*(X, Y)\right]}_{\text{Constant with respect to } \theta} -\ \mathbb{E}_{p^*} \left[\log q_\theta(Y \mid X)\right]$$
 
 Because the entropy of the real world $\mathbb{E}_{p^*}[\log p^*(X, Y)]$ is invariant to our model parameters $\theta$, minimizing KL divergence directly simplifies to:
 
@@ -161,11 +163,8 @@ gf_point(y ~ x, data = sim_data, alpha = 0.5, size = 1.8, color = "gray25") |>
     subtitle = "Higher capacity models minimize sample empirical risk at the cost of divergence from p*",
     x = "X",
     y = "Y"
-  ) |>
-  gf_theme(theme_minimal())
+  )
 ```
-
-## Analytical evaluation of generalization KL divergence
 
 To quantify model quality, we compute the true population KL divergence on test inputs $X \sim \text{Uniform}(-5, 5)$.
 
@@ -173,7 +172,7 @@ For two Gaussians $p^*(Y \mid x) = \mathcal{N}(\mu^*(x), \sigma^{*2})$ and $q(Y 
 
 $$D_{\text{KL}}(p^*(\cdot \mid x) \parallel q(\cdot \mid x)) = \log\frac{\hat{\sigma}}{\sigma^*} + \frac{\sigma^{*2} + (\mu^*(x) - \hat{\mu}(x))^2}{2\hat{\sigma}^2} - \frac{1}{2}$$
 
-Dividing by $\log(2)$ yields the divergence in **bits**.
+Dividing by $\log(2)$ yields the KL divergence in **bits**.
 
 ```{r}
 #| label: kl-poly-evaluation
@@ -215,7 +214,7 @@ knitr::kable(poly_results, digits = 4, caption = "Expected KL Divergence from Tr
 
 A deep neural network parameterized by $\theta$ acts as a universal function approximator. We fit a Multi-Layer Perceptron (MLP) using the same homoscedastic likelihood:
 
-$$Y \mid X \sim \text{Normal}\left(\mu = f(X; \theta), \; \hat{\sigma}^2\right)$$
+$$Y \mid X \sim \text{Normal}\left(\hat{\mu} = f(X; \theta), \; \hat{\sigma}^2\right)$$
 
 - **Architecture:** $1 \to 32 \to 32 \to 1$ (\~1,150 parameters)
 - **Activations:** Continuously Differentiable Exponential Linear Units (`CELU`)
@@ -306,8 +305,7 @@ gf_point(y ~ x, data = sim_data, alpha = 0.5, size = 1.8, color = "gray25") |>
     subtitle = paste0("Mean conditional KL divergence: ", mle_kl_bits, " bits (Estimated sigma: ", round(sigma_hat_mle, 3), ")"),
     x = "X",
     y = "Y"
-  ) |>
-  gf_theme(theme_minimal())
+  )
 ```
 
 With 1,150 parameters and only 30 observations, empirical data-space KL minimization interpolates noise clusters and exhibits arbitrary behavior outside the training domain $x \notin [-5, 5]$.
@@ -470,11 +468,8 @@ gf_point(y ~ x, data = sim_data, alpha = 0.5, size = 1.8, color = "gray25") |>
     subtitle = paste0("Mean conditional KL divergence: ", bnn_kl_bits, " bits (Total predictive uncertainty: epistemic + aleatoric)"),
     x = "X",
     y = "Y"
-  ) |>
-  gf_theme(theme_minimal())
+  )
 ```
-
-Notice how the Bayesian network's uncertainty band naturally flares outward for $|x| > 5$ where data is absent, accurately communicating epistemic uncertainty rather than making overconfident assertions.
 
 ## Synthesis: the hierarchy of KL divergence minimization
 
@@ -513,3 +508,9 @@ knitr::kable(all_results, digits = 4, caption = "Summary: KL Divergence Across S
 |:-----------------|:-----------------|:-----------------|:-----------------|
 | **Maximum Likelihood (MLE / OLS)** | **Data Space:** $D_{\text{KL}}(p^* \parallel q_\theta)$ | $\arg\max_\theta \sum_{i=1}^n \log q_\theta(y_i \mid x_i)$ | Overfits and collapses uncertainty in high-capacity models |
 | **Bayesian Inference (VI)** | **Parameter Space:** $D_{\text{KL}}(q_\phi \parallel p(\cdot \mid \mathcal{D}))$ | $\arg\min_\phi \left\{ D_{\text{KL}}(q_\phi \parallel p) - \mathbb{E}_{q}[\log q(y \mid x)] \right\}$ | Regularizes capacity and preserves honest epistemic uncertainty |
+
+## Print environment
+
+```{r}
+xfun::session_info()
+```

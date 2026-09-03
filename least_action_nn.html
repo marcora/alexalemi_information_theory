@@ -151,10 +151,10 @@ window.Quarto = {
 
 <section id="introduction-two-ways-to-look-at-a-missile-launch" class="level2">
 <h2 class="anchored" data-anchor-id="introduction-two-ways-to-look-at-a-missile-launch">Introduction: two ways to look at a missile launch</h2>
-<p>Imagine a missile launched into the air. How does nature decide exactly what path it will take before it hits the ground?</p>
+<p>Imagine a missile launched into the air. How does Nature decide exactly what path it will take before it hits the ground?</p>
 <ol type="1">
 <li><strong>The Newtonian approach (local):</strong> Nature looks at the missile frame-by-frame. At every single microsecond, it calculates the forces acting on it (<span class="math inline">\(F = ma\)</span>) and pushes it to its next position.</li>
-<li><strong>The Lagrangian approach (global):</strong> Nature looks at the <em>entire flight history all at once</em>. It looks at the starting point, the ending point, and chooses the path that minimizes a physical “cost function” called <strong>Action</strong>.</li>
+<li><strong>The Lagrangian approach (global):</strong> Nature looks at the <em>entire flight history all at once</em>. It looks at the starting point, the ending point, and chooses the path that minimizes a physical “cost function” called <strong>Total Action</strong>.</li>
 </ol>
 <p>In this notebook, we are going to build a <strong>neural network</strong> that knows absolutely zero physics. It doesn’t know what a parabola is, and it doesn’t know Newton’s equations. We will force it to search through an infinite space of possible curves, using optimization to discover the exact path of a missile by minimizing its Action cost.</p>
 </section>
@@ -167,9 +167,9 @@ window.Quarto = {
 <li><p><strong>Kinetic Energy (Motion Cost):</strong> <span class="math inline">\(T = \frac{1}{2}m(v_x^2 + v_y^2)\)</span></p></li>
 <li><p><strong>Potential Energy (Height Cost):</strong> <span class="math inline">\(V = mgy\)</span></p></li>
 </ul>
-<p>The <strong>Total Action (</strong><span class="math inline">\(S\)</span>) is the sum of this cost across the entire flight time. Nature always picks the path where <span class="math inline">\(S\)</span> is minimized:</p>
+<p>The <strong>Total Action</strong> (<span class="math inline">\(S\)</span>) is the sum of this cost across the entire flight time. Nature always picks the path where <span class="math inline">\(S\)</span> is minimized:</p>
 <p><span class="math display">\[S = \int_{0}^{t_{max}} (T - V) \, dt\]</span></p>
-<p>If our Neural Network guesses a path that is too wavy, the velocity spikes, making <span class="math inline">\(T\)</span> huge, and the Action explodes. If it guesses a path that is a flat line, it misses out on the potential energy deductions from <span class="math inline">\(V\)</span>. The perfect balance is a parabola.</p>
+<p>If our neural network guesses a path that is too wavy, the velocity spikes, making <span class="math inline">\(T\)</span> huge, and <span class="math inline">\(S\)</span> explodes. If it guesses a path that is a flat line, it misses out on the potential energy deductions from <span class="math inline">\(V\)</span>, and <span class="math inline">\(S\)</span> increases. The perfect balance is a parabola.</p>
 </section>
 <section id="fit-neural-network-to-find-the-path-of-least-action" class="level2">
 <h2 class="anchored" data-anchor-id="fit-neural-network-to-find-the-path-of-least-action">Fit neural network to find “the path of least action”</h2>
@@ -191,7 +191,7 @@ window.Quarto = {
 </div>
 <section id="setup-network-and-loss-function" class="level3">
 <h3 class="anchored" data-anchor-id="setup-network-and-loss-function">Setup network and loss function</h3>
-<p>The code below constructs the forward pass of the network and sets up the calculus loop that approximates the Action integral.</p>
+<p>The code below constructs the forward pass of the network and sets up the calculus loop that approximates the Total Action integral.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. A Simple Multi-Layer Perceptron Function</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1 Input (time) -&gt; 5 Hidden Neurons (with smooth tanh curve) -&gt; 1 Output (position y)</span></span>
@@ -238,7 +238,7 @@ window.Quarto = {
 </section>
 <section id="train-network" class="level3">
 <h3 class="anchored" data-anchor-id="train-network">Train network</h3>
-<p>Now, we feed a set of random weights into the network. It will look like a chaotic scribble. Then, we let R’s optimizer adjust those weights to minimize the Action cost.</p>
+<p>Now, we feed a set of random weights into the network. It will look like a chaotic scribble. Then, we let R’s optimizer adjust those weights to minimize the Total Action cost.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Initialize Network Weights Randomly</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>initial_weights <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">16</span>, <span class="at">min =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">max =</span> <span class="fl">0.5</span>)</span>
@@ -257,7 +257,7 @@ window.Quarto = {
 </section>
 <section id="compare-with-trajectory-calculated-using-newtonian-mechanics" class="level2">
 <h2 class="anchored" data-anchor-id="compare-with-trajectory-calculated-using-newtonian-mechanics">Compare with trajectory calculated using Newtonian mechanics</h2>
-<p>To see if this variational deep-learning approach actually works, let’s overlay the Neural Network’s self-discovered path against the exact calculus path calculated using Newtonian mechanics (<span class="math inline">\(y(t) = v_{0y}t - \frac{1}{2}gt^2\)</span>).</p>
+<p>To see if this variational deep-learning approach actually works, let’s overlay the neural network’s self-discovered path against the exact calculus path calculated using Newtonian mechanics: <span class="math inline">\(y(t) = v_{0y}t - \frac{1}{2}gt^2\)</span>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Generate Paths for the Final Graph</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>t_plot <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, t_max, <span class="at">by =</span> <span class="fl">0.01</span>)</span>

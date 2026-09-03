@@ -8,10 +8,10 @@ format:
 
 ## Introduction: two ways to look at a missile launch
 
-Imagine a missile launched into the air. How does nature decide exactly what path it will take before it hits the ground?
+Imagine a missile launched into the air. How does Nature decide exactly what path it will take before it hits the ground?
 
 1.  **The Newtonian approach (local):** Nature looks at the missile frame-by-frame. At every single microsecond, it calculates the forces acting on it ($F = ma$) and pushes it to its next position.
-2.  **The Lagrangian approach (global):** Nature looks at the *entire flight history all at once*. It looks at the starting point, the ending point, and chooses the path that minimizes a physical "cost function" called **Action**.
+2.  **The Lagrangian approach (global):** Nature looks at the *entire flight history all at once*. It looks at the starting point, the ending point, and chooses the path that minimizes a physical "cost function" called **Total Action**.
 
 In this notebook, we are going to build a **neural network** that knows absolutely zero physics. It doesn't know what a parabola is, and it doesn't know Newton's equations. We will force it to search through an infinite space of possible curves, using optimization to discover the exact path of a missile by minimizing its Action cost.
 
@@ -27,11 +27,11 @@ For a missile of mass $m$ under standard gravity $g$:
 
 - **Potential Energy (Height Cost):** $V = mgy$
 
-The **Total Action (**$S$) is the sum of this cost across the entire flight time. Nature always picks the path where $S$ is minimized:
+The **Total Action** ($S$) is the sum of this cost across the entire flight time. Nature always picks the path where $S$ is minimized:
 
 $$S = \int_{0}^{t_{max}} (T - V) \, dt$$
 
-If our Neural Network guesses a path that is too wavy, the velocity spikes, making $T$ huge, and the Action explodes. If it guesses a path that is a flat line, it misses out on the potential energy deductions from $V$. The perfect balance is a parabola.
+If our neural network guesses a path that is too wavy, the velocity spikes, making $T$ huge, and $S$ explodes. If it guesses a path that is a flat line, it misses out on the potential energy deductions from $V$, and $S$ increases. The perfect balance is a parabola.
 
 ## Fit neural network to find "the path of least action"
 
@@ -54,7 +54,7 @@ vx <- 10     # Fixed horizontal speed (travels 20m in 2 seconds)
 
 ### Setup network and loss function
 
-The code below constructs the forward pass of the network and sets up the calculus loop that approximates the Action integral.
+The code below constructs the forward pass of the network and sets up the calculus loop that approximates the Total Action integral.
 
 ```{r nn-engine}
 # 2. A Simple Multi-Layer Perceptron Function
@@ -102,7 +102,7 @@ nn_loss_function <- function(weights) {
 
 ### Train network
 
-Now, we feed a set of random weights into the network. It will look like a chaotic scribble. Then, we let R's optimizer adjust those weights to minimize the Action cost.
+Now, we feed a set of random weights into the network. It will look like a chaotic scribble. Then, we let R's optimizer adjust those weights to minimize the Total Action cost.
 
 ```{r training}
 # 4. Initialize Network Weights Randomly
@@ -121,7 +121,7 @@ trained_weights <- nn_optimization$par
 
 ## Compare with trajectory calculated using Newtonian mechanics
 
-To see if this variational deep-learning approach actually works, let's overlay the Neural Network's self-discovered path against the exact calculus path calculated using Newtonian mechanics ($y(t) = v_{0y}t - \frac{1}{2}gt^2$).
+To see if this variational deep-learning approach actually works, let's overlay the neural network's self-discovered path against the exact calculus path calculated using Newtonian mechanics: $y(t) = v_{0y}t - \frac{1}{2}gt^2$.
 
 ```{r plotting, fig.width=8, fig.height=5}
 # 6. Generate Paths for the Final Graph
