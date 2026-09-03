@@ -108,15 +108,42 @@ window.Quarto = {
 
 </head>
 
-<body class="fullcontent quarto-light">
+<body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview-and-learning-objectives" id="toc-overview-and-learning-objectives" class="nav-link active" data-scroll-target="#overview-and-learning-objectives">Overview and learning objectives</a></li>
+  <li><a href="#sources-and-further-reading" id="toc-sources-and-further-reading" class="nav-link" data-scroll-target="#sources-and-further-reading">Sources and further reading</a></li>
+  <li><a href="#the-true-data-generating-process-dgp" id="toc-the-true-data-generating-process-dgp" class="nav-link" data-scroll-target="#the-true-data-generating-process-dgp">The true data-generating process (DGP)</a></li>
+  <li><a href="#theory-learning-via-data-space-kl-divergence-minimization" id="toc-theory-learning-via-data-space-kl-divergence-minimization" class="nav-link" data-scroll-target="#theory-learning-via-data-space-kl-divergence-minimization">Theory: learning via data-space KL divergence minimization</a>
+  <ul class="collapse">
+  <li><a href="#deriving-mean-squared-error-mse-from-the-gaussian-log-likelihood" id="toc-deriving-mean-squared-error-mse-from-the-gaussian-log-likelihood" class="nav-link" data-scroll-target="#deriving-mean-squared-error-mse-from-the-gaussian-log-likelihood">Deriving mean squared error (MSE) from the Gaussian log-likelihood</a></li>
+  </ul></li>
+  <li><a href="#polynomial-hypotheses-and-the-capacity-dilemma" id="toc-polynomial-hypotheses-and-the-capacity-dilemma" class="nav-link" data-scroll-target="#polynomial-hypotheses-and-the-capacity-dilemma">Polynomial hypotheses and the capacity dilemma</a></li>
+  <li><a href="#analytical-evaluation-of-generalization-kl-divergence" id="toc-analytical-evaluation-of-generalization-kl-divergence" class="nav-link" data-scroll-target="#analytical-evaluation-of-generalization-kl-divergence">Analytical evaluation of generalization KL divergence</a></li>
+  <li><a href="#neural-networks-via-mle-high-capacity-meets-empirical-risk" id="toc-neural-networks-via-mle-high-capacity-meets-empirical-risk" class="nav-link" data-scroll-target="#neural-networks-via-mle-high-capacity-meets-empirical-risk">Neural networks via MLE: high capacity meets empirical risk</a></li>
+  <li><a href="#bayesian-learning-parameter-space-kl-divergence-minimization" id="toc-bayesian-learning-parameter-space-kl-divergence-minimization" class="nav-link" data-scroll-target="#bayesian-learning-parameter-space-kl-divergence-minimization">Bayesian learning: parameter-space KL divergence minimization</a>
+  <ul class="collapse">
+  <li><a href="#the-reparameterization-trick" id="toc-the-reparameterization-trick" class="nav-link" data-scroll-target="#the-reparameterization-trick">The reparameterization trick</a></li>
+  <li><a href="#predictive-epistemic-and-aleatoric-uncertainty" id="toc-predictive-epistemic-and-aleatoric-uncertainty" class="nav-link" data-scroll-target="#predictive-epistemic-and-aleatoric-uncertainty">Predictive epistemic and aleatoric uncertainty</a></li>
+  </ul></li>
+  <li><a href="#synthesis-the-hierarchy-of-kl-divergence-minimization" id="toc-synthesis-the-hierarchy-of-kl-divergence-minimization" class="nav-link" data-scroll-target="#synthesis-the-hierarchy-of-kl-divergence-minimization">Synthesis: the hierarchy of KL divergence minimization</a>
+  <ul class="collapse">
+  <li><a href="#summary-of-principles" id="toc-summary-of-principles" class="nav-link" data-scroll-target="#summary-of-principles">Summary of principles</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">KL Divergence Minimization as a General Principle of Statistical Learning</h1>
+<p class="subtitle lead">From Maximum Likelihood to Bayesian Deep Learning</p>
 </div>
 
 
@@ -133,57 +160,80 @@ window.Quarto = {
 </header>
 
 
+<section id="overview-and-learning-objectives" class="level2">
+<h2 class="anchored" data-anchor-id="overview-and-learning-objectives">Overview and learning objectives</h2>
+<p>Most statistical and machine learning methods are introduced through disparate lenses: Ordinary Least Squares minimizes squared residuals, Maximum Likelihood maximizes sample probability density, and Bayesian inference updates prior beliefs via Bayes’ rule.</p>
+<p>This notebook demonstrates that <strong>Kullback-Leibler (KL) divergence minimization serves as a unifying foundational principle across all these paradigms</strong>:</p>
+<ol type="1">
+<li><strong>Maximum Likelihood Estimation (MLE)</strong> minimizes the <em>forward KL divergence in data space</em> between the true distribution and the model family.</li>
+<li><strong>Mean Squared Error (MSE)</strong> is the exact mathematical consequence of minimizing this data-space KL divergence under Gaussian errors.</li>
+<li><strong>Bayesian Learning (Variational Inference)</strong> minimizes the <em>reverse KL divergence in parameter space</em> between an approximate posterior distribution and the true posterior distribution.</li>
+</ol>
+</section>
+<section id="sources-and-further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="sources-and-further-reading">Sources and further reading</h2>
+<ul>
+<li><a href="https://youtu.be/JGDAZ4joUX8">VIB is Half Bayes</a> <a href="https://doi.org/10.48550/arXiv.2011.08711">VIB is Half Bayes (arXiv:2011.08711)</a></li>
+<li><a href="https://youtu.be/OAHsR02dUc0">A Tale of Two Worlds: The Variational Approach to Machine Learning</a></li>
+</ul>
 <div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggformula)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">666</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(torch)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Set seeds for reproducibility across R and libtorch</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">666</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">torch_manual_seed</span>(<span class="dv">666</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
-<section id="sources" class="level2">
-<h2 class="anchored" data-anchor-id="sources">Sources</h2>
-<ul>
-<li><p><a href="https://youtu.be/JGDAZ4joUX8" class="uri">https://youtu.be/JGDAZ4joUX8</a></p></li>
-<li><p><a href="https://youtu.be/OAHsR02dUc0" class="uri">https://youtu.be/OAHsR02dUc0</a></p></li>
-<li><p><a href="https://doi.org/10.48550/arXiv.2011.08711" class="uri">https://doi.org/10.48550/arXiv.2011.08711</a></p></li>
-</ul>
 </section>
-<section id="simulating-the-true-data-generating-process" class="level2">
-<h2 class="anchored" data-anchor-id="simulating-the-true-data-generating-process">Simulating the True Data Generating Process</h2>
-<p>From the target specification, the true distribution is defined as:</p>
-<p><span class="math display">\[X \sim \text{Uniform}(-5, 5)\]</span> <span class="math display">\[Y \mid X \sim \text{Normal}\left(\frac{X^3}{100}, 0.09\right)\]</span></p>
-<p>Note that the variance is <span class="math inline">\(\sigma^2 = 0.09\)</span>, which corresponds to a standard deviation of <span class="math inline">\(\sigma = \sqrt{0.09} = 0.3\)</span>.</p>
+<section id="the-true-data-generating-process-dgp" class="level2">
+<h2 class="anchored" data-anchor-id="the-true-data-generating-process-dgp">The true data-generating process (DGP)</h2>
+<p>We define a known synthetic ground-truth environment <span class="math inline">\(p^*(x, y) = p^*(y \mid x) p^*(x)\)</span>:</p>
+<p><span class="math display">\[X \sim \text{Uniform}(-5, 5)\]</span> <span class="math display">\[Y \mid X \sim \text{Normal}\left(\mu^*(X) = \frac{X^3}{100}, \; \sigma^{*2} = 0.09\right)\]</span></p>
+<p>The true conditional standard deviation is <span class="math inline">\(\sigma^* = \sqrt{0.09} = 0.3\)</span>. We sample a small dataset of <span class="math inline">\(n = 30\)</span> observations to illustrate how different learning principles behave in the low-data / high-capacity regime.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of samples</span></span>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample size</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">30</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># True DGP parameters</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sim_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">runif</span>(n, <span class="at">min =</span> <span class="sc">-</span><span class="dv">5</span>, <span class="at">max =</span> <span class="dv">5</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_true =</span> (x<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="dv">100</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> mu_true, <span class="at">sd =</span> <span class="fu">sqrt</span>(<span class="fl">0.09</span>))</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Data frame for true curve and 1 SD envelope</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>true_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">300</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_true =</span> (x<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="dv">100</span>,</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">lower =</span> mu_true <span class="sc">-</span> <span class="fl">0.3</span>,</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">upper =</span> mu_true <span class="sc">+</span> <span class="fl">0.3</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Base plot on sim_data, explicitly pass true_grid to the annotation layers</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="fu">gf_point</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sim_data, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower <span class="sc">+</span> upper <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">fill =</span> <span class="st">"peachpuff"</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_true <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_labs</span>(</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"True Data Distribution &amp; Sampled Observations"</span>,</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_theme</span>(<span class="fu">theme_minimal</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sigma_sq_true <span class="ot">&lt;-</span> <span class="fl">0.09</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>sigma_true    <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(sigma_sq_true)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulated training sample</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>sim_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">runif</span>(n, <span class="at">min =</span> <span class="sc">-</span><span class="dv">5</span>, <span class="at">max =</span> <span class="dv">5</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_true =</span> (x<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="dv">100</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> mu_true, <span class="at">sd =</span> sigma_true)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Dense evaluation grid for the ground truth</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>true_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">300</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_true =</span> (x<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="dv">100</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">lower =</span> mu_true <span class="sc">-</span> sigma_true,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">upper =</span> mu_true <span class="sc">+</span> sigma_true</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize DGP</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="fu">gf_point</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sim_data, <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">"gray20"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower <span class="sc">+</span> upper <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">fill =</span> <span class="st">"peachpuff"</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_true <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_labs</span>(</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"True Data Distribution &amp; Sampled Observations (n = 30)"</span>,</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Dashed orange line: true mean function; Peach envelope: true ±1 SD"</span>,</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_theme</span>(<span class="fu">theme_minimal</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -192,70 +242,75 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<hr>
 </section>
-<section id="the-statistical-learning-framework" class="level2">
-<h2 class="anchored" data-anchor-id="the-statistical-learning-framework">The Statistical Learning Framework</h2>
-<p>Let the true data-generating density be <span class="math inline">\(p^*(x, y) = p^*(y \mid x) p^*(x)\)</span> and our parametric candidate model be <span class="math inline">\(q_\theta(x, y) = q_\theta(y \mid x) p^*(x)\)</span>.</p>
-<p>The Kullback-Leibler (KL) divergence from our model <span class="math inline">\(q_\theta\)</span> to the true distribution <span class="math inline">\(p^*\)</span> is:</p>
+<section id="theory-learning-via-data-space-kl-divergence-minimization" class="level2">
+<h2 class="anchored" data-anchor-id="theory-learning-via-data-space-kl-divergence-minimization">Theory: learning via data-space KL divergence minimization</h2>
+<p>Let <span class="math inline">\(p^*(x, y)\)</span> be the true distribution and <span class="math inline">\(q_\theta(x, y) = q_\theta(y \mid x) p^*(x)\)</span> be our parameterized model candidate.</p>
+<p>The <strong>Kullback-Leibler (KL) divergence</strong> from our candidate model <span class="math inline">\(q_\theta\)</span> to the true distribution <span class="math inline">\(p^*\)</span> measures information lost when approximating <span class="math inline">\(p^*\)</span> with <span class="math inline">\(q_\theta\)</span>:</p>
 <p><span class="math display">\[D_{\text{KL}}(p^* \parallel q_\theta) = \int \int p^*(x, y) \log \frac{p^*(x, y)}{q_\theta(x, y)} \, dy \, dx\]</span></p>
 <p>Expanding the logarithm:</p>
-<p><span class="math display">\[D_{\text{KL}}(p^* \parallel q_\theta) = \mathbb{E}_{p^*}\left[\log p^*(X, Y)\right] - \mathbb{E}_{p^*}\left[\log q_\theta(X, Y)\right]\]</span></p>
-<p>Because <span class="math inline">\(\mathbb{E}_{p^*}[\log p^*(X, Y)]\)</span> depends strictly on the true world and is constant with respect to model parameters <span class="math inline">\(\theta\)</span>:</p>
+<p><span class="math display">\[D_{\text{KL}}(p^* \parallel q_\theta) = \underbrace{\mathbb{E}_{p^*}\left[\log p^*(X, Y)\right]}_{\text{Constant with respect to } \theta} - \mathbb{E}_{p^*}\left[\log q_\theta(Y \mid X)\right]\]</span></p>
+<p>Because the entropy of the real world <span class="math inline">\(\mathbb{E}_{p^*}[\log p^*(X, Y)]\)</span> is invariant to our model parameters <span class="math inline">\(\theta\)</span>, minimizing KL divergence directly simplifies to:</p>
 <p><span class="math display">\[\arg\min_\theta D_{\text{KL}}(p^* \parallel q_\theta) = \arg\max_\theta \mathbb{E}_{p^*}\left[\log q_\theta(Y \mid X)\right]\]</span></p>
-<p>Under the empirical distribution of a sample <span class="math inline">\((x_i, y_i)_{i=1}^n \sim p^*\)</span>, the empirical expectation replaces the population expectation:</p>
+<p>Under an observed finite sample <span class="math inline">\((x_i, y_i)_{i=1}^n \sim p^*\)</span>, the empirical sample mean approximates the population expectation:</p>
 <p><span class="math display">\[\mathbb{E}_{p^*}\left[\log q_\theta(Y \mid X)\right] \approx \frac{1}{n}\sum_{i=1}^n \log q_\theta(y_i \mid x_i)\]</span></p>
-<p>Thus, <strong>Maximum Likelihood Estimation (MLE)</strong> directly approximates <strong>minimal KL divergence</strong> from the truth.</p>
-<hr>
+<p><span class="math display">\[\therefore \arg\min_\theta D_{\text{KL}}(p^* \parallel q_\theta) \approx \arg\max_\theta \sum_{i=1}^n \log q_\theta(y_i \mid x_i)\]</span></p>
+<blockquote class="blockquote">
+<p><strong>Core Insight 1:</strong> Maximum Likelihood Estimation (MLE) is not an arbitrary estimation heuristic; it is the empirical approximation of <strong>forward KL divergence minimization in data space</strong>.</p>
+</blockquote>
+<section id="deriving-mean-squared-error-mse-from-the-gaussian-log-likelihood" class="level3">
+<h3 class="anchored" data-anchor-id="deriving-mean-squared-error-mse-from-the-gaussian-log-likelihood">Deriving mean squared error (MSE) from the Gaussian log-likelihood</h3>
+<p>Assume a homoscedastic conditional Gaussian model with constant noise variance <span class="math inline">\(\sigma^2\)</span>:</p>
+<p><span class="math display">\[q_\theta(Y \mid X = x) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left( -\frac{(y - f(x; \theta))^2}{2\sigma^2} \right)\]</span></p>
+<p>Evaluating the total log-likelihood:</p>
+<p><span class="math display">\[\sum_{i=1}^n \log q_\theta(y_i \mid x_i) = -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^n \left(y_i - f(x_i; \theta)\right)^2\]</span></p>
+<p>Dropping additive constants and positive scaling factors independent of <span class="math inline">\(\theta\)</span>:</p>
+<p><span class="math display">\[\arg\max_\theta \sum_{i=1}^n \log q_\theta(y_i \mid x_i) \iff \arg\min_\theta \frac{1}{n} \sum_{i=1}^n \left(y_i - f(x_i; \theta)\right)^2\]</span></p>
+<blockquote class="blockquote">
+<p><strong>Core Insight 2:</strong> Ordinary Least Squares / Mean Squared Error regression is mathematically equivalent to empirical KL divergence minimization under a constant-variance Gaussian model.</p>
+</blockquote>
 </section>
-<section id="connecting-kl-minimization-to-mean-squared-error-mse" class="level2">
-<h2 class="anchored" data-anchor-id="connecting-kl-minimization-to-mean-squared-error-mse">Connecting KL Minimization to Mean Squared Error (MSE)</h2>
-<p>Consider a conditional Gaussian regression model with fixed variance <span class="math inline">\(\sigma^2\)</span>:</p>
-<p><span class="math display">\[q_\theta(Y \mid X = x) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left( -\frac{(y - f_\theta(x))^2}{2\sigma^2} \right)\]</span></p>
-<p>Evaluating the log-likelihood under this model:</p>
-<p><span class="math display">\[\log q_\theta(y_i \mid x_i) = -\frac{1}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\left(y_i - f_\theta(x_i)\right)^2\]</span></p>
-<p>Maximizing this objective over <span class="math inline">\(\theta\)</span> discards additive and scaling constants:</p>
-<p><span class="math display">\[\arg\min_\theta D_{\text{KL}}(p^* \parallel q_\theta) \iff \arg\min_\theta \frac{1}{n} \sum_{i=1}^n \left(y_i - f_\theta(x_i)\right)^2\]</span></p>
-<p>Minimizing squared error loss is mathematically identical to minimizing the KL divergence under homoscedastic Gaussian assumptions.</p>
-<hr>
 </section>
-<section id="model-fitting-polynomial-hypothesis-classes" class="level2">
-<h2 class="anchored" data-anchor-id="model-fitting-polynomial-hypothesis-classes">Model Fitting: Polynomial Hypothesis Classes</h2>
-<p>We fit three models via ordinary least squares (equivalent to KL minimization within each model family):</p>
-<ul>
-<li><strong>Model 1 (Linear):</strong> <span class="math inline">\(\hat{y} = \beta_0 + \beta_1 x\)</span></li>
-<li><strong>Model 2 (Cubic - Well Specified):</strong> <span class="math inline">\(\hat{y} = \beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 x^3\)</span></li>
-<li><strong>Model 3 (Degree 9 - Overparameterized):</strong> <span class="math inline">\(\hat{y} = \sum_{k=0}^9 \beta_k x^k\)</span></li>
-</ul>
+<section id="polynomial-hypotheses-and-the-capacity-dilemma" class="level2">
+<h2 class="anchored" data-anchor-id="polynomial-hypotheses-and-the-capacity-dilemma">Polynomial hypotheses and the capacity dilemma</h2>
+<p>We first evaluate data-space KL minimization across linear regression models with three different hypothesis capacities:</p>
+<ol type="1">
+<li><strong>Linear (Underparameterized / High Bias):</strong> <span class="math inline">\(f(x) = \beta_0 + \beta_1 x\)</span></li>
+<li><strong>Cubic (Well-Specified):</strong> <span class="math inline">\(f(x) = \sum_{k=0}^3 \beta_k x^k\)</span></li>
+<li><strong>Degree 9 Polynomial (Overparameterized / High Variance):</strong> <span class="math inline">\(f(x) = \sum_{k=0}^9 \beta_k x^k\)</span></li>
+</ol>
 <div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mod_linear <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sim_data)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>mod_cubic  <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="dv">3</span>, <span class="at">raw =</span> <span class="cn">TRUE</span>), <span class="at">data =</span> sim_data)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>mod_deg9   <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="dv">9</span>, <span class="at">raw =</span> <span class="cn">TRUE</span>), <span class="at">data =</span> sim_data)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>preds <span class="ot">&lt;-</span> true_grid <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>preds_poly <span class="ot">&lt;-</span> true_grid <span class="sc">|&gt;</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Linear (Underfit)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">predict</span>(mod_linear, <span class="at">newdata =</span> true_grid),</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Cubic (True Form)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">predict</span>(mod_cubic, <span class="at">newdata =</span> true_grid),</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Degree 9 (High Variance)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">predict</span>(mod_deg9, <span class="at">newdata =</span> true_grid)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Cubic (Well-Specified)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">predict</span>(mod_cubic, <span class="at">newdata =</span> true_grid),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Degree 9 (Overfit)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">predict</span>(mod_deg9, <span class="at">newdata =</span> true_grid)</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Linear (Underfit)</span><span class="st">`</span>, <span class="st">`</span><span class="at">Cubic (True Form)</span><span class="st">`</span>, <span class="st">`</span><span class="at">Degree 9 (High Variance)</span><span class="st">`</span>),</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Linear (Underfit)</span><span class="st">`</span>, <span class="st">`</span><span class="at">Cubic (Well-Specified)</span><span class="st">`</span>, <span class="st">`</span><span class="at">Degree 9 (Overfit)</span><span class="st">`</span>),</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"Model"</span>,</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"y_hat"</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Option A: Start with gf_point, then add ribbon and lines explicitly</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="fu">gf_point</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sim_data, <span class="at">alpha =</span> <span class="fl">0.25</span>, <span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower <span class="sc">+</span> upper <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">fill =</span> <span class="st">"peachpuff"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(y_hat <span class="sc">~</span> x, <span class="at">data =</span> preds, <span class="at">color =</span> <span class="sc">~</span>Model, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">gf_point</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sim_data, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="fl">1.8</span>, <span class="at">color =</span> <span class="st">"gray25"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower <span class="sc">+</span> upper <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">fill =</span> <span class="st">"peachpuff"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_true <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(y_hat <span class="sc">~</span> x, <span class="at">data =</span> preds_poly, <span class="at">color =</span> <span class="sc">~</span>Model, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_labs</span>(</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Fitted Models via Empirical Risk / KL Minimization"</span>,</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Peach band shows true conditional distribution mean ± 1 SD"</span>,</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Polynomial Hypothesis Classes via Least Squares (Data-Space KL)"</span>,</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Higher capacity models minimize sample empirical risk at the cost of divergence from p*"</span>,</span>
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
 <span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_theme</span>(<span class="fu">theme_minimal</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -264,193 +319,457 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<hr>
 </section>
-<section id="empirical-kl-divergence-computation" class="level2">
-<h2 class="anchored" data-anchor-id="empirical-kl-divergence-computation">Empirical KL Divergence Computation</h2>
-<p>For a Gaussian predictive distribution <span class="math inline">\(q_\theta(y \mid x) = \mathcal{N}(\mu(x), \sigma_\epsilon^2)\)</span> where the true model is <span class="math inline">\(p^*(y \mid x) = \mathcal{N}(\mu^*(x), \sigma^{*2})\)</span>, the conditional KL divergence simplifies analytically to:</p>
-<p><span class="math display">\[D_{\text{KL}}(p^*(\cdot \mid x) \parallel q_\theta(\cdot \mid x)) = \log\frac{\sigma_\epsilon}{\sigma^*} + \frac{\sigma^{*2} + (\mu^*(x) - \mu(x))^2}{2\sigma_\epsilon^2} - \frac{1}{2}\]</span></p>
-<p>Assuming the estimated noise variance matches <span class="math inline">\(\hat{\sigma}^2 \approx \sigma^{*2} = 0.09\)</span>:</p>
-<p><span class="math display">\[D_{\text{KL}}(p^*(\cdot \mid x) \parallel q_\theta(\cdot \mid x)) = \frac{(\mu^*(x) - \mu(x))^2}{2\sigma^{*2}}\]</span></p>
-<p>We approximate the expected divergence <span class="math inline">\(\mathbb{E}_X [D_{\text{KL}}]\)</span> across a test set:</p>
+<section id="analytical-evaluation-of-generalization-kl-divergence" class="level2">
+<h2 class="anchored" data-anchor-id="analytical-evaluation-of-generalization-kl-divergence">Analytical evaluation of generalization KL divergence</h2>
+<p>To quantify model quality, we compute the true population KL divergence on test inputs <span class="math inline">\(X \sim \text{Uniform}(-5, 5)\)</span>.</p>
+<p>For two Gaussians <span class="math inline">\(p^*(Y \mid x) = \mathcal{N}(\mu^*(x), \sigma^{*2})\)</span> and <span class="math inline">\(q(Y \mid x) = \mathcal{N}(\hat{\mu}(x), \hat{\sigma}^2)\)</span>, the conditional KL divergence (in nats) is:</p>
+<p><span class="math display">\[D_{\text{KL}}(p^*(\cdot \mid x) \parallel q(\cdot \mid x)) = \log\frac{\hat{\sigma}}{\sigma^*} + \frac{\sigma^{*2} + (\mu^*(x) - \hat{\mu}(x))^2}{2\hat{\sigma}^2} - \frac{1}{2}\]</span></p>
+<p>Dividing by <span class="math inline">\(\log(2)\)</span> yields the divergence in <strong>bits</strong>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">runif</span>(<span class="dv">10000</span>, <span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>),</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">mu_true =</span> (x<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="dv">100</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_linear =</span> <span class="fu">predict</span>(mod_linear, <span class="at">newdata =</span> <span class="fu">pick</span>(<span class="fu">everything</span>())),</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_cubic  =</span> <span class="fu">predict</span>(mod_cubic, <span class="at">newdata =</span> <span class="fu">pick</span>(<span class="fu">everything</span>())),</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_deg9   =</span> <span class="fu">predict</span>(mod_deg9, <span class="at">newdata =</span> <span class="fu">pick</span>(<span class="fu">everything</span>()))</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>sigma_sq_true <span class="ot">&lt;-</span> <span class="fl">0.09</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>test_data <span class="sc">|&gt;</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">KL_Linear =</span> <span class="fu">mean</span>((mu_true <span class="sc">-</span> pred_linear)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> sigma_sq_true),</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">KL_Cubic  =</span> <span class="fu">mean</span>((mu_true <span class="sc">-</span> pred_cubic)<span class="sc">^</span><span class="dv">2</span>)  <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> sigma_sq_true),</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">KL_Deg9   =</span> <span class="fu">mean</span>((mu_true <span class="sc">-</span> pred_deg9)<span class="sc">^</span><span class="dv">2</span>)   <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> sigma_sq_true)</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"Model"</span>, <span class="at">values_to =</span> <span class="st">"Estimated_KL"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="fu">str_remove</span>(Model, <span class="st">"KL_"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">4</span>, <span class="at">caption =</span> <span class="st">"Expected KL Divergence from True DGP (Lower is Better)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dense test sample</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">runif</span>(<span class="dv">20000</span>, <span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">mu_true =</span> (x<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="dv">100</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_linear =</span> <span class="fu">predict</span>(mod_linear, <span class="at">newdata =</span> <span class="fu">pick</span>(<span class="fu">everything</span>())),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_cubic  =</span> <span class="fu">predict</span>(mod_cubic,  <span class="at">newdata =</span> <span class="fu">pick</span>(<span class="fu">everything</span>())),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_deg9   =</span> <span class="fu">predict</span>(mod_deg9,   <span class="at">newdata =</span> <span class="fu">pick</span>(<span class="fu">everything</span>()))</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to compute conditional KL divergence in bits</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>compute_kl_bits <span class="ot">&lt;-</span> <span class="cf">function</span>(mu_true, mu_pred, sigma_pred, <span class="at">sigma_true =</span> <span class="fl">0.3</span>) {</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  kl_nats <span class="ot">&lt;-</span> <span class="fu">log</span>(sigma_pred <span class="sc">/</span> sigma_true) <span class="sc">+</span> </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    (sigma_true<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (mu_true <span class="sc">-</span> mu_pred)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> (sigma_pred<span class="sc">^</span><span class="dv">2</span>)) <span class="sc">-</span> <span class="fl">0.5</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  kl_nats <span class="sc">/</span> <span class="fu">log</span>(<span class="dv">2</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Empirical residual standard deviations for polynomial fits</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>sigma_linear <span class="ot">&lt;-</span> <span class="fu">summary</span>(mod_linear)<span class="sc">$</span>sigma</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>sigma_cubic  <span class="ot">&lt;-</span> <span class="fu">summary</span>(mod_cubic)<span class="sc">$</span>sigma</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>sigma_deg9   <span class="ot">&lt;-</span> <span class="fu">summary</span>(mod_deg9)<span class="sc">$</span>sigma</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>poly_results <span class="ot">&lt;-</span> test_data <span class="sc">|&gt;</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Linear (Underfit)</span><span class="st">`</span>    <span class="ot">=</span> <span class="fu">mean</span>(<span class="fu">compute_kl_bits</span>(mu_true, pred_linear, sigma_linear)),</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Cubic (Well-Specified)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(<span class="fu">compute_kl_bits</span>(mu_true, pred_cubic,  sigma_cubic)),</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Degree 9 (Overfit)</span><span class="st">`</span>   <span class="ot">=</span> <span class="fu">mean</span>(<span class="fu">compute_kl_bits</span>(mu_true, pred_deg9,   sigma_deg9))</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"Model"</span>, <span class="at">values_to =</span> <span class="st">"Expected_KL_Bits"</span>)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(poly_results, <span class="at">digits =</span> <span class="dv">4</span>, <span class="at">caption =</span> <span class="st">"Expected KL Divergence from True DGP in Bits (Lower is Better)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Expected KL Divergence from True DGP (Lower is Better)</caption>
+<caption>Expected KL Divergence from True DGP in Bits (Lower is Better)</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Model</th>
-<th style="text-align: right;">Estimated_KL</th>
+<th style="text-align: right;">Expected_KL_Bits</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Linear</td>
-<td style="text-align: right;">0.3405</td>
+<td style="text-align: left;">Linear (Underfit)</td>
+<td style="text-align: right;">0.3734</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Cubic</td>
-<td style="text-align: right;">0.0841</td>
+<td style="text-align: left;">Cubic (Well-Specified)</td>
+<td style="text-align: right;">0.1498</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Deg9</td>
-<td style="text-align: right;">0.2550</td>
+<td style="text-align: left;">Degree 9 (Overfit)</td>
+<td style="text-align: right;">0.4786</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>The well-specified cubic model achieves near-zero divergence, whereas model mis-specification (linear) introduces irreducible approximation error (bias), and excessive capacity (degree 9) introduces estimation error (variance).</p>
 </section>
-<section id="learning-heteroscedastic-representations-with-a-neural-network" class="level2">
-<h2 class="anchored" data-anchor-id="learning-heteroscedastic-representations-with-a-neural-network">Learning Heteroscedastic Representations with a Neural Network</h2>
-<p>Instead of assuming a fixed variance <span class="math inline">\(\sigma^2\)</span>, we can parameterize both the conditional mean and conditional variance using a neural network:</p>
-<p><span class="math display">\[z = f(x, \theta) = (z_0, z_1)^\top \in \mathbb{R}^2\]</span> <span class="math display">\[Y \mid Z \sim \text{Normal}\left(\mu = z_0, \, \sigma^2 = g(z_1)^2\right)\]</span> <span class="math display">\[g(z) = 0.01 + \log(1 + e^z) = 0.01 + \text{softplus}(z)\]</span></p>
-<section id="network-specification" class="level3">
-<h3 class="anchored" data-anchor-id="network-specification">Network Specification</h3>
+<section id="neural-networks-via-mle-high-capacity-meets-empirical-risk" class="level2">
+<h2 class="anchored" data-anchor-id="neural-networks-via-mle-high-capacity-meets-empirical-risk">Neural networks via MLE: high capacity meets empirical risk</h2>
+<p>A deep neural network parameterized by <span class="math inline">\(\theta\)</span> acts as a universal function approximator. We fit a Multi-Layer Perceptron (MLP) using the same homoscedastic likelihood:</p>
+<p><span class="math display">\[Y \mid X \sim \text{Normal}\left(\mu = f(X; \theta), \; \hat{\sigma}^2\right)\]</span></p>
 <ul>
-<li><strong>Architecture:</strong> <span class="math inline">\(1 \to 32 \to 32 \to 2\)</span></li>
-<li><strong>Activations:</strong> Continuously Differentiable Exponential Linear Units (<code>CELU</code>) for hidden layers</li>
-<li><strong>Output layer:</strong> 2-dimensional linear representation producing latent variables <span class="math inline">\(z_0\)</span> and <span class="math inline">\(z_1\)</span></li>
+<li><strong>Architecture:</strong> <span class="math inline">\(1 \to 32 \to 32 \to 1\)</span> (~1,150 parameters)</li>
+<li><strong>Activations:</strong> Continuously Differentiable Exponential Linear Units (<code>CELU</code>)</li>
+<li><strong>Loss:</strong> Mean Squared Error (MSE), directly minimizing empirical data-space KL divergence.</li>
 </ul>
-</section>
-<section id="negative-log-likelihood-as-kl-minimization" class="level3">
-<h3 class="anchored" data-anchor-id="negative-log-likelihood-as-kl-minimization">Negative Log-Likelihood as KL Minimization</h3>
-<p>Under this model, minimizing empirical KL divergence equates to minimizing the negative log-likelihood (NLL):</p>
-<p><span class="math display">\[\mathcal{L}(\theta) = \frac{1}{n}\sum_{i=1}^n \left[ \log g(z_{1, i}) + \frac{(y_i - z_{0, i})^2}{2\, g(z_{1, i})^2} \right]\]</span></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(torch)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Set torch seed for reproducibility</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">torch_manual_seed</span>(<span class="dv">42</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Define Network Architecture</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>GaussianMLP <span class="ot">&lt;-</span> <span class="fu">nn_module</span>(</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"GaussianMLP"</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">initialize =</span> <span class="cf">function</span>() {</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>net <span class="ot">&lt;-</span> <span class="fu">nn_sequential</span>(</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nn_linear</span>(<span class="dv">1</span>, <span class="dv">32</span>),</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nn_celu</span>(),</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nn_linear</span>(<span class="dv">32</span>, <span class="dv">32</span>),</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nn_celu</span>(),</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nn_linear</span>(<span class="dv">32</span>, <span class="dv">2</span>)</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  },</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">forward =</span> <span class="cf">function</span>(x) {</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span><span class="fu">net</span>(x)</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">GaussianMLP</span>()</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>optimizer <span class="ot">&lt;-</span> <span class="fu">optim_adam</span>(model<span class="sc">$</span>parameters, <span class="at">lr =</span> <span class="fl">0.01</span>)</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare tensors</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">&lt;-</span> <span class="fu">torch_tensor</span>(<span class="fu">matrix</span>(sim_data<span class="sc">$</span>x, <span class="at">ncol =</span> <span class="dv">1</span>), <span class="at">dtype =</span> <span class="fu">torch_float</span>())</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">&lt;-</span> <span class="fu">torch_tensor</span>(<span class="fu">matrix</span>(sim_data<span class="sc">$</span>y, <span class="at">ncol =</span> <span class="dv">1</span>), <span class="at">dtype =</span> <span class="fu">torch_float</span>())</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Heteroscedastic Gaussian NLL loss function</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>gaussian_nll_loss <span class="ot">&lt;-</span> <span class="cf">function</span>(z, y) {</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  mu <span class="ot">&lt;-</span> z[, <span class="dv">1</span>, drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># g(z1) = 0.01 + softplus(z1)</span></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  sigma <span class="ot">&lt;-</span> <span class="fl">0.01</span> <span class="sc">+</span> <span class="fu">nnf_softplus</span>(z[, <span class="dv">2</span>, <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Negative log likelihood (omitting constant 0.5 * log(2 * pi))</span></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  loss <span class="ot">&lt;-</span> <span class="fu">torch_log</span>(sigma) <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">torch_pow</span>((y <span class="sc">-</span> mu) <span class="sc">/</span> sigma, <span class="dv">2</span>)</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">torch_mean</span>(loss)</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Training loop</span></span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>epochs <span class="ot">&lt;-</span> <span class="dv">1500</span></span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (epoch <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>epochs) {</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  optimizer<span class="sc">$</span><span class="fu">zero_grad</span>()</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>  z_pred <span class="ot">&lt;-</span> <span class="fu">model</span>(x_train)</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>  loss <span class="ot">&lt;-</span> <span class="fu">gaussian_nll_loss</span>(z_pred, y_train)</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>  loss<span class="sc">$</span><span class="fu">backward</span>()</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>  optimizer<span class="sc">$</span><span class="fu">step</span>()</span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define Homoscedastic MLP Architecture</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>MLP <span class="ot">&lt;-</span> <span class="fu">nn_module</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"MLP"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">initialize =</span> <span class="cf">function</span>() {</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>net <span class="ot">&lt;-</span> <span class="fu">nn_sequential</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nn_linear</span>(<span class="dv">1</span>, <span class="dv">32</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nn_celu</span>(),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nn_linear</span>(<span class="dv">32</span>, <span class="dv">32</span>),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nn_celu</span>(),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nn_linear</span>(<span class="dv">32</span>, <span class="dv">1</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">forward =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span><span class="fu">net</span>(x)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>mle_model <span class="ot">&lt;-</span> <span class="fu">MLP</span>()</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>mle_optimizer <span class="ot">&lt;-</span> <span class="fu">optim_adam</span>(mle_model<span class="sc">$</span>parameters, <span class="at">lr =</span> <span class="fl">0.005</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Tensors for torch</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">&lt;-</span> <span class="fu">torch_tensor</span>(<span class="fu">matrix</span>(sim_data<span class="sc">$</span>x, <span class="at">ncol =</span> <span class="dv">1</span>), <span class="at">dtype =</span> <span class="fu">torch_float</span>())</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">&lt;-</span> <span class="fu">torch_tensor</span>(<span class="fu">matrix</span>(sim_data<span class="sc">$</span>y, <span class="at">ncol =</span> <span class="dv">1</span>), <span class="at">dtype =</span> <span class="fu">torch_float</span>())</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Train network by minimizing MSE</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>mle_epochs <span class="ot">&lt;-</span> <span class="dv">3000</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (epoch <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>mle_epochs) {</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  mle_optimizer<span class="sc">$</span><span class="fu">zero_grad</span>()</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  y_hat <span class="ot">&lt;-</span> <span class="fu">mle_model</span>(x_train)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  loss  <span class="ot">&lt;-</span> <span class="fu">nnf_mse_loss</span>(y_hat, y_train)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  loss<span class="sc">$</span><span class="fu">backward</span>()</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  mle_optimizer<span class="sc">$</span><span class="fu">step</span>()</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate constant residual standard deviation sigma_hat</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>mle_model<span class="sc">$</span><span class="fu">eval</span>()</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="fu">with_no_grad</span>({</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  residuals <span class="ot">&lt;-</span> y_train <span class="sc">-</span> <span class="fu">mle_model</span>(x_train)</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  sigma_hat_mle <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">torch_sqrt</span>(<span class="fu">torch_mean</span>(residuals<span class="sc">^</span><span class="dv">2</span>)))</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
-</section>
-<section id="model-evaluation-and-representation-visualization" class="level3">
-<h3 class="anchored" data-anchor-id="model-evaluation-and-representation-visualization">Model Evaluation and Representation Visualization</h3>
-<p>We compute predictions across the range <span class="math inline">\(x \in [-6, 6]\)</span> along with the conditional standard deviation band <span class="math inline">\(\mu(x) \pm \sigma(x)\)</span>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict over evaluation grid</span></span>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict on an extended evaluation grid x in [-6, 6] to observe extrapolation</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>eval_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>, <span class="at">length.out =</span> <span class="dv">400</span>))</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>x_test_tensor <span class="ot">&lt;-</span> <span class="fu">torch_tensor</span>(<span class="fu">matrix</span>(eval_grid<span class="sc">$</span>x, <span class="at">ncol =</span> <span class="dv">1</span>), <span class="at">dtype =</span> <span class="fu">torch_float</span>())</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>model<span class="sc">$</span><span class="fu">eval</span>()</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">with_no_grad</span>({</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  z_test <span class="ot">&lt;-</span> <span class="fu">model</span>(x_test_tensor)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  mu_pred <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(z_test[, <span class="dv">1</span>])</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  sigma_pred <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fl">0.01</span> <span class="sc">+</span> <span class="fu">nnf_softplus</span>(z_test[, <span class="dv">2</span>]))</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>nn_eval <span class="ot">&lt;-</span> eval_grid <span class="sc">|&gt;</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_hat =</span> mu_pred,</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">sigma_hat =</span> sigma_pred,</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">lower_band =</span> mu_hat <span class="sc">-</span> sigma_hat,</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">upper_band =</span> mu_hat <span class="sc">+</span> sigma_hat</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate conditional KL divergence in bits (log2 base)</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co"># KL(p* || q) = log(sigma_q / sigma_p) + (sigma_p^2 + (mu_p - mu_q)^2)/(2 * sigma_q^2) - 0.5</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>sigma_true <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fl">0.09</span>)</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>eval_kl <span class="ot">&lt;-</span> eval_grid <span class="sc">|&gt;</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(x <span class="sc">&gt;=</span> <span class="sc">-</span><span class="dv">5</span> <span class="sc">&amp;</span> x <span class="sc">&lt;=</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> <span class="co"># Evaluate on support of p*(X)</span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_p =</span> (x<span class="sc">^</span><span class="dv">3</span>) <span class="sc">/</span> <span class="dv">100</span>,</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_q =</span> <span class="fu">approx</span>(nn_eval<span class="sc">$</span>x, nn_eval<span class="sc">$</span>mu_hat, <span class="at">xout =</span> x)<span class="sc">$</span>y,</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">sigma_q =</span> <span class="fu">approx</span>(nn_eval<span class="sc">$</span>x, nn_eval<span class="sc">$</span>sigma_hat, <span class="at">xout =</span> x)<span class="sc">$</span>y,</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">kl_nats =</span> <span class="fu">log</span>(sigma_q <span class="sc">/</span> sigma_true) <span class="sc">+</span> </span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>      (sigma_true<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (mu_p <span class="sc">-</span> mu_q)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> (sigma_q<span class="sc">^</span><span class="dv">2</span>)) <span class="sc">-</span> <span class="fl">0.5</span>,</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">kl_bits =</span> kl_nats <span class="sc">/</span> <span class="fu">log</span>(<span class="dv">2</span>)</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>mean_kl_bits <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(eval_kl<span class="sc">$</span>kl_bits), <span class="dv">2</span>)</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization matching the model diagnostic plot</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="fu">gf_ribbon</span>(lower <span class="sc">+</span> upper <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">fill =</span> <span class="st">"peachpuff"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_true <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower_band <span class="sc">+</span> upper_band <span class="sc">~</span> x, <span class="at">data =</span> nn_eval, <span class="at">fill =</span> <span class="st">"#1f77b4"</span>, <span class="at">alpha =</span> <span class="fl">0.35</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_hat <span class="sc">~</span> x, <span class="at">data =</span> nn_eval, <span class="at">color =</span> <span class="st">"#1f77b4"</span>, <span class="at">linewidth =</span> <span class="fl">1.1</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_labs</span>(</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Neural Network Representation &amp; Uncertainty Band"</span>,</span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">"Mean conditional KL divergence: "</span>, mean_kl_bits, <span class="st">" bits"</span>),</span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_theme</span>(<span class="fu">theme_minimal</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">with_no_grad</span>({</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  mu_mle <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">mle_model</span>(x_test_tensor))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>mle_eval <span class="ot">&lt;-</span> eval_grid <span class="sc">|&gt;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_hat     =</span> mu_mle,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">sigma_hat  =</span> sigma_hat_mle,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">lower_band =</span> mu_hat <span class="sc">-</span> sigma_hat,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">upper_band =</span> mu_hat <span class="sc">+</span> sigma_hat</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate test KL divergence on support [-5, 5]</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>eval_mle_kl <span class="ot">&lt;-</span> test_data <span class="sc">|&gt;</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_mle =</span> <span class="fu">approx</span>(mle_eval<span class="sc">$</span>x, mle_eval<span class="sc">$</span>mu_hat, <span class="at">xout =</span> x)<span class="sc">$</span>y,</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">kl_bits  =</span> <span class="fu">compute_kl_bits</span>(mu_true, pred_mle, sigma_hat_mle)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>mle_kl_bits <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(eval_mle_kl<span class="sc">$</span>kl_bits), <span class="dv">3</span>)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="fu">gf_point</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sim_data, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="fl">1.8</span>, <span class="at">color =</span> <span class="st">"gray25"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower <span class="sc">+</span> upper <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">fill =</span> <span class="st">"peachpuff"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_true <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower_band <span class="sc">+</span> upper_band <span class="sc">~</span> x, <span class="at">data =</span> mle_eval, <span class="at">fill =</span> <span class="st">"#1f77b4"</span>, <span class="at">alpha =</span> <span class="fl">0.35</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_hat <span class="sc">~</span> x, <span class="at">data =</span> mle_eval, <span class="at">color =</span> <span class="st">"#1f77b4"</span>, <span class="at">linewidth =</span> <span class="fl">1.1</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_labs</span>(</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Neural Network via MLE (Data-Space KL Minimization)"</span>,</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">"Mean conditional KL divergence: "</span>, mle_kl_bits, <span class="st">" bits (Estimated sigma: "</span>, <span class="fu">round</span>(sigma_hat_mle, <span class="dv">3</span>), <span class="st">")"</span>),</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_theme</span>(<span class="fu">theme_minimal</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="min_dkl_nn_files/figure-html/nn-visualization-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="min_dkl_nn_files/figure-html/mle-visualization-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+<p>With 1,150 parameters and only 30 observations, empirical data-space KL minimization interpolates noise clusters and exhibits arbitrary behavior outside the training domain <span class="math inline">\(x \notin [-5, 5]\)</span>.</p>
+</section>
+<section id="bayesian-learning-parameter-space-kl-divergence-minimization" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-learning-parameter-space-kl-divergence-minimization">Bayesian learning: parameter-space KL divergence minimization</h2>
+<p>To tame overfitting, Bayesian inference avoids searching for a single optimal parameter point <span class="math inline">\(\theta\)</span>. Instead, we place a prior distribution <span class="math inline">\(p(\theta)\)</span> over network weights and seek the posterior distribution <span class="math inline">\(p(\theta \mid \mathcal{D})\)</span>.</p>
+<p>Because the exact posterior is analytically intractable in deep networks, <strong>Variational Inference</strong> frames parameter learning as finding an approximate distribution <span class="math inline">\(q_\phi(\theta)\)</span> that minimizes the <strong>KL divergence in parameter space</strong>:</p>
+<p><span class="math display">\[\phi^* = \arg\min_\phi D_{\text{KL}}\left(q_\phi(\theta) \;\parallel\; p(\theta \mid \mathcal{D})\right)\]</span></p>
+<p>By Bayes’ theorem, <span class="math inline">\(p(\theta \mid \mathcal{D}) = \frac{p(\mathcal{D} \mid \theta) p(\theta)}{p(\mathcal{D})}\)</span>:</p>
+<p><span class="math display">\[D_{\text{KL}}\left(q_\phi(\theta) \;\parallel\; p(\theta \mid \mathcal{D})\right) = \underbrace{D_{\text{KL}}\left(q_\phi(\theta) \;\parallel\; p(\theta)\right)}_{\text{Parameter-Space Complexity Penalty}} - \underbrace{\mathbb{E}_{q_\phi(\theta)}\left[\sum_{i=1}^n \log q_\theta(y_i \mid x_i)\right]}_{\text{Expected Data Log-Likelihood}} + \underbrace{\log p(\mathcal{D})}_{\text{Constant wrt } \phi}\]</span></p>
+<p>Discarding the marginal evidence <span class="math inline">\(\log p(\mathcal{D})\)</span>, minimizing this parameter-space KL divergence is identical to minimizing the <strong>Variational Free Energy</strong> (maximizing the Evidence Lower Bound, ELBO):</p>
+<p><span class="math display">\[\mathcal{L}_{\text{VI}}(\phi) = D_{\text{KL}}\left(q_\phi(\theta) \;\parallel\; p(\theta)\right) + \sum_{i=1}^n \mathbb{E}_{q_\phi(\theta)}\left[ \frac{(y_i - f(x_i; \theta))^2}{2\hat{\sigma}^2} + \log \hat{\sigma} \right]\]</span></p>
+<section id="the-reparameterization-trick" class="level3">
+<h3 class="anchored" data-anchor-id="the-reparameterization-trick">The reparameterization trick</h3>
+<p>We specify an isotropic prior <span class="math inline">\(p(\theta) = \mathcal{N}(0, \sigma_0^2 I)\)</span> and a mean-field Gaussian variational posterior <span class="math inline">\(q_\phi(w) = \mathcal{N}(\mu_w, \sigma_w^2)\)</span> where <span class="math inline">\(\sigma_w = 10^{-4} + \text{softplus}(\rho_w)\)</span>.</p>
+<p>Weights are sampled differentiably via: <span class="math display">\[w = \mu_w + \sigma_w \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)\]</span></p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Variational Bayesian Linear Layer</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>bnn_linear <span class="ot">&lt;-</span> <span class="fu">nn_module</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"bnn_linear"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">initialize =</span> <span class="cf">function</span>(in_features, out_features, <span class="at">prior_sd =</span> <span class="fl">1.0</span>) {</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>in_features  <span class="ot">&lt;-</span> in_features</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>out_features <span class="ot">&lt;-</span> out_features</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>prior_sd     <span class="ot">&lt;-</span> prior_sd</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Variational parameters: means and log-variances (rho)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>weight_mu  <span class="ot">&lt;-</span> <span class="fu">nn_parameter</span>(<span class="fu">torch_empty</span>(out_features, in_features)<span class="sc">$</span><span class="fu">uniform_</span>(<span class="sc">-</span><span class="fl">0.1</span>, <span class="fl">0.1</span>))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>weight_rho <span class="ot">&lt;-</span> <span class="fu">nn_parameter</span>(<span class="fu">torch_full</span>(<span class="fu">c</span>(out_features, in_features), <span class="sc">-</span><span class="fl">4.0</span>))</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>bias_mu  <span class="ot">&lt;-</span> <span class="fu">nn_parameter</span>(<span class="fu">torch_zeros</span>(out_features))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>bias_rho <span class="ot">&lt;-</span> <span class="fu">nn_parameter</span>(<span class="fu">torch_full</span>(<span class="fu">c</span>(out_features), <span class="sc">-</span><span class="fl">4.0</span>))</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">forward =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    weight_sigma <span class="ot">&lt;-</span> <span class="fl">1e-4</span> <span class="sc">+</span> <span class="fu">nnf_softplus</span>(self<span class="sc">$</span>weight_rho)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    bias_sigma   <span class="ot">&lt;-</span> <span class="fl">1e-4</span> <span class="sc">+</span> <span class="fu">nnf_softplus</span>(self<span class="sc">$</span>bias_rho)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Reparameterization trick</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    eps_w <span class="ot">&lt;-</span> <span class="fu">torch_randn_like</span>(self<span class="sc">$</span>weight_mu)</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    eps_b <span class="ot">&lt;-</span> <span class="fu">torch_randn_like</span>(self<span class="sc">$</span>bias_mu)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    weight <span class="ot">&lt;-</span> self<span class="sc">$</span>weight_mu <span class="sc">+</span> weight_sigma <span class="sc">*</span> eps_w</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    bias   <span class="ot">&lt;-</span> self<span class="sc">$</span>bias_mu   <span class="sc">+</span> bias_sigma   <span class="sc">*</span> eps_b</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nnf_linear</span>(x, weight, bias)</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">kl_loss =</span> <span class="cf">function</span>() {</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    weight_sigma <span class="ot">&lt;-</span> <span class="fl">1e-4</span> <span class="sc">+</span> <span class="fu">nnf_softplus</span>(self<span class="sc">$</span>weight_rho)</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    bias_sigma   <span class="ot">&lt;-</span> <span class="fl">1e-4</span> <span class="sc">+</span> <span class="fu">nnf_softplus</span>(self<span class="sc">$</span>bias_rho)</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Analytical KL against N(0, prior_sd^2)</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    kl_w <span class="ot">&lt;-</span> <span class="fu">torch_sum</span>(<span class="fu">torch_log</span>(self<span class="sc">$</span>prior_sd <span class="sc">/</span> weight_sigma) <span class="sc">+</span> </span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>                      (weight_sigma<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> self<span class="sc">$</span>weight_mu<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> self<span class="sc">$</span>prior_sd<span class="sc">^</span><span class="dv">2</span>) <span class="sc">-</span> <span class="fl">0.5</span>)</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    kl_b <span class="ot">&lt;-</span> <span class="fu">torch_sum</span>(<span class="fu">torch_log</span>(self<span class="sc">$</span>prior_sd <span class="sc">/</span> bias_sigma) <span class="sc">+</span> </span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>                      (bias_sigma<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> self<span class="sc">$</span>bias_mu<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> self<span class="sc">$</span>prior_sd<span class="sc">^</span><span class="dv">2</span>) <span class="sc">-</span> <span class="fl">0.5</span>)</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    kl_w <span class="sc">+</span> kl_b</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Complete Variational BNN Architecture</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>BayesianMLP <span class="ot">&lt;-</span> <span class="fu">nn_module</span>(</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>  <span class="st">"BayesianMLP"</span>,</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">initialize =</span> <span class="cf">function</span>(<span class="at">prior_sd =</span> <span class="fl">1.0</span>) {</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>l1 <span class="ot">&lt;-</span> <span class="fu">bnn_linear</span>(<span class="dv">1</span>, <span class="dv">32</span>, <span class="at">prior_sd =</span> prior_sd)</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>l2 <span class="ot">&lt;-</span> <span class="fu">bnn_linear</span>(<span class="dv">32</span>, <span class="dv">32</span>, <span class="at">prior_sd =</span> prior_sd)</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>l3 <span class="ot">&lt;-</span> <span class="fu">bnn_linear</span>(<span class="dv">32</span>, <span class="dv">1</span>, <span class="at">prior_sd =</span> prior_sd)</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>  <span class="at">forward =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">nnf_celu</span>(self<span class="sc">$</span><span class="fu">l1</span>(x))</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">nnf_celu</span>(self<span class="sc">$</span><span class="fu">l2</span>(x))</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span><span class="fu">l3</span>(x)</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">kl_loss =</span> <span class="cf">function</span>() {</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>l1<span class="sc">$</span><span class="fu">kl_loss</span>() <span class="sc">+</span> self<span class="sc">$</span>l2<span class="sc">$</span><span class="fu">kl_loss</span>() <span class="sc">+</span> self<span class="sc">$</span>l3<span class="sc">$</span><span class="fu">kl_loss</span>()</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>bnn_model <span class="ot">&lt;-</span> <span class="fu">BayesianMLP</span>(<span class="at">prior_sd =</span> <span class="fl">1.0</span>)</span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>bnn_optimizer <span class="ot">&lt;-</span> <span class="fu">optim_adam</span>(bnn_model<span class="sc">$</span>parameters, <span class="at">lr =</span> <span class="fl">0.005</span>)</span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a><span class="co"># Variational Free Energy Optimization</span></span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>bnn_epochs <span class="ot">&lt;-</span> <span class="dv">3000</span></span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (epoch <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>bnn_epochs) {</span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>  bnn_optimizer<span class="sc">$</span><span class="fu">zero_grad</span>()</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>  <span class="co"># KL annealing schedule: beta scales smoothly from 0 to 1/n</span></span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>  beta <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="dv">1</span> <span class="sc">/</span> n, (epoch <span class="sc">/</span> <span class="dv">1500</span>) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">/</span> n))</span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Stochastic forward pass: sample theta ~ q_phi(theta)</span></span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>  y_hat <span class="ot">&lt;-</span> <span class="fu">bnn_model</span>(x_train)</span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Negative log-likelihood (constant noise model with true/calibrated sigma)</span></span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>  nll <span class="ot">&lt;-</span> <span class="fu">torch_sum</span>(<span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">torch_pow</span>((y_train <span class="sc">-</span> y_hat) <span class="sc">/</span> sigma_true, <span class="dv">2</span>))</span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Total Variational Free Energy: Data NLL + beta * Parameter KL</span></span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>  loss <span class="ot">&lt;-</span> nll <span class="sc">+</span> beta <span class="sc">*</span> bnn_model<span class="sc">$</span><span class="fu">kl_loss</span>()</span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>  loss<span class="sc">$</span><span class="fu">backward</span>()</span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>  bnn_optimizer<span class="sc">$</span><span class="fu">step</span>()</span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="predictive-epistemic-and-aleatoric-uncertainty" class="level3">
+<h3 class="anchored" data-anchor-id="predictive-epistemic-and-aleatoric-uncertainty">Predictive epistemic and aleatoric uncertainty</h3>
+<p>Under the Bayesian model, generating predictions entails drawing <span class="math inline">\(S\)</span> posterior parameter samples <span class="math inline">\(\theta^{(s)} \sim q_\phi(\theta)\)</span>.</p>
+<p>The total predictive variance decomposes into: <span class="math display">\[\sigma^2_{\text{pred}}(x) = \underbrace{\text{Var}_{\theta}\left[f(x; \theta)\right]}_{\text{Epistemic (Model Uncertainty)}} + \underbrace{\sigma^{*2}}_{\text{Aleatoric (Noise)}}\]</span></p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw Monte Carlo predictions from the variational posterior</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>num_mc_samples <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>mc_preds <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> <span class="fu">nrow</span>(eval_grid), <span class="at">ncol =</span> num_mc_samples)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">with_no_grad</span>({</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>num_mc_samples) {</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    mc_preds[, s] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">bnn_model</span>(x_test_tensor))</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>bnn_eval <span class="ot">&lt;-</span> eval_grid <span class="sc">|&gt;</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu_hat        =</span> <span class="fu">rowMeans</span>(mc_preds),</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">var_epistemic =</span> <span class="fu">apply</span>(mc_preds, <span class="dv">1</span>, var),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">var_aleatoric =</span> sigma_sq_true,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_sd      =</span> <span class="fu">sqrt</span>(var_epistemic <span class="sc">+</span> var_aleatoric),</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">lower_band    =</span> mu_hat <span class="sc">-</span> total_sd,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">upper_band    =</span> mu_hat <span class="sc">+</span> total_sd</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate test KL divergence on support [-5, 5]</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>eval_bnn_kl <span class="ot">&lt;-</span> test_data <span class="sc">|&gt;</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_bnn   =</span> <span class="fu">approx</span>(bnn_eval<span class="sc">$</span>x, bnn_eval<span class="sc">$</span>mu_hat, <span class="at">xout =</span> x)<span class="sc">$</span>y,</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">sigma_bnn  =</span> <span class="fu">approx</span>(bnn_eval<span class="sc">$</span>x, bnn_eval<span class="sc">$</span>total_sd, <span class="at">xout =</span> x)<span class="sc">$</span>y,</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">kl_bits    =</span> <span class="fu">compute_kl_bits</span>(mu_true, pred_bnn, sigma_bnn)</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>bnn_kl_bits <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(eval_bnn_kl<span class="sc">$</span>kl_bits), <span class="dv">3</span>)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="fu">gf_point</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sim_data, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="fl">1.8</span>, <span class="at">color =</span> <span class="st">"gray25"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower <span class="sc">+</span> upper <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">fill =</span> <span class="st">"peachpuff"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_true <span class="sc">~</span> x, <span class="at">data =</span> true_grid, <span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_ribbon</span>(lower_band <span class="sc">+</span> upper_band <span class="sc">~</span> x, <span class="at">data =</span> bnn_eval, <span class="at">fill =</span> <span class="st">"#2ca02c"</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_line</span>(mu_hat <span class="sc">~</span> x, <span class="at">data =</span> bnn_eval, <span class="at">color =</span> <span class="st">"#2ca02c"</span>, <span class="at">linewidth =</span> <span class="fl">1.1</span>, <span class="at">inherit =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>), <span class="at">x =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_labs</span>(</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Bayesian Neural Network (Parameter-Space KL Minimization)"</span>,</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">"Mean conditional KL divergence: "</span>, bnn_kl_bits, <span class="st">" bits (Total predictive uncertainty: epistemic + aleatoric)"</span>),</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"X"</span>,</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Y"</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gf_theme</span>(<span class="fu">theme_minimal</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="min_dkl_nn_files/figure-html/bnn-visualization-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Notice how the Bayesian network’s uncertainty band naturally flares outward for <span class="math inline">\(|x| &gt; 5\)</span> where data is absent, accurately communicating epistemic uncertainty rather than making overconfident assertions.</p>
+</section>
+</section>
+<section id="synthesis-the-hierarchy-of-kl-divergence-minimization" class="level2">
+<h2 class="anchored" data-anchor-id="synthesis-the-hierarchy-of-kl-divergence-minimization">Synthesis: the hierarchy of KL divergence minimization</h2>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>all_results <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Paradigm =</span> <span class="fu">c</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Linear Regression (OLS)"</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Cubic Regression (OLS)"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Degree 9 Polynomial (OLS)"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Neural Network (MLE / MSE)"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Bayesian Neural Network (Variational Inference)"</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Optimization Objective</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Min Data-Space KL (Linear Family)"</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Min Data-Space KL (Cubic Family)"</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Min Data-Space KL (Polynomial Deg 9)"</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Min Data-Space KL (Neural Network)"</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Min Parameter-Space KL (ELBO Free Energy)"</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Expected KL Divergence (Bits)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mean</span>(<span class="fu">compute_kl_bits</span>(test_data<span class="sc">$</span>mu_true, test_data<span class="sc">$</span>pred_linear, sigma_linear)),</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mean</span>(<span class="fu">compute_kl_bits</span>(test_data<span class="sc">$</span>mu_true, test_data<span class="sc">$</span>pred_cubic,  sigma_cubic)),</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mean</span>(<span class="fu">compute_kl_bits</span>(test_data<span class="sc">$</span>mu_true, test_data<span class="sc">$</span>pred_deg9,   sigma_deg9)),</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mean</span>(eval_mle_kl<span class="sc">$</span>kl_bits),</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mean</span>(eval_bnn_kl<span class="sc">$</span>kl_bits)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(all_results, <span class="at">digits =</span> <span class="dv">4</span>, <span class="at">caption =</span> <span class="st">"Summary: KL Divergence Across Statistical Learning Paradigms"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Summary: KL Divergence Across Statistical Learning Paradigms</caption>
+<colgroup>
+<col style="width: 40%">
+<col style="width: 35%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Paradigm</th>
+<th style="text-align: left;">Optimization Objective</th>
+<th style="text-align: right;">Expected KL Divergence (Bits)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Linear Regression (OLS)</td>
+<td style="text-align: left;">Min Data-Space KL (Linear Family)</td>
+<td style="text-align: right;">0.3734</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cubic Regression (OLS)</td>
+<td style="text-align: left;">Min Data-Space KL (Cubic Family)</td>
+<td style="text-align: right;">0.1498</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Degree 9 Polynomial (OLS)</td>
+<td style="text-align: left;">Min Data-Space KL (Polynomial Deg 9)</td>
+<td style="text-align: right;">0.4786</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Neural Network (MLE / MSE)</td>
+<td style="text-align: left;">Min Data-Space KL (Neural Network)</td>
+<td style="text-align: right;">3.3519</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bayesian Neural Network (Variational Inference)</td>
+<td style="text-align: left;">Min Parameter-Space KL (ELBO Free Energy)</td>
+<td style="text-align: right;">0.1050</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="summary-of-principles" class="level3">
+<h3 class="anchored" data-anchor-id="summary-of-principles">Summary of principles</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Paradigm</th>
+<th style="text-align: left;">Domain of KL Minimization</th>
+<th style="text-align: left;">Mathematical Formulation</th>
+<th style="text-align: left;">Typical Pathology</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Maximum Likelihood (MLE / OLS)</strong></td>
+<td style="text-align: left;"><strong>Data Space:</strong> <span class="math inline">\(D_{\text{KL}}(p^* \parallel q_\theta)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\arg\max_\theta \sum_{i=1}^n \log q_\theta(y_i \mid x_i)\)</span></td>
+<td style="text-align: left;">Overfits and collapses uncertainty in high-capacity models</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Bayesian Inference (VI)</strong></td>
+<td style="text-align: left;"><strong>Parameter Space:</strong> <span class="math inline">\(D_{\text{KL}}(q_\phi \parallel p(\cdot \mid \mathcal{D}))\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\arg\min_\phi \left\{ D_{\text{KL}}(q_\phi \parallel p) - \mathbb{E}_{q}[\log q(y \mid x)] \right\}\)</span></td>
+<td style="text-align: left;">Regularizes capacity and preserves honest epistemic uncertainty</td>
+</tr>
+</tbody>
+</table>
 </section>
 </section>
 

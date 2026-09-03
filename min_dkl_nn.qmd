@@ -1,121 +1,137 @@
 ---
 title: "KL Divergence Minimization as a General Principle of Statistical Learning"
-format: html
+subtitle: "From Maximum Likelihood to Bayesian Deep Learning"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: show
 execute:
   warning: false
   message: false
 ---
 
+## Overview and learning objectives
+
+Most statistical and machine learning methods are introduced through disparate lenses: Ordinary Least Squares minimizes squared residuals, Maximum Likelihood maximizes sample probability density, and Bayesian inference updates prior beliefs via Bayes' rule.
+
+This notebook demonstrates that **Kullback-Leibler (KL) divergence minimization serves as a unifying foundational principle across all these paradigms**:
+
+1.  **Maximum Likelihood Estimation (MLE)** minimizes the *forward KL divergence in data space* between the true distribution and the model family.
+2.  **Mean Squared Error (MSE)** is the exact mathematical consequence of minimizing this data-space KL divergence under Gaussian errors.
+3.  **Bayesian Learning (Variational Inference)** minimizes the *reverse KL divergence in parameter space* between an approximate posterior distribution and the true posterior distribution.
+
+## Sources and further reading
+
+- [VIB is Half Bayes](https://youtu.be/JGDAZ4joUX8) [VIB is Half Bayes (arXiv:2011.08711)](https://doi.org/10.48550/arXiv.2011.08711)
+- [A Tale of Two Worlds: The Variational Approach to Machine Learning](https://youtu.be/OAHsR02dUc0)
+
 ```{r}
 #| label: setup
 library(tidyverse)
 library(ggformula)
+library(torch)
 
+# Set seeds for reproducibility across R and libtorch
 set.seed(666)
+torch_manual_seed(666)
 ```
 
-## Sources
+## The true data-generating process (DGP)
 
-- <https://youtu.be/JGDAZ4joUX8>
+We define a known synthetic ground-truth environment $p^*(x, y) = p^*(y \mid x) p^*(x)$:
 
-- <https://youtu.be/OAHsR02dUc0>
+$$X \sim \text{Uniform}(-5, 5)$$ $$Y \mid X \sim \text{Normal}\left(\mu^*(X) = \frac{X^3}{100}, \; \sigma^{*2} = 0.09\right)$$
 
-- <https://doi.org/10.48550/arXiv.2011.08711>
-
-## Simulating the True Data Generating Process
-
-From the target specification, the true distribution is defined as:
-
-$$X \sim \text{Uniform}(-5, 5)$$ $$Y \mid X \sim \text{Normal}\left(\frac{X^3}{100}, 0.09\right)$$
-
-Note that the variance is $\sigma^2 = 0.09$, which corresponds to a standard deviation of $\sigma = \sqrt{0.09} = 0.3$.
+The true conditional standard deviation is $\sigma^* = \sqrt{0.09} = 0.3$. We sample a small dataset of $n = 30$ observations to illustrate how different learning principles behave in the low-data / high-capacity regime.
 
 ```{r}
 #| label: simulate-data
-# Number of samples
+# Sample size
 n <- 30
 
 # True DGP parameters
+sigma_sq_true <- 0.09
+sigma_true    <- sqrt(sigma_sq_true)
+
+# Simulated training sample
 sim_data <- tibble(
   x = runif(n, min = -5, max = 5)
 ) |>
   mutate(
     mu_true = (x^3) / 100,
-    y = rnorm(n, mean = mu_true, sd = sqrt(0.09))
+    y = rnorm(n, mean = mu_true, sd = sigma_true)
   )
 
-# Data frame for true curve and 1 SD envelope
+# Dense evaluation grid for the ground truth
 true_grid <- tibble(x = seq(-5, 5, length.out = 300)) |>
   mutate(
     mu_true = (x^3) / 100,
-    lower = mu_true - 0.3,
-    upper = mu_true + 0.3
+    lower = mu_true - sigma_true,
+    upper = mu_true + sigma_true
   )
 
-# Base plot on sim_data, explicitly pass true_grid to the annotation layers
-gf_point(y ~ x, data = sim_data, alpha = 0.4, size = 1.5) |>
+# Visualize DGP
+gf_point(y ~ x, data = sim_data, alpha = 0.6, size = 2, color = "gray20") |>
   gf_ribbon(lower + upper ~ x, data = true_grid, fill = "peachpuff", alpha = 0.6, inherit = FALSE) |>
   gf_line(mu_true ~ x, data = true_grid, color = "darkorange", linetype = "dashed", linewidth = 1, inherit = FALSE) |>
   gf_lims(y = c(-3, 3), x = c(-6, 6)) |>
   gf_labs(
-    title = "True Data Distribution & Sampled Observations",
+    title = "True Data Distribution & Sampled Observations (n = 30)",
+    subtitle = "Dashed orange line: true mean function; Peach envelope: true ±1 SD",
     x = "X",
     y = "Y"
   ) |>
   gf_theme(theme_minimal())
 ```
 
-------------------------------------------------------------------------
+## Theory: learning via data-space KL divergence minimization
 
-## The Statistical Learning Framework
+Let $p^*(x, y)$ be the true distribution and $q_\theta(x, y) = q_\theta(y \mid x) p^*(x)$ be our parameterized model candidate.
 
-Let the true data-generating density be $p^*(x, y) = p^*(y \mid x) p^*(x)$ and our parametric candidate model be $q_\theta(x, y) = q_\theta(y \mid x) p^*(x)$.
-
-The Kullback-Leibler (KL) divergence from our model $q_\theta$ to the true distribution $p^*$ is:
+The **Kullback-Leibler (KL) divergence** from our candidate model $q_\theta$ to the true distribution $p^*$ measures information lost when approximating $p^*$ with $q_\theta$:
 
 $$D_{\text{KL}}(p^* \parallel q_\theta) = \int \int p^*(x, y) \log \frac{p^*(x, y)}{q_\theta(x, y)} \, dy \, dx$$
 
 Expanding the logarithm:
 
-$$D_{\text{KL}}(p^* \parallel q_\theta) = \mathbb{E}_{p^*}\left[\log p^*(X, Y)\right] - \mathbb{E}_{p^*}\left[\log q_\theta(X, Y)\right]$$
+$$D_{\text{KL}}(p^* \parallel q_\theta) = \underbrace{\mathbb{E}_{p^*}\left[\log p^*(X, Y)\right]}_{\text{Constant with respect to } \theta} - \mathbb{E}_{p^*}\left[\log q_\theta(Y \mid X)\right]$$
 
-Because $\mathbb{E}_{p^*}[\log p^*(X, Y)]$ depends strictly on the true world and is constant with respect to model parameters $\theta$:
+Because the entropy of the real world $\mathbb{E}_{p^*}[\log p^*(X, Y)]$ is invariant to our model parameters $\theta$, minimizing KL divergence directly simplifies to:
 
 $$\arg\min_\theta D_{\text{KL}}(p^* \parallel q_\theta) = \arg\max_\theta \mathbb{E}_{p^*}\left[\log q_\theta(Y \mid X)\right]$$
 
-Under the empirical distribution of a sample $(x_i, y_i)_{i=1}^n \sim p^*$, the empirical expectation replaces the population expectation:
+Under an observed finite sample $(x_i, y_i)_{i=1}^n \sim p^*$, the empirical sample mean approximates the population expectation:
 
 $$\mathbb{E}_{p^*}\left[\log q_\theta(Y \mid X)\right] \approx \frac{1}{n}\sum_{i=1}^n \log q_\theta(y_i \mid x_i)$$
 
-Thus, **Maximum Likelihood Estimation (MLE)** directly approximates **minimal KL divergence** from the truth.
+$$\therefore \arg\min_\theta D_{\text{KL}}(p^* \parallel q_\theta) \approx \arg\max_\theta \sum_{i=1}^n \log q_\theta(y_i \mid x_i)$$
 
-------------------------------------------------------------------------
+> **Core Insight 1:** Maximum Likelihood Estimation (MLE) is not an arbitrary estimation heuristic; it is the empirical approximation of **forward KL divergence minimization in data space**.
 
-## Connecting KL Minimization to Mean Squared Error (MSE)
+### Deriving mean squared error (MSE) from the Gaussian log-likelihood
 
-Consider a conditional Gaussian regression model with fixed variance $\sigma^2$:
+Assume a homoscedastic conditional Gaussian model with constant noise variance $\sigma^2$:
 
-$$q_\theta(Y \mid X = x) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left( -\frac{(y - f_\theta(x))^2}{2\sigma^2} \right)$$
+$$q_\theta(Y \mid X = x) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left( -\frac{(y - f(x; \theta))^2}{2\sigma^2} \right)$$
 
-Evaluating the log-likelihood under this model:
+Evaluating the total log-likelihood:
 
-$$\log q_\theta(y_i \mid x_i) = -\frac{1}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\left(y_i - f_\theta(x_i)\right)^2$$
+$$\sum_{i=1}^n \log q_\theta(y_i \mid x_i) = -\frac{n}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\sum_{i=1}^n \left(y_i - f(x_i; \theta)\right)^2$$
 
-Maximizing this objective over $\theta$ discards additive and scaling constants:
+Dropping additive constants and positive scaling factors independent of $\theta$:
 
-$$\arg\min_\theta D_{\text{KL}}(p^* \parallel q_\theta) \iff \arg\min_\theta \frac{1}{n} \sum_{i=1}^n \left(y_i - f_\theta(x_i)\right)^2$$
+$$\arg\max_\theta \sum_{i=1}^n \log q_\theta(y_i \mid x_i) \iff \arg\min_\theta \frac{1}{n} \sum_{i=1}^n \left(y_i - f(x_i; \theta)\right)^2$$
 
-Minimizing squared error loss is mathematically identical to minimizing the KL divergence under homoscedastic Gaussian assumptions.
+> **Core Insight 2:** Ordinary Least Squares / Mean Squared Error regression is mathematically equivalent to empirical KL divergence minimization under a constant-variance Gaussian model.
 
-------------------------------------------------------------------------
+## Polynomial hypotheses and the capacity dilemma
 
-## Model Fitting: Polynomial Hypothesis Classes
+We first evaluate data-space KL minimization across linear regression models with three different hypothesis capacities:
 
-We fit three models via ordinary least squares (equivalent to KL minimization within each model family):
-
-- **Model 1 (Linear):** $\hat{y} = \beta_0 + \beta_1 x$
-- **Model 2 (Cubic - Well Specified):** $\hat{y} = \beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 x^3$
-- **Model 3 (Degree 9 - Overparameterized):** $\hat{y} = \sum_{k=0}^9 \beta_k x^k$
+1.  **Linear (Underparameterized / High Bias):** $f(x) = \beta_0 + \beta_1 x$
+2.  **Cubic (Well-Specified):** $f(x) = \sum_{k=0}^3 \beta_k x^k$
+3.  **Degree 9 Polynomial (Overparameterized / High Variance):** $f(x) = \sum_{k=0}^9 \beta_k x^k$
 
 ```{r}
 #| label: model-fitting
@@ -123,108 +139,100 @@ mod_linear <- lm(y ~ x, data = sim_data)
 mod_cubic  <- lm(y ~ poly(x, 3, raw = TRUE), data = sim_data)
 mod_deg9   <- lm(y ~ poly(x, 9, raw = TRUE), data = sim_data)
 
-preds <- true_grid |>
+preds_poly <- true_grid |>
   mutate(
     `Linear (Underfit)` = predict(mod_linear, newdata = true_grid),
-    `Cubic (True Form)` = predict(mod_cubic, newdata = true_grid),
-    `Degree 9 (High Variance)` = predict(mod_deg9, newdata = true_grid)
+    `Cubic (Well-Specified)` = predict(mod_cubic, newdata = true_grid),
+    `Degree 9 (Overfit)` = predict(mod_deg9, newdata = true_grid)
   ) |>
   pivot_longer(
-    cols = c(`Linear (Underfit)`, `Cubic (True Form)`, `Degree 9 (High Variance)`),
+    cols = c(`Linear (Underfit)`, `Cubic (Well-Specified)`, `Degree 9 (Overfit)`),
     names_to = "Model",
     values_to = "y_hat"
   )
 
-# Option A: Start with gf_point, then add ribbon and lines explicitly
-gf_point(y ~ x, data = sim_data, alpha = 0.25, size = 1.2) |>
+gf_point(y ~ x, data = sim_data, alpha = 0.5, size = 1.8, color = "gray25") |>
   gf_ribbon(lower + upper ~ x, data = true_grid, fill = "peachpuff", alpha = 0.5, inherit = FALSE) |>
-  gf_line(y_hat ~ x, data = preds, color = ~Model, linewidth = 1, inherit = FALSE) |>
+  gf_line(mu_true ~ x, data = true_grid, color = "darkorange", linetype = "dashed", linewidth = 0.8, inherit = FALSE) |>
+  gf_line(y_hat ~ x, data = preds_poly, color = ~Model, linewidth = 1, inherit = FALSE) |>
   gf_lims(y = c(-3, 3), x = c(-5, 5)) |>
   gf_labs(
-    title = "Fitted Models via Empirical Risk / KL Minimization",
-    subtitle = "Peach band shows true conditional distribution mean ± 1 SD",
+    title = "Polynomial Hypothesis Classes via Least Squares (Data-Space KL)",
+    subtitle = "Higher capacity models minimize sample empirical risk at the cost of divergence from p*",
     x = "X",
     y = "Y"
   ) |>
   gf_theme(theme_minimal())
 ```
 
-------------------------------------------------------------------------
+## Analytical evaluation of generalization KL divergence
 
-## Empirical KL Divergence Computation
+To quantify model quality, we compute the true population KL divergence on test inputs $X \sim \text{Uniform}(-5, 5)$.
 
-For a Gaussian predictive distribution $q_\theta(y \mid x) = \mathcal{N}(\mu(x), \sigma_\epsilon^2)$ where the true model is $p^*(y \mid x) = \mathcal{N}(\mu^*(x), \sigma^{*2})$, the conditional KL divergence simplifies analytically to:
+For two Gaussians $p^*(Y \mid x) = \mathcal{N}(\mu^*(x), \sigma^{*2})$ and $q(Y \mid x) = \mathcal{N}(\hat{\mu}(x), \hat{\sigma}^2)$, the conditional KL divergence (in nats) is:
 
-$$D_{\text{KL}}(p^*(\cdot \mid x) \parallel q_\theta(\cdot \mid x)) = \log\frac{\sigma_\epsilon}{\sigma^*} + \frac{\sigma^{*2} + (\mu^*(x) - \mu(x))^2}{2\sigma_\epsilon^2} - \frac{1}{2}$$
+$$D_{\text{KL}}(p^*(\cdot \mid x) \parallel q(\cdot \mid x)) = \log\frac{\hat{\sigma}}{\sigma^*} + \frac{\sigma^{*2} + (\mu^*(x) - \hat{\mu}(x))^2}{2\hat{\sigma}^2} - \frac{1}{2}$$
 
-Assuming the estimated noise variance matches $\hat{\sigma}^2 \approx \sigma^{*2} = 0.09$:
-
-$$D_{\text{KL}}(p^*(\cdot \mid x) \parallel q_\theta(\cdot \mid x)) = \frac{(\mu^*(x) - \mu(x))^2}{2\sigma^{*2}}$$
-
-We approximate the expected divergence $\mathbb{E}_X [D_{\text{KL}}]$ across a test set:
+Dividing by $\log(2)$ yields the divergence in **bits**.
 
 ```{r}
-#| label: kl-evaluation
+#| label: kl-poly-evaluation
+# Dense test sample
 test_data <- tibble(
-  x = runif(10000, -5, 5),
+  x = runif(20000, -5, 5),
   mu_true = (x^3) / 100
 ) |>
   mutate(
     pred_linear = predict(mod_linear, newdata = pick(everything())),
-    pred_cubic  = predict(mod_cubic, newdata = pick(everything())),
-    pred_deg9   = predict(mod_deg9, newdata = pick(everything()))
+    pred_cubic  = predict(mod_cubic,  newdata = pick(everything())),
+    pred_deg9   = predict(mod_deg9,   newdata = pick(everything()))
   )
 
-sigma_sq_true <- 0.09
+# Function to compute conditional KL divergence in bits
+compute_kl_bits <- function(mu_true, mu_pred, sigma_pred, sigma_true = 0.3) {
+  kl_nats <- log(sigma_pred / sigma_true) + 
+    (sigma_true^2 + (mu_true - mu_pred)^2) / (2 * (sigma_pred^2)) - 0.5
+  kl_nats / log(2)
+}
 
-test_data |>
+# Empirical residual standard deviations for polynomial fits
+sigma_linear <- summary(mod_linear)$sigma
+sigma_cubic  <- summary(mod_cubic)$sigma
+sigma_deg9   <- summary(mod_deg9)$sigma
+
+poly_results <- test_data |>
   summarise(
-    KL_Linear = mean((mu_true - pred_linear)^2) / (2 * sigma_sq_true),
-    KL_Cubic  = mean((mu_true - pred_cubic)^2)  / (2 * sigma_sq_true),
-    KL_Deg9   = mean((mu_true - pred_deg9)^2)   / (2 * sigma_sq_true)
+    `Linear (Underfit)`    = mean(compute_kl_bits(mu_true, pred_linear, sigma_linear)),
+    `Cubic (Well-Specified)` = mean(compute_kl_bits(mu_true, pred_cubic,  sigma_cubic)),
+    `Degree 9 (Overfit)`   = mean(compute_kl_bits(mu_true, pred_deg9,   sigma_deg9))
   ) |>
-  pivot_longer(everything(), names_to = "Model", values_to = "Estimated_KL") |>
-  mutate(Model = str_remove(Model, "KL_")) |>
-  knitr::kable(digits = 4, caption = "Expected KL Divergence from True DGP (Lower is Better)")
+  pivot_longer(everything(), names_to = "Model", values_to = "Expected_KL_Bits")
+
+knitr::kable(poly_results, digits = 4, caption = "Expected KL Divergence from True DGP in Bits (Lower is Better)")
 ```
 
-The well-specified cubic model achieves near-zero divergence, whereas model mis-specification (linear) introduces irreducible approximation error (bias), and excessive capacity (degree 9) introduces estimation error (variance).
+## Neural networks via MLE: high capacity meets empirical risk
 
-## Learning Heteroscedastic Representations with a Neural Network
+A deep neural network parameterized by $\theta$ acts as a universal function approximator. We fit a Multi-Layer Perceptron (MLP) using the same homoscedastic likelihood:
 
-Instead of assuming a fixed variance $\sigma^2$, we can parameterize both the conditional mean and conditional variance using a neural network:
+$$Y \mid X \sim \text{Normal}\left(\mu = f(X; \theta), \; \hat{\sigma}^2\right)$$
 
-$$z = f(x, \theta) = (z_0, z_1)^\top \in \mathbb{R}^2$$ $$Y \mid Z \sim \text{Normal}\left(\mu = z_0, \, \sigma^2 = g(z_1)^2\right)$$ $$g(z) = 0.01 + \log(1 + e^z) = 0.01 + \text{softplus}(z)$$
-
-### Network Specification
-
-- **Architecture:** $1 \to 32 \to 32 \to 2$
-- **Activations:** Continuously Differentiable Exponential Linear Units (`CELU`) for hidden layers
-- **Output layer:** 2-dimensional linear representation producing latent variables $z_0$ and $z_1$
-
-### Negative Log-Likelihood as KL Minimization
-
-Under this model, minimizing empirical KL divergence equates to minimizing the negative log-likelihood (NLL):
-
-$$\mathcal{L}(\theta) = \frac{1}{n}\sum_{i=1}^n \left[ \log g(z_{1, i}) + \frac{(y_i - z_{0, i})^2}{2\, g(z_{1, i})^2} \right]$$
+- **Architecture:** $1 \to 32 \to 32 \to 1$ (\~1,150 parameters)
+- **Activations:** Continuously Differentiable Exponential Linear Units (`CELU`)
+- **Loss:** Mean Squared Error (MSE), directly minimizing empirical data-space KL divergence.
 
 ```{r}
-#| label: neural-network-model
-library(torch)
-
-# Set torch seed for reproducibility
-torch_manual_seed(42)
-
-# Define Network Architecture
-GaussianMLP <- nn_module(
-  "GaussianMLP",
+#| label: mle-neural-network
+# Define Homoscedastic MLP Architecture
+MLP <- nn_module(
+  "MLP",
   initialize = function() {
     self$net <- nn_sequential(
       nn_linear(1, 32),
       nn_celu(),
       nn_linear(32, 32),
       nn_celu(),
-      nn_linear(32, 2)
+      nn_linear(32, 1)
     )
   },
   forward = function(x) {
@@ -232,87 +240,276 @@ GaussianMLP <- nn_module(
   }
 )
 
-model <- GaussianMLP()
-optimizer <- optim_adam(model$parameters, lr = 0.01)
+mle_model <- MLP()
+mle_optimizer <- optim_adam(mle_model$parameters, lr = 0.005)
 
-# Prepare tensors
+# Tensors for torch
 x_train <- torch_tensor(matrix(sim_data$x, ncol = 1), dtype = torch_float())
 y_train <- torch_tensor(matrix(sim_data$y, ncol = 1), dtype = torch_float())
 
-# Heteroscedastic Gaussian NLL loss function
-gaussian_nll_loss <- function(z, y) {
-  mu <- z[, 1, drop = FALSE]
-  # g(z1) = 0.01 + softplus(z1)
-  sigma <- 0.01 + nnf_softplus(z[, 2, drop = FALSE])
+# Train network by minimizing MSE
+mle_epochs <- 3000
+for (epoch in 1:mle_epochs) {
+  mle_optimizer$zero_grad()
   
-  # Negative log likelihood (omitting constant 0.5 * log(2 * pi))
-  loss <- torch_log(sigma) + 0.5 * torch_pow((y - mu) / sigma, 2)
-  torch_mean(loss)
+  y_hat <- mle_model(x_train)
+  loss  <- nnf_mse_loss(y_hat, y_train)
+  
+  loss$backward()
+  mle_optimizer$step()
 }
 
-# Training loop
-epochs <- 1500
-for (epoch in 1:epochs) {
-  optimizer$zero_grad()
-  z_pred <- model(x_train)
-  loss <- gaussian_nll_loss(z_pred, y_train)
-  loss$backward()
-  optimizer$step()
-}
+# Estimate constant residual standard deviation sigma_hat
+mle_model$eval()
+with_no_grad({
+  residuals <- y_train - mle_model(x_train)
+  sigma_hat_mle <- as.numeric(torch_sqrt(torch_mean(residuals^2)))
+})
 ```
 
-### Model Evaluation and Representation Visualization
-
-We compute predictions across the range $x \in [-6, 6]$ along with the conditional standard deviation band $\mu(x) \pm \sigma(x)$.
-
 ```{r}
-#| label: nn-visualization
-# Predict over evaluation grid
+#| label: mle-visualization
+# Predict on an extended evaluation grid x in [-6, 6] to observe extrapolation
 eval_grid <- tibble(x = seq(-6, 6, length.out = 400))
 x_test_tensor <- torch_tensor(matrix(eval_grid$x, ncol = 1), dtype = torch_float())
 
-model$eval()
 with_no_grad({
-  z_test <- model(x_test_tensor)
-  mu_pred <- as.numeric(z_test[, 1])
-  sigma_pred <- as.numeric(0.01 + nnf_softplus(z_test[, 2]))
+  mu_mle <- as.numeric(mle_model(x_test_tensor))
 })
 
-nn_eval <- eval_grid |>
+mle_eval <- eval_grid |>
   mutate(
-    mu_hat = mu_pred,
-    sigma_hat = sigma_pred,
+    mu_hat     = mu_mle,
+    sigma_hat  = sigma_hat_mle,
     lower_band = mu_hat - sigma_hat,
     upper_band = mu_hat + sigma_hat
   )
 
-# Calculate conditional KL divergence in bits (log2 base)
-# KL(p* || q) = log(sigma_q / sigma_p) + (sigma_p^2 + (mu_p - mu_q)^2)/(2 * sigma_q^2) - 0.5
-sigma_true <- sqrt(0.09)
-eval_kl <- eval_grid |>
-  filter(x >= -5 & x <= 5) |> # Evaluate on support of p*(X)
+# Calculate test KL divergence on support [-5, 5]
+eval_mle_kl <- test_data |>
   mutate(
-    mu_p = (x^3) / 100,
-    mu_q = approx(nn_eval$x, nn_eval$mu_hat, xout = x)$y,
-    sigma_q = approx(nn_eval$x, nn_eval$sigma_hat, xout = x)$y,
-    kl_nats = log(sigma_q / sigma_true) + 
-      (sigma_true^2 + (mu_p - mu_q)^2) / (2 * (sigma_q^2)) - 0.5,
-    kl_bits = kl_nats / log(2)
+    pred_mle = approx(mle_eval$x, mle_eval$mu_hat, xout = x)$y,
+    kl_bits  = compute_kl_bits(mu_true, pred_mle, sigma_hat_mle)
   )
 
-mean_kl_bits <- round(mean(eval_kl$kl_bits), 2)
+mle_kl_bits <- round(mean(eval_mle_kl$kl_bits), 3)
 
-# Visualization matching the model diagnostic plot
-gf_ribbon(lower + upper ~ x, data = true_grid, fill = "peachpuff", alpha = 0.5) |>
-  gf_line(mu_true ~ x, data = true_grid, color = "darkorange", linetype = "dashed", linewidth = 0.8) |>
-  gf_ribbon(lower_band + upper_band ~ x, data = nn_eval, fill = "#1f77b4", alpha = 0.35, inherit = FALSE) |>
-  gf_line(mu_hat ~ x, data = nn_eval, color = "#1f77b4", linewidth = 1.1, inherit = FALSE) |>
+# Visualization
+gf_point(y ~ x, data = sim_data, alpha = 0.5, size = 1.8, color = "gray25") |>
+  gf_ribbon(lower + upper ~ x, data = true_grid, fill = "peachpuff", alpha = 0.5, inherit = FALSE) |>
+  gf_line(mu_true ~ x, data = true_grid, color = "darkorange", linetype = "dashed", linewidth = 0.8, inherit = FALSE) |>
+  gf_ribbon(lower_band + upper_band ~ x, data = mle_eval, fill = "#1f77b4", alpha = 0.35, inherit = FALSE) |>
+  gf_line(mu_hat ~ x, data = mle_eval, color = "#1f77b4", linewidth = 1.1, inherit = FALSE) |>
   gf_lims(y = c(-3, 3), x = c(-6, 6)) |>
   gf_labs(
-    title = "Neural Network Representation & Uncertainty Band",
-    subtitle = paste0("Mean conditional KL divergence: ", mean_kl_bits, " bits"),
+    title = "Neural Network via MLE (Data-Space KL Minimization)",
+    subtitle = paste0("Mean conditional KL divergence: ", mle_kl_bits, " bits (Estimated sigma: ", round(sigma_hat_mle, 3), ")"),
     x = "X",
     y = "Y"
   ) |>
   gf_theme(theme_minimal())
 ```
+
+With 1,150 parameters and only 30 observations, empirical data-space KL minimization interpolates noise clusters and exhibits arbitrary behavior outside the training domain $x \notin [-5, 5]$.
+
+## Bayesian learning: parameter-space KL divergence minimization
+
+To tame overfitting, Bayesian inference avoids searching for a single optimal parameter point $\theta$. Instead, we place a prior distribution $p(\theta)$ over network weights and seek the posterior distribution $p(\theta \mid \mathcal{D})$.
+
+Because the exact posterior is analytically intractable in deep networks, **Variational Inference** frames parameter learning as finding an approximate distribution $q_\phi(\theta)$ that minimizes the **KL divergence in parameter space**:
+
+$$\phi^* = \arg\min_\phi D_{\text{KL}}\left(q_\phi(\theta) \;\parallel\; p(\theta \mid \mathcal{D})\right)$$
+
+By Bayes' theorem, $p(\theta \mid \mathcal{D}) = \frac{p(\mathcal{D} \mid \theta) p(\theta)}{p(\mathcal{D})}$:
+
+$$D_{\text{KL}}\left(q_\phi(\theta) \;\parallel\; p(\theta \mid \mathcal{D})\right) = \underbrace{D_{\text{KL}}\left(q_\phi(\theta) \;\parallel\; p(\theta)\right)}_{\text{Parameter-Space Complexity Penalty}} - \underbrace{\mathbb{E}_{q_\phi(\theta)}\left[\sum_{i=1}^n \log q_\theta(y_i \mid x_i)\right]}_{\text{Expected Data Log-Likelihood}} + \underbrace{\log p(\mathcal{D})}_{\text{Constant wrt } \phi}$$
+
+Discarding the marginal evidence $\log p(\mathcal{D})$, minimizing this parameter-space KL divergence is identical to minimizing the **Variational Free Energy** (maximizing the Evidence Lower Bound, ELBO):
+
+$$\mathcal{L}_{\text{VI}}(\phi) = D_{\text{KL}}\left(q_\phi(\theta) \;\parallel\; p(\theta)\right) + \sum_{i=1}^n \mathbb{E}_{q_\phi(\theta)}\left[ \frac{(y_i - f(x_i; \theta))^2}{2\hat{\sigma}^2} + \log \hat{\sigma} \right]$$
+
+### The reparameterization trick
+
+We specify an isotropic prior $p(\theta) = \mathcal{N}(0, \sigma_0^2 I)$ and a mean-field Gaussian variational posterior $q_\phi(w) = \mathcal{N}(\mu_w, \sigma_w^2)$ where $\sigma_w = 10^{-4} + \text{softplus}(\rho_w)$.
+
+Weights are sampled differentiably via: $$w = \mu_w + \sigma_w \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)$$
+
+```{r}
+#| label: bayesian-nn-model
+# Variational Bayesian Linear Layer
+bnn_linear <- nn_module(
+  "bnn_linear",
+  initialize = function(in_features, out_features, prior_sd = 1.0) {
+    self$in_features  <- in_features
+    self$out_features <- out_features
+    self$prior_sd     <- prior_sd
+
+    # Variational parameters: means and log-variances (rho)
+    self$weight_mu  <- nn_parameter(torch_empty(out_features, in_features)$uniform_(-0.1, 0.1))
+    self$weight_rho <- nn_parameter(torch_full(c(out_features, in_features), -4.0))
+
+    self$bias_mu  <- nn_parameter(torch_zeros(out_features))
+    self$bias_rho <- nn_parameter(torch_full(c(out_features), -4.0))
+  },
+  forward = function(x) {
+    weight_sigma <- 1e-4 + nnf_softplus(self$weight_rho)
+    bias_sigma   <- 1e-4 + nnf_softplus(self$bias_rho)
+
+    # Reparameterization trick
+    eps_w <- torch_randn_like(self$weight_mu)
+    eps_b <- torch_randn_like(self$bias_mu)
+
+    weight <- self$weight_mu + weight_sigma * eps_w
+    bias   <- self$bias_mu   + bias_sigma   * eps_b
+
+    nnf_linear(x, weight, bias)
+  },
+  kl_loss = function() {
+    weight_sigma <- 1e-4 + nnf_softplus(self$weight_rho)
+    bias_sigma   <- 1e-4 + nnf_softplus(self$bias_rho)
+
+    # Analytical KL against N(0, prior_sd^2)
+    kl_w <- torch_sum(torch_log(self$prior_sd / weight_sigma) + 
+                      (weight_sigma^2 + self$weight_mu^2) / (2 * self$prior_sd^2) - 0.5)
+    kl_b <- torch_sum(torch_log(self$prior_sd / bias_sigma) + 
+                      (bias_sigma^2 + self$bias_mu^2) / (2 * self$prior_sd^2) - 0.5)
+    kl_w + kl_b
+  }
+)
+
+# Complete Variational BNN Architecture
+BayesianMLP <- nn_module(
+  "BayesianMLP",
+  initialize = function(prior_sd = 1.0) {
+    self$l1 <- bnn_linear(1, 32, prior_sd = prior_sd)
+    self$l2 <- bnn_linear(32, 32, prior_sd = prior_sd)
+    self$l3 <- bnn_linear(32, 1, prior_sd = prior_sd)
+  },
+  forward = function(x) {
+    x <- nnf_celu(self$l1(x))
+    x <- nnf_celu(self$l2(x))
+    self$l3(x)
+  },
+  kl_loss = function() {
+    self$l1$kl_loss() + self$l2$kl_loss() + self$l3$kl_loss()
+  }
+)
+
+bnn_model <- BayesianMLP(prior_sd = 1.0)
+bnn_optimizer <- optim_adam(bnn_model$parameters, lr = 0.005)
+
+# Variational Free Energy Optimization
+bnn_epochs <- 3000
+for (epoch in 1:bnn_epochs) {
+  bnn_optimizer$zero_grad()
+  
+  # KL annealing schedule: beta scales smoothly from 0 to 1/n
+  beta <- min(1 / n, (epoch / 1500) * (1 / n))
+  
+  # Stochastic forward pass: sample theta ~ q_phi(theta)
+  y_hat <- bnn_model(x_train)
+  
+  # Negative log-likelihood (constant noise model with true/calibrated sigma)
+  nll <- torch_sum(0.5 * torch_pow((y_train - y_hat) / sigma_true, 2))
+  
+  # Total Variational Free Energy: Data NLL + beta * Parameter KL
+  loss <- nll + beta * bnn_model$kl_loss()
+  
+  loss$backward()
+  bnn_optimizer$step()
+}
+```
+
+### Predictive epistemic and aleatoric uncertainty
+
+Under the Bayesian model, generating predictions entails drawing $S$ posterior parameter samples $\theta^{(s)} \sim q_\phi(\theta)$.
+
+The total predictive variance decomposes into: $$\sigma^2_{\text{pred}}(x) = \underbrace{\text{Var}_{\theta}\left[f(x; \theta)\right]}_{\text{Epistemic (Model Uncertainty)}} + \underbrace{\sigma^{*2}}_{\text{Aleatoric (Noise)}}$$
+
+```{r}
+#| label: bnn-visualization
+# Draw Monte Carlo predictions from the variational posterior
+num_mc_samples <- 100
+mc_preds <- matrix(0, nrow = nrow(eval_grid), ncol = num_mc_samples)
+
+with_no_grad({
+  for (s in 1:num_mc_samples) {
+    mc_preds[, s] <- as.numeric(bnn_model(x_test_tensor))
+  }
+})
+
+bnn_eval <- eval_grid |>
+  mutate(
+    mu_hat        = rowMeans(mc_preds),
+    var_epistemic = apply(mc_preds, 1, var),
+    var_aleatoric = sigma_sq_true,
+    total_sd      = sqrt(var_epistemic + var_aleatoric),
+    lower_band    = mu_hat - total_sd,
+    upper_band    = mu_hat + total_sd
+  )
+
+# Calculate test KL divergence on support [-5, 5]
+eval_bnn_kl <- test_data |>
+  mutate(
+    pred_bnn   = approx(bnn_eval$x, bnn_eval$mu_hat, xout = x)$y,
+    sigma_bnn  = approx(bnn_eval$x, bnn_eval$total_sd, xout = x)$y,
+    kl_bits    = compute_kl_bits(mu_true, pred_bnn, sigma_bnn)
+  )
+
+bnn_kl_bits <- round(mean(eval_bnn_kl$kl_bits), 3)
+
+# Visualization
+gf_point(y ~ x, data = sim_data, alpha = 0.5, size = 1.8, color = "gray25") |>
+  gf_ribbon(lower + upper ~ x, data = true_grid, fill = "peachpuff", alpha = 0.5, inherit = FALSE) |>
+  gf_line(mu_true ~ x, data = true_grid, color = "darkorange", linetype = "dashed", linewidth = 0.8, inherit = FALSE) |>
+  gf_ribbon(lower_band + upper_band ~ x, data = bnn_eval, fill = "#2ca02c", alpha = 0.3, inherit = FALSE) |>
+  gf_line(mu_hat ~ x, data = bnn_eval, color = "#2ca02c", linewidth = 1.1, inherit = FALSE) |>
+  gf_lims(y = c(-3, 3), x = c(-6, 6)) |>
+  gf_labs(
+    title = "Bayesian Neural Network (Parameter-Space KL Minimization)",
+    subtitle = paste0("Mean conditional KL divergence: ", bnn_kl_bits, " bits (Total predictive uncertainty: epistemic + aleatoric)"),
+    x = "X",
+    y = "Y"
+  ) |>
+  gf_theme(theme_minimal())
+```
+
+Notice how the Bayesian network's uncertainty band naturally flares outward for $|x| > 5$ where data is absent, accurately communicating epistemic uncertainty rather than making overconfident assertions.
+
+## Synthesis: the hierarchy of KL divergence minimization
+
+```{r}
+#| label: final-comparison
+all_results <- tibble(
+  Paradigm = c(
+    "Linear Regression (OLS)",
+    "Cubic Regression (OLS)",
+    "Degree 9 Polynomial (OLS)",
+    "Neural Network (MLE / MSE)",
+    "Bayesian Neural Network (Variational Inference)"
+  ),
+  `Optimization Objective` = c(
+    "Min Data-Space KL (Linear Family)",
+    "Min Data-Space KL (Cubic Family)",
+    "Min Data-Space KL (Polynomial Deg 9)",
+    "Min Data-Space KL (Neural Network)",
+    "Min Parameter-Space KL (ELBO Free Energy)"
+  ),
+  `Expected KL Divergence (Bits)` = c(
+    mean(compute_kl_bits(test_data$mu_true, test_data$pred_linear, sigma_linear)),
+    mean(compute_kl_bits(test_data$mu_true, test_data$pred_cubic,  sigma_cubic)),
+    mean(compute_kl_bits(test_data$mu_true, test_data$pred_deg9,   sigma_deg9)),
+    mean(eval_mle_kl$kl_bits),
+    mean(eval_bnn_kl$kl_bits)
+  )
+)
+
+knitr::kable(all_results, digits = 4, caption = "Summary: KL Divergence Across Statistical Learning Paradigms")
+```
+
+### Summary of principles
+
+| Paradigm | Domain of KL Minimization | Mathematical Formulation | Typical Pathology |
+|:-----------------|:-----------------|:-----------------|:-----------------|
+| **Maximum Likelihood (MLE / OLS)** | **Data Space:** $D_{\text{KL}}(p^* \parallel q_\theta)$ | $\arg\max_\theta \sum_{i=1}^n \log q_\theta(y_i \mid x_i)$ | Overfits and collapses uncertainty in high-capacity models |
+| **Bayesian Inference (VI)** | **Parameter Space:** $D_{\text{KL}}(q_\phi \parallel p(\cdot \mid \mathcal{D}))$ | $\arg\min_\phi \left\{ D_{\text{KL}}(q_\phi \parallel p) - \mathbb{E}_{q}[\log q(y \mid x)] \right\}$ | Regularizes capacity and preserves honest epistemic uncertainty |
