@@ -1,0 +1,534 @@
+---
+title: "Weight of Evidence, Statistical Power, and Posterior Odds"
+format:
+  html:
+    toc: true
+    number-sections: true
+  pdf: default
+---
+
+# Weight of Evidence
+
+Suppose we want to compare two hypotheses, $H_0$ and $H_1$, after observing some data $D$.
+
+A natural measure of the weight of evidence supplied by the data is the likelihood ratio:
+
+$$LR_{10}
+=
+\frac{P(D\mid H_1)}
+     {P(D\mid H_0)}$$
+
+The likelihood ratio tells us how much more likely the observation is under $H_1$ than under $H_0$.
+
+For example,
+
+$$LR_{10}=4$$
+
+means that the observation is four times more likely under $H_1$ than under $H_0$.
+
+Thus, the data provide 4:1 evidence in favor of $H_1$ over $H_0$.
+
+Let's begin with a simple example.
+
+# Example 1: Two heads in two coin flips
+
+Suppose we have two hypotheses about a coin ($H = \text{heads}, T = \text{tails}$):
+
+- $H_0$: the coin is fair
+- $H_1$: the coin is tricked and has two heads
+
+Under $H_0$,
+
+$$P(H\mid H_0)=\frac{1}{2}$$
+
+Under $H_1$,
+
+$$P(H\mid H_1)=1$$
+
+Now flip the coin twice and observe two heads
+
+$$D=H \land H$$
+
+Under $H_0$,
+
+$$P(D\mid H_0)
+=
+\left(\frac{1}{2}\right)^2
+=
+\frac{1}{4}$$
+
+Under $H_1$,
+
+$$P(D\mid H_1)=1$$
+
+Therefore, the likelihood ratio is
+
+$$LR_{10}
+=
+\frac{P(D\mid H_1)}
+     {P(D\mid H_0)}
+=
+\frac{1}{1/4}
+=
+4$$
+
+Thus,
+
+$$\boxed{LR_{10}=4}$$
+
+Observing two heads is four times more likely under $H_1$ than under $H_0$.
+
+The observation therefore provides 4:1 evidence in favor of $H_1$.
+
+## From weight of evidence to posterior odds
+
+The likelihood ratio tells us how strongly the observation favors one hypothesis over the other.
+
+But suppose we want to answer a different question:
+
+> After observing the data, what are the odds of $H_1$ relative to $H_0$?
+
+To calculate these posterior odds, we also need to specify the prior odds.
+
+Suppose the prior odds are
+
+$$H_1:H_0=1:9$$
+
+Posterior odds are obtained by multiplying the prior odds by the likelihood ratio:
+
+$$\boxed{
+\text{posterior odds}
+=
+\text{likelihood ratio}
+\times
+\text{prior odds}
+}$$
+
+Therefore,
+
+$$\text{posterior odds}
+=
+4\times\frac{1}{9}
+=
+\frac{4}{9}$$
+
+Thus,
+
+$$\boxed{H_1:H_0=4:9}$$
+
+To convert posterior odds into a posterior probability,
+
+$$P(H_1\mid D)
+=
+\frac{4}{4+9}
+=
+\frac{4}{13}
+\approx 0.31$$
+
+Thus,
+
+$$\boxed{P(H_1\mid HH)\approx 0.31}$$
+
+Similarly,
+
+$$P(H_0\mid HH)
+=
+\frac{9}{4+9}
+=
+\frac{9}{13}
+\approx 0.69$$
+
+Therefore,
+
+$$\boxed{P(H_0\mid HH)\approx 0.69}$$
+
+Notice what happened:
+
+$$\boxed{
+1:9
+\xrightarrow{\;LR=4\;}
+4:9
+}$$
+
+The observation favors $H_1$ over $H_0$, because $LR_{10}>1$.
+
+But the evidence is not strong enough to overcome the initial 9:1 odds in favor of $H_0$.
+
+# Example 2: Statistical significance in a low-powered study
+
+Now consider a conventional null-hypothesis significance test.
+
+Define the observation
+
+$$D=\{p<0.05\}$$
+
+Suppose the significance threshold is
+
+$$\alpha=0.05$$
+
+By definition,
+
+$$P(D\mid H_0)=0.05$$
+
+Now suppose the study has **20% statistical power**, representative of [the low levels of statistical power reported in many neuroscientific studies](https://www.nature.com/articles/nrn3475).
+
+Power is the probability of obtaining a statistically significant result when $H_1$ is true:
+
+$$P(D\mid H_1)=1-\beta$$
+
+For 20% power,
+
+$$P(D\mid H_1)=0.20$$
+
+Suppose we obtain a statistically significant result:
+
+$$p<0.05$$
+
+## Weight of evidence
+
+The likelihood ratio associated with the observation is
+
+$$LR_{10}
+=
+\frac{P(D\mid H_1)}
+     {P(D\mid H_0)}$$
+
+Therefore,
+
+$$LR_{10}
+=
+\frac{0.20}{0.05}
+=
+4$$
+
+Thus,
+
+$$\boxed{LR_{10}=4}$$
+
+A statistically significant result is four times more likely under $H_1$ than under $H_0$.
+
+The significant result therefore provides 4:1 evidence in favor of $H_1$.
+
+Notice that this is exactly the same weight of evidence as observing two heads in the coin-flip example:
+
+$$\boxed{
+LR_{10}^{\text{coin}}=
+LR_{10}^{\text{20\% power}}=4
+}$$
+
+Knowing only that the study produced $p<0.05$, the weight of evidence is the same in these two examples.
+
+## Posterior odds
+
+Again suppose our prior odds are
+
+$$H_1:H_0=1:9$$
+
+The posterior odds are
+
+$$\text{posterior odds}
+=
+4\times\frac{1}{9}
+=
+\frac{4}{9}$$
+
+Therefore,
+
+$$\boxed{H_1:H_0=4:9}$$
+
+Just as in the coin-flip example,
+
+$$\boxed{
+1:9
+\xrightarrow{\;LR=4\;}
+4:9
+}$$
+
+Converting these posterior odds into a posterior probability,
+
+$$P(H_1\mid D)
+=
+\frac{4}{4+9}
+=
+\frac{4}{13}
+\approx 0.31$$
+
+Thus,
+
+$$\boxed{P(H_1\mid p<0.05)\approx 0.31}$$
+
+Likewise,
+
+$$P(H_0\mid D)
+=
+\frac{9}{4+9}
+=
+\frac{9}{13}
+\approx 0.69$$
+
+Therefore,
+
+$$\boxed{P(H_0\mid p<0.05)\approx 0.69}$$
+
+The statistically significant result provides evidence in favor of $H_1$, but that evidence is not sufficient to overcome prior odds of 9:1 in favor of $H_0$.
+
+## What does $p<0.05$ tell us?
+
+The significance threshold tells us that
+
+$$P(p<0.05\mid H_0)=0.05$$
+
+It does not tell us the posterior odds of $H_1$ versus $H_0$.
+
+To calculate posterior odds, we need three quantities:
+
+$$P(D\mid H_0),
+\qquad
+P(D\mid H_1),
+\qquad
+\text{and the prior odds}$$
+
+The first two determine the likelihood ratio:
+
+$$LR_{10}
+=
+\frac{P(D\mid H_1)}
+     {P(D\mid H_0)}$$
+
+We then combine the likelihood ratio with the prior odds to obtain the posterior odds.
+
+# Example 3: Statistical significance in an 80%-powered study
+
+Now consider the same statistical test, but suppose the study has 80% power.
+
+The significance threshold remains
+
+$$\alpha=0.05$$
+
+Therefore,
+
+$$P(D\mid H_0)=0.05$$
+
+But with 80% power,
+
+$$P(D\mid H_1)=0.80$$
+
+Again, suppose we obtain a statistically significant result:
+
+$$p<0.05$$
+
+## Weight of evidence
+
+The likelihood ratio is now
+
+$$LR_{10}
+=
+\frac{P(D\mid H_1)}
+     {P(D\mid H_0)}
+=
+\frac{0.80}{0.05}
+=
+16$$
+
+Thus,
+
+$$\boxed{LR_{10}=16}$$
+
+A significant result is now 16 times more likely under $H_1$ than under $H_0$.
+
+The observation therefore provides 16:1 evidence in favor of $H_1$.
+
+Compare this with the low-powered study:
+
+$$\begin{aligned}
+20\%\text{ power}:&\quad LR_{10}=4,\\
+80\%\text{ power}:&\quad LR_{10}=16.
+\end{aligned}$$
+
+The same criterion,
+
+$$p<0.05,$$
+
+can therefore correspond to very different weights of evidence depending on the power of the experiment.
+
+## Posterior odds
+
+Keep the prior odds fixed at
+
+$$H_1:H_0=1:9$$
+
+The posterior odds are now
+
+$$\text{posterior odds}
+=
+16\times\frac{1}{9}
+=
+\frac{16}{9}$$
+
+Therefore,
+
+$$\boxed{H_1:H_0=16:9}$$
+
+The updating is now
+
+$$\boxed{
+1:9
+\xrightarrow{\;LR=16\;}
+16:9
+}$$
+
+Converting these posterior odds into a posterior probability,
+
+$$P(H_1\mid D)
+=
+\frac{16}{16+9}
+=
+\frac{16}{25}
+=
+0.64$$
+
+Thus,
+
+$$\boxed{P(H_1\mid p<0.05)=0.64}$$
+
+Similarly,
+
+$$P(H_0\mid D)
+=
+\frac{9}{16+9}
+=
+\frac{9}{25}
+=
+0.36$$
+
+Therefore,
+
+$$\boxed{P(H_0\mid p<0.05)=0.36}$$
+
+Unlike the 20%-powered study, the evidence is now strong enough to overcome the initial 9:1 odds in favor of $H_0$.
+
+# Comparing the three examples
+
+In all three examples, we use the same prior odds:
+
+$$H_1:H_0=1:9$$
+
+What changes is the weight of evidence supplied by the observation.
+
+| Observation | $P(D\mid H_0)$ | $P(D\mid H_1)$ | Weight of evidence $LR_{10}$ | Prior odds $H_1:H_0$ | Posterior odds $H_1:H_0$ | $P(H_1\mid D)$ | $P(H_0\mid D)$ |
+|---------|--------:|--------:|--------:|--------:|--------:|--------:|--------:|
+| Two heads in two flips | 0.25 | 1.00 | **4** | 1:9 | **4:9** | **0.31** | **0.69** |
+| $p<0.05$, 20% power | 0.05 | 0.20 | **4** | 1:9 | **4:9** | **0.31** | **0.69** |
+| $p<0.05$, 80% power | 0.05 | 0.80 | **16** | 1:9 | **16:9** | **0.64** | **0.36** |
+
+The logic is identical in each case.
+
+First, calculate the weight of evidence:
+
+$$\boxed{
+LR_{10}
+=
+\frac{P(D\mid H_1)}
+     {P(D\mid H_0)}
+}$$
+
+Then, if we want posterior odds, combine the weight of evidence with the prior odds:
+
+$$\boxed{
+\text{posterior odds}
+=
+LR_{10}
+\times
+\text{prior odds}
+}$$
+
+Finally, convert posterior odds to posterior probabilities.
+
+If the posterior odds are $a:b$, then
+
+$$P(H_1\mid D)=\frac{a}{a+b}$$
+
+and
+
+$$P(H_0\mid D)=\frac{b}{a+b}$$
+
+# Take-home message
+
+The **weight of evidence** supplied by an observation is quantified by the likelihood ratio:
+
+$$\boxed{
+LR_{10}
+=
+\frac{P(D\mid H_1)}
+     {P(D\mid H_0)}
+}$$
+
+For a statistically significant result considered simply as the binary event
+
+$$D=\{p<\alpha\},$$
+
+this becomes
+
+$$\boxed{
+LR_{10}
+=
+\frac{1-\beta}{\alpha}
+}$$
+
+Thus, with $\alpha=0.05$,
+
+$$20\%\text{ power}
+\quad\Longrightarrow\quad
+LR_{10}=4,$$
+
+whereas
+
+$$80\%\text{ power}
+\quad\Longrightarrow\quad
+LR_{10}=16$$
+
+If we then want to determine the **posterior odds**, the weight of evidence alone is not enough. We also need the prior odds:
+
+$$\boxed{
+\text{posterior odds}
+=
+\text{weight of evidence}
+\times
+\text{prior odds}
+}$$
+
+With prior odds of $1:9$,
+
+$$\boxed{
+1:9
+\xrightarrow{\;LR=4\;}
+4:9
+}$$
+
+for both the coin-flip example and the 20%-powered study, corresponding to
+
+$$\boxed{
+P(H_1\mid D)=\frac{4}{13}\approx0.31
+}$$
+
+For the 80%-powered study,
+
+$$\boxed{
+1:9
+\xrightarrow{\;LR=16\;}
+16:9
+}$$
+
+corresponding to
+
+$$\boxed{
+P(H_1\mid D)=\frac{16}{25}=0.64
+}$$
+
+**The likelihood ratio tells us how much the evidence changes the odds.**
+
+**The prior odds tell us where we start.**
+
+**The posterior odds tell us where we end up.**
+
+**The posterior probabilities convert those final odds into probabilities.**
