@@ -767,11 +767,23 @@ $$I(X;f(Z))\leq I(X;Z)$$ Information is either preserved or lost, never increase
 
 ## Signal and noise
 
+The distinction between signal and noise depends on the task (e.g., classification). Signal is the information in the input that is relevant to the task (e.g., information about the label), while noise is the remaining, task-irrelevant information:
+
+$$\underbrace{H(X)}_{303\text{ bits}}
+=
+\underbrace{I(X;Y)}_{3.32\text{ bits}}
++
+\underbrace{H(X \mid Y)}_{299.68\text{ bits}}$$
+
+$$\underbrace{H(X)}_{\text{total information}}
+=
+\underbrace{I(X;Y)}_{\text{signal}}
++
+\underbrace{H(X\mid Y)}_{\text{task-irrelevant information / ``noise''}}$$
+
+$H(X\mid Y)$ represents the information in $X$ that remains after $Y$ is known, and it is regarded as “noise” relative to the task defined by $Y$. In this example, handwriting style is noise for digit classification but signal for writer identification.
+
 ![](images/clipboard-3196650230.png)
-
-Signal (e.g., label information = what digit is the image of?) is, in this example, \~1% of total information.
-
-Our task as machine learners is to separate the "signal" (e.g., label information = what digit is the image of?) from the "noise" (information not relevant to our question).
 
 ![](images/clipboard-1660565837.png)
 

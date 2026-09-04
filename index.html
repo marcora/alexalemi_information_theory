@@ -1036,9 +1036,19 @@ I(X;Y)
 </section>
 <section id="signal-and-noise" class="level2">
 <h2 class="anchored" data-anchor-id="signal-and-noise">Signal and noise</h2>
+<p>The distinction between signal and noise depends on the task (e.g., classification). Signal is the information in the input that is relevant to the task (e.g., information about the label), while noise is the remaining, task-irrelevant information:</p>
+<p><span class="math display">\[\underbrace{H(X)}_{303\text{ bits}}
+=
+\underbrace{I(X;Y)}_{3.32\text{ bits}}
++
+\underbrace{H(X \mid Y)}_{299.68\text{ bits}}\]</span></p>
+<p><span class="math display">\[\underbrace{H(X)}_{\text{total information}}
+=
+\underbrace{I(X;Y)}_{\text{signal}}
++
+\underbrace{H(X\mid Y)}_{\text{task-irrelevant information / ``noise''}}\]</span></p>
+<p><span class="math inline">\(H(X\mid Y)\)</span> represents the information in <span class="math inline">\(X\)</span> that remains after <span class="math inline">\(Y\)</span> is known, and it is regarded as “noise” relative to the task defined by <span class="math inline">\(Y\)</span>. In this example, handwriting style is noise for digit classification but signal for writer identification.</p>
 <p><img src="images/clipboard-3196650230.png" class="img-fluid"></p>
-<p>Signal (e.g., label information = what digit is the image of?) is, in this example, ~1% of total information.</p>
-<p>Our task as machine learners is to separate the “signal” (e.g., label information = what digit is the image of?) from the “noise” (information not relevant to our question).</p>
 <p><img src="images/clipboard-1660565837.png" class="img-fluid"></p>
 <p><img src="images/clipboard-822947537.png" class="img-fluid"></p>
 </section>
