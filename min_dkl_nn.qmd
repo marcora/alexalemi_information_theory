@@ -26,6 +26,7 @@ This notebook demonstrates that **Kullback-Leibler (KL) divergence minimization 
 - [KL is All You Need](https://blog.alexalemi.com/kl-is-all-you-need.html)
 - [VIB is Half Bayes](https://youtu.be/JGDAZ4joUX8) [@alemi2020]
 - [A Tale of Two Worlds: The Variational Approach to Machine Learning](https://youtu.be/OAHsR02dUc0)
+- [PACm Bayes](https://youtu.be/HHu7fclYlVg?si=lfLzT9YQY3_hxGv6)
 
 ## Setup environment
 
@@ -505,7 +506,7 @@ knitr::kable(all_results, digits = 4, caption = "Summary: KL Divergence Across S
 ### Summary of principles
 
 | Paradigm | Domain of KL Minimization | Mathematical Formulation | Typical Pathology |
-|:---|:---|:---|:---|
+|:-----------------|:-----------------|:-----------------|:-----------------|
 | **Maximum Likelihood (MLE / OLS)** | **Data Space:** $D_{\text{KL}}(p^* \parallel q_\theta)$ | $\arg\max_\theta \sum_{i=1}^n \log q_\theta(y_i \mid x_i)$ | Overfits and collapses uncertainty in high-capacity models |
 | **Bayesian Inference (VI)** | **Parameter Space:** $D_{\text{KL}}(q_\phi \parallel p(\cdot \mid \mathcal{D}))$ | $\arg\min_\phi \left\{ D_{\text{KL}}(q_\phi \parallel p) - \mathbb{E}_{q}[\log q(y \mid x)] \right\}$ | Regularizes capacity and preserves honest epistemic uncertainty |
 
