@@ -140,23 +140,21 @@ window.Quarto = {
 </section>
 <section id="example-1-two-heads-in-two-coin-flips" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Example 1: Two heads in two coin flips</h1>
-<p>Suppose we have two hypotheses about a coin (<span class="math inline">\(H = \text{heads}, T = \text{tails}\)</span>):</p>
+<p>Suppose we have two hypotheses about a coin:</p>
 <ul>
 <li><span class="math inline">\(H_0\)</span>: the coin is fair</li>
 <li><span class="math inline">\(H_1\)</span>: the coin is tricked and has two heads</li>
 </ul>
 <p>Under <span class="math inline">\(H_0\)</span>,</p>
-<p><span class="math display">\[P(H\mid H_0)=\frac{1}{2}\]</span></p>
+<p><span class="math display">\[P(\text{head}\mid H_0)=\frac{1}{2}\]</span></p>
 <p>Under <span class="math inline">\(H_1\)</span>,</p>
-<p><span class="math display">\[P(H\mid H_1)=1\]</span></p>
+<p><span class="math display">\[P(\text{head}\mid H_1)=1\]</span></p>
 <p>Now flip the coin twice and observe two heads</p>
-<p><span class="math display">\[D=H \land H\]</span></p>
-<p>Under <span class="math inline">\(H_0\)</span>,</p>
+<p><span class="math display">\[D=2\ \text{heads}\]</span></p>
+<p>Under <span class="math inline">\(H_0\)</span> (and assuming independence),</p>
 <p><span class="math display">\[P(D\mid H_0)
 =
-\left(\frac{1}{2}\right)^2
-=
-\frac{1}{4}\]</span></p>
+\frac{1}{2} \cdot \frac{1}{2}=\frac{1}{4}=0.25\]</span></p>
 <p>Under <span class="math inline">\(H_1\)</span>,</p>
 <p><span class="math display">\[P(D\mid H_1)=1\]</span></p>
 <p>Therefore, the likelihood ratio is</p>
@@ -165,7 +163,7 @@ window.Quarto = {
 \frac{P(D\mid H_1)}
      {P(D\mid H_0)}
 =
-\frac{1}{1/4}
+\frac{1}{0.25}
 =
 4\]</span></p>
 <p>Thus,</p>
@@ -181,41 +179,39 @@ window.Quarto = {
 </blockquote>
 <p>To calculate these posterior odds, we also need to specify the prior odds.</p>
 <p>Suppose the prior odds are</p>
-<p><span class="math display">\[H_1:H_0=1:9\]</span></p>
+<p><span class="math display">\[\boxed{H_1:H_0=1:9}\]</span></p>
 <p>Posterior odds are obtained by multiplying the prior odds by the likelihood ratio:</p>
-<p><span class="math display">\[\boxed{
-\text{posterior odds}
+<p><span class="math display">\[\text{posterior odds}
 =
 \text{likelihood ratio}
 \times
-\text{prior odds}
-}\]</span></p>
+\text{prior odds}\]</span></p>
 <p>Therefore,</p>
 <p><span class="math display">\[\text{posterior odds}
 =
 4\times\frac{1}{9}
 =
 \frac{4}{9}\]</span></p>
-<p>Thus,</p>
+<p>Thus, the posterior odds are</p>
 <p><span class="math display">\[\boxed{H_1:H_0=4:9}\]</span></p>
 <p>To convert posterior odds into a posterior probability,</p>
 <p><span class="math display">\[P(H_1\mid D)
 =
-\frac{4}{4+9}
+\frac{\frac{4}{9}}{1 + \frac{4}{9}}
 =
 \frac{4}{13}
 \approx 0.31\]</span></p>
 <p>Thus,</p>
-<p><span class="math display">\[\boxed{P(H_1\mid HH)\approx 0.31}\]</span></p>
+<p><span class="math display">\[\boxed{P(H_1\mid D)\approx 0.31}\]</span></p>
 <p>Similarly,</p>
-<p><span class="math display">\[P(H_0\mid HH)
+<p><span class="math display">\[P(H_0\mid D)
 =
-\frac{9}{4+9}
+\frac{\frac{9}{4}}{1 + \frac{9}{4}}
 =
 \frac{9}{13}
 \approx 0.69\]</span></p>
 <p>Therefore,</p>
-<p><span class="math display">\[\boxed{P(H_0\mid HH)\approx 0.69}\]</span></p>
+<p><span class="math display">\[\boxed{P(H_0\mid D)\approx 0.69}\]</span></p>
 <p>Notice what happened:</p>
 <p><span class="math display">\[\boxed{
 1:9
@@ -229,19 +225,15 @@ window.Quarto = {
 <section id="example-2-statistical-significance-in-a-low-powered-study" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Example 2: Statistical significance in a low-powered study</h1>
 <p>Now consider a conventional null-hypothesis significance test.</p>
-<p>Define the observation</p>
-<p><span class="math display">\[D=\{p&lt;0.05\}\]</span></p>
-<p>Suppose the significance threshold is</p>
-<p><span class="math display">\[\alpha=0.05\]</span></p>
+<p>Suppose the study report a statistically significant result (<span class="math inline">\(\alpha = 0.05\)</span>):</p>
+<p><span class="math display">\[D = p&lt;0.05\]</span></p>
 <p>By definition,</p>
 <p><span class="math display">\[P(D\mid H_0)=0.05\]</span></p>
-<p>Now suppose the study has <strong>20% statistical power</strong>, representative of <a href="https://www.nature.com/articles/nrn3475">the low levels of statistical power reported in many neuroscientific studies</a>.</p>
+<p>Then, suppose the study has <strong>20% statistical power</strong> (<span class="math inline">\(\beta = 0.8\)</span>) representative of <a href="https://www.nature.com/articles/nrn3475">the low levels of statistical power reported in many neuroscientific studies</a>.</p>
 <p>Power is the probability of obtaining a statistically significant result when <span class="math inline">\(H_1\)</span> is true:</p>
 <p><span class="math display">\[P(D\mid H_1)=1-\beta\]</span></p>
 <p>For 20% power,</p>
 <p><span class="math display">\[P(D\mid H_1)=0.20\]</span></p>
-<p>Suppose we obtain a statistically significant result:</p>
-<p><span class="math display">\[p&lt;0.05\]</span></p>
 <section id="weight-of-evidence-1" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="weight-of-evidence-1"><span class="header-section-number">3.1</span> Weight of evidence</h2>
 <p>The likelihood ratio associated with the observation is</p>
@@ -259,9 +251,9 @@ window.Quarto = {
 <p><span class="math display">\[\boxed{LR_{10}=4}\]</span></p>
 <p>A statistically significant result is four times more likely under <span class="math inline">\(H_1\)</span> than under <span class="math inline">\(H_0\)</span>.</p>
 <p>The significant result therefore provides 4:1 evidence in favor of <span class="math inline">\(H_1\)</span>.</p>
-<p>Notice that this is exactly the same weight of evidence as observing two heads in the coin-flip example:</p>
+<p>Notice that this is exactly the same weight of evidence as observing two heads in the coin flip example:</p>
 <p><span class="math display">\[\boxed{
-LR_{10}^{\text{coin}}=
+LR_{10}^{\text{coin flip}}=
 LR_{10}^{\text{20\% power}}=4
 }\]</span></p>
 <p>Knowing only that the study produced <span class="math inline">\(p&lt;0.05\)</span>, the weight of evidence is the same in these two examples.</p>
@@ -269,7 +261,7 @@ LR_{10}^{\text{20\% power}}=4
 <section id="posterior-odds" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="posterior-odds"><span class="header-section-number">3.2</span> Posterior odds</h2>
 <p>Again suppose our prior odds are</p>
-<p><span class="math display">\[H_1:H_0=1:9\]</span></p>
+<p><span class="math display">\[\boxed{H_1:H_0=1:9}\]</span></p>
 <p>The posterior odds are</p>
 <p><span class="math display">\[\text{posterior odds}
 =
@@ -278,7 +270,7 @@ LR_{10}^{\text{20\% power}}=4
 \frac{4}{9}\]</span></p>
 <p>Therefore,</p>
 <p><span class="math display">\[\boxed{H_1:H_0=4:9}\]</span></p>
-<p>Just as in the coin-flip example,</p>
+<p>Just as in the coin flip example,</p>
 <p><span class="math display">\[\boxed{
 1:9
 \xrightarrow{\;LR=4\;}
@@ -287,7 +279,7 @@ LR_{10}^{\text{20\% power}}=4
 <p>Converting these posterior odds into a posterior probability,</p>
 <p><span class="math display">\[P(H_1\mid D)
 =
-\frac{4}{4+9}
+\frac{\frac{4}{9}}{1 + \frac{4}{9}}
 =
 \frac{4}{13}
 \approx 0.31\]</span></p>
@@ -296,7 +288,7 @@ LR_{10}^{\text{20\% power}}=4
 <p>Likewise,</p>
 <p><span class="math display">\[P(H_0\mid D)
 =
-\frac{9}{4+9}
+\frac{\frac{9}{4}}{1 + \frac{9}{4}}
 =
 \frac{9}{13}
 \approx 0.69\]</span></p>
@@ -310,30 +302,27 @@ LR_{10}^{\text{20\% power}}=4
 <p><span class="math display">\[P(p&lt;0.05\mid H_0)=0.05\]</span></p>
 <p>It does not tell us the posterior odds of <span class="math inline">\(H_1\)</span> versus <span class="math inline">\(H_0\)</span>.</p>
 <p>To calculate posterior odds, we need three quantities:</p>
-<p><span class="math display">\[P(D\mid H_0),
+<p><span class="math display">\[P(p&lt;0.05\mid H_0)
 \qquad
-P(D\mid H_1),
+P(p&lt;0.05\mid H_1)
 \qquad
-\text{and the prior odds}\]</span></p>
+\frac{P(H_1)}{P(H_0)}\]</span></p>
 <p>The first two determine the likelihood ratio:</p>
 <p><span class="math display">\[LR_{10}
 =
 \frac{P(D\mid H_1)}
      {P(D\mid H_0)}\]</span></p>
+<p>The last one is the prior odds.</p>
 <p>We then combine the likelihood ratio with the prior odds to obtain the posterior odds.</p>
 </section>
 </section>
 <section id="example-3-statistical-significance-in-an-80-powered-study" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Example 3: Statistical significance in an 80%-powered study</h1>
 <p>Now consider the same statistical test, but suppose the study has 80% power.</p>
-<p>The significance threshold remains</p>
-<p><span class="math display">\[\alpha=0.05\]</span></p>
 <p>Therefore,</p>
 <p><span class="math display">\[P(D\mid H_0)=0.05\]</span></p>
 <p>But with 80% power,</p>
 <p><span class="math display">\[P(D\mid H_1)=0.80\]</span></p>
-<p>Again, suppose we obtain a statistically significant result:</p>
-<p><span class="math display">\[p&lt;0.05\]</span></p>
 <section id="weight-of-evidence-2" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="weight-of-evidence-2"><span class="header-section-number">4.1</span> Weight of evidence</h2>
 <p>The likelihood ratio is now</p>
@@ -351,16 +340,16 @@ P(D\mid H_1),
 <p>The observation therefore provides 16:1 evidence in favor of <span class="math inline">\(H_1\)</span>.</p>
 <p>Compare this with the low-powered study:</p>
 <p><span class="math display">\[\begin{aligned}
-20\%\text{ power}:&amp;\quad LR_{10}=4,\\
-80\%\text{ power}:&amp;\quad LR_{10}=16.
+20\%\text{ power}:&amp;\quad LR_{10}=4\\
+80\%\text{ power}:&amp;\quad LR_{10}=16
 \end{aligned}\]</span></p>
 <p>The same criterion,</p>
-<p><span class="math display">\[p&lt;0.05,\]</span></p>
+<p><span class="math display">\[p&lt;0.05\]</span></p>
 <p>can therefore correspond to very different weights of evidence depending on the power of the experiment.</p>
 </section>
 <section id="posterior-odds-1" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="posterior-odds-1"><span class="header-section-number">4.2</span> Posterior odds</h2>
-<p>Keep the prior odds fixed at</p>
+<p>Keep the prior odds at</p>
 <p><span class="math display">\[H_1:H_0=1:9\]</span></p>
 <p>The posterior odds are now</p>
 <p><span class="math display">\[\text{posterior odds}
@@ -379,7 +368,7 @@ P(D\mid H_1),
 <p>Converting these posterior odds into a posterior probability,</p>
 <p><span class="math display">\[P(H_1\mid D)
 =
-\frac{16}{16+9}
+\frac{\frac{16}{9}}{1+\frac{16}{9}}
 =
 \frac{16}{25}
 =
@@ -389,7 +378,7 @@ P(D\mid H_1),
 <p>Similarly,</p>
 <p><span class="math display">\[P(H_0\mid D)
 =
-\frac{9}{16+9}
+\frac{\frac{9}{16}}{1+\frac{9}{16}}
 =
 \frac{9}{25}
 =
@@ -492,7 +481,7 @@ LR_{10}
      {P(D\mid H_0)}
 }\]</span></p>
 <p>For a statistically significant result considered simply as the binary event</p>
-<p><span class="math display">\[D=\{p&lt;\alpha\},\]</span></p>
+<p><span class="math display">\[D=p&lt;\alpha\]</span></p>
 <p>this becomes</p>
 <p><span class="math display">\[\boxed{
 LR_{10}
@@ -502,7 +491,7 @@ LR_{10}
 <p>Thus, with <span class="math inline">\(\alpha=0.05\)</span>,</p>
 <p><span class="math display">\[20\%\text{ power}
 \quad\Longrightarrow\quad
-LR_{10}=4,\]</span></p>
+LR_{10}=4\]</span></p>
 <p>whereas</p>
 <p><span class="math display">\[80\%\text{ power}
 \quad\Longrightarrow\quad
@@ -521,7 +510,7 @@ LR_{10}=16\]</span></p>
 \xrightarrow{\;LR=4\;}
 4:9
 }\]</span></p>
-<p>for both the coin-flip example and the 20%-powered study, corresponding to</p>
+<p>for both the coin flip example and the 20%-powered study, corresponding to</p>
 <p><span class="math display">\[\boxed{
 P(H_1\mid D)=\frac{4}{13}\approx0.31
 }\]</span></p>

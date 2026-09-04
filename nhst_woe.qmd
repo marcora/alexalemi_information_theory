@@ -32,30 +32,28 @@ Let's begin with a simple example.
 
 # Example 1: Two heads in two coin flips
 
-Suppose we have two hypotheses about a coin ($H = \text{heads}, T = \text{tails}$):
+Suppose we have two hypotheses about a coin:
 
 - $H_0$: the coin is fair
 - $H_1$: the coin is tricked and has two heads
 
 Under $H_0$,
 
-$$P(H\mid H_0)=\frac{1}{2}$$
+$$P(\text{head}\mid H_0)=\frac{1}{2}$$
 
 Under $H_1$,
 
-$$P(H\mid H_1)=1$$
+$$P(\text{head}\mid H_1)=1$$
 
 Now flip the coin twice and observe two heads
 
-$$D=H \land H$$
+$$D=2\ \text{heads}$$
 
-Under $H_0$,
+Under $H_0$ (and assuming independence),
 
 $$P(D\mid H_0)
 =
-\left(\frac{1}{2}\right)^2
-=
-\frac{1}{4}$$
+\frac{1}{2} \cdot \frac{1}{2}=\frac{1}{4}=0.25$$
 
 Under $H_1$,
 
@@ -68,7 +66,7 @@ $$LR_{10}
 \frac{P(D\mid H_1)}
      {P(D\mid H_0)}
 =
-\frac{1}{1/4}
+\frac{1}{0.25}
 =
 4$$
 
@@ -92,17 +90,15 @@ To calculate these posterior odds, we also need to specify the prior odds.
 
 Suppose the prior odds are
 
-$$H_1:H_0=1:9$$
+$$\boxed{H_1:H_0=1:9}$$
 
 Posterior odds are obtained by multiplying the prior odds by the likelihood ratio:
 
-$$\boxed{
-\text{posterior odds}
+$$\text{posterior odds}
 =
 \text{likelihood ratio}
 \times
-\text{prior odds}
-}$$
+\text{prior odds}$$
 
 Therefore,
 
@@ -112,7 +108,7 @@ $$\text{posterior odds}
 =
 \frac{4}{9}$$
 
-Thus,
+Thus, the posterior odds are
 
 $$\boxed{H_1:H_0=4:9}$$
 
@@ -120,27 +116,27 @@ To convert posterior odds into a posterior probability,
 
 $$P(H_1\mid D)
 =
-\frac{4}{4+9}
+\frac{\frac{4}{9}}{1 + \frac{4}{9}}
 =
 \frac{4}{13}
 \approx 0.31$$
 
 Thus,
 
-$$\boxed{P(H_1\mid HH)\approx 0.31}$$
+$$\boxed{P(H_1\mid D)\approx 0.31}$$
 
 Similarly,
 
-$$P(H_0\mid HH)
+$$P(H_0\mid D)
 =
-\frac{9}{4+9}
+\frac{\frac{9}{4}}{1 + \frac{9}{4}}
 =
 \frac{9}{13}
 \approx 0.69$$
 
 Therefore,
 
-$$\boxed{P(H_0\mid HH)\approx 0.69}$$
+$$\boxed{P(H_0\mid D)\approx 0.69}$$
 
 Notice what happened:
 
@@ -158,19 +154,15 @@ But the evidence is not strong enough to overcome the initial 9:1 odds in favor 
 
 Now consider a conventional null-hypothesis significance test.
 
-Define the observation
+Suppose the study report a statistically significant result ($\alpha = 0.05$):
 
-$$D=\{p<0.05\}$$
-
-Suppose the significance threshold is
-
-$$\alpha=0.05$$
+$$D = p<0.05$$
 
 By definition,
 
 $$P(D\mid H_0)=0.05$$
 
-Now suppose the study has **20% statistical power**, representative of [the low levels of statistical power reported in many neuroscientific studies](https://www.nature.com/articles/nrn3475).
+Then, suppose the study has **20% statistical power** ($\beta = 0.8$) representative of [the low levels of statistical power reported in many neuroscientific studies](https://www.nature.com/articles/nrn3475).
 
 Power is the probability of obtaining a statistically significant result when $H_1$ is true:
 
@@ -179,10 +171,6 @@ $$P(D\mid H_1)=1-\beta$$
 For 20% power,
 
 $$P(D\mid H_1)=0.20$$
-
-Suppose we obtain a statistically significant result:
-
-$$p<0.05$$
 
 ## Weight of evidence
 
@@ -209,10 +197,10 @@ A statistically significant result is four times more likely under $H_1$ than un
 
 The significant result therefore provides 4:1 evidence in favor of $H_1$.
 
-Notice that this is exactly the same weight of evidence as observing two heads in the coin-flip example:
+Notice that this is exactly the same weight of evidence as observing two heads in the coin flip example:
 
 $$\boxed{
-LR_{10}^{\text{coin}}=
+LR_{10}^{\text{coin flip}}=
 LR_{10}^{\text{20\% power}}=4
 }$$
 
@@ -222,7 +210,7 @@ Knowing only that the study produced $p<0.05$, the weight of evidence is the sam
 
 Again suppose our prior odds are
 
-$$H_1:H_0=1:9$$
+$$\boxed{H_1:H_0=1:9}$$
 
 The posterior odds are
 
@@ -236,7 +224,7 @@ Therefore,
 
 $$\boxed{H_1:H_0=4:9}$$
 
-Just as in the coin-flip example,
+Just as in the coin flip example,
 
 $$\boxed{
 1:9
@@ -248,7 +236,7 @@ Converting these posterior odds into a posterior probability,
 
 $$P(H_1\mid D)
 =
-\frac{4}{4+9}
+\frac{\frac{4}{9}}{1 + \frac{4}{9}}
 =
 \frac{4}{13}
 \approx 0.31$$
@@ -261,7 +249,7 @@ Likewise,
 
 $$P(H_0\mid D)
 =
-\frac{9}{4+9}
+\frac{\frac{9}{4}}{1 + \frac{9}{4}}
 =
 \frac{9}{13}
 \approx 0.69$$
@@ -282,11 +270,11 @@ It does not tell us the posterior odds of $H_1$ versus $H_0$.
 
 To calculate posterior odds, we need three quantities:
 
-$$P(D\mid H_0),
+$$P(p<0.05\mid H_0)
 \qquad
-P(D\mid H_1),
+P(p<0.05\mid H_1)
 \qquad
-\text{and the prior odds}$$
+\frac{P(H_1)}{P(H_0)}$$
 
 The first two determine the likelihood ratio:
 
@@ -295,15 +283,13 @@ $$LR_{10}
 \frac{P(D\mid H_1)}
      {P(D\mid H_0)}$$
 
+The last one is the prior odds.
+
 We then combine the likelihood ratio with the prior odds to obtain the posterior odds.
 
 # Example 3: Statistical significance in an 80%-powered study
 
 Now consider the same statistical test, but suppose the study has 80% power.
-
-The significance threshold remains
-
-$$\alpha=0.05$$
 
 Therefore,
 
@@ -312,10 +298,6 @@ $$P(D\mid H_0)=0.05$$
 But with 80% power,
 
 $$P(D\mid H_1)=0.80$$
-
-Again, suppose we obtain a statistically significant result:
-
-$$p<0.05$$
 
 ## Weight of evidence
 
@@ -341,19 +323,19 @@ The observation therefore provides 16:1 evidence in favor of $H_1$.
 Compare this with the low-powered study:
 
 $$\begin{aligned}
-20\%\text{ power}:&\quad LR_{10}=4,\\
-80\%\text{ power}:&\quad LR_{10}=16.
+20\%\text{ power}:&\quad LR_{10}=4\\
+80\%\text{ power}:&\quad LR_{10}=16
 \end{aligned}$$
 
 The same criterion,
 
-$$p<0.05,$$
+$$p<0.05$$
 
 can therefore correspond to very different weights of evidence depending on the power of the experiment.
 
 ## Posterior odds
 
-Keep the prior odds fixed at
+Keep the prior odds at
 
 $$H_1:H_0=1:9$$
 
@@ -381,7 +363,7 @@ Converting these posterior odds into a posterior probability,
 
 $$P(H_1\mid D)
 =
-\frac{16}{16+9}
+\frac{\frac{16}{9}}{1+\frac{16}{9}}
 =
 \frac{16}{25}
 =
@@ -395,7 +377,7 @@ Similarly,
 
 $$P(H_0\mid D)
 =
-\frac{9}{16+9}
+\frac{\frac{9}{16}}{1+\frac{9}{16}}
 =
 \frac{9}{25}
 =
@@ -465,7 +447,7 @@ LR_{10}
 
 For a statistically significant result considered simply as the binary event
 
-$$D=\{p<\alpha\},$$
+$$D=p<\alpha$$
 
 this becomes
 
@@ -479,7 +461,7 @@ Thus, with $\alpha=0.05$,
 
 $$20\%\text{ power}
 \quad\Longrightarrow\quad
-LR_{10}=4,$$
+LR_{10}=4$$
 
 whereas
 
@@ -505,7 +487,7 @@ $$\boxed{
 4:9
 }$$
 
-for both the coin-flip example and the 20%-powered study, corresponding to
+for both the coin flip example and the 20%-powered study, corresponding to
 
 $$\boxed{
 P(H_1\mid D)=\frac{4}{13}\approx0.31
