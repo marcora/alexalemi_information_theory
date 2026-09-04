@@ -783,6 +783,8 @@ $$\underbrace{H(X)}_{\text{total information}}
 
 $H(X\mid Y)$ represents the information in $X$ that remains after $Y$ is known, and it is regarded as “noise” relative to the task defined by $Y$. In this example, handwriting style is noise for digit classification but signal for writer identification.
 
+\[what is signal and what is noise depends on the inferential question, hypothesis space, and background information\]
+
 ![](images/clipboard-3196650230.png)
 
 ![](images/clipboard-1660565837.png)
